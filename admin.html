@@ -66,7 +66,8 @@
                 <div id="view-products" class="view">
                     <div class="view-header">
                         <h2>Catálogo de Productos</h2>
-                        <button class="btn btn--primary" id="btn-add-product">
+                        <button class="btn btn--primary" id="btn-add-product"
+                            onclick="window.location.href='admin-product.html'">
                             <i data-lucide="plus"></i> Nuevo Producto
                         </button>
                     </div>
@@ -110,93 +111,7 @@
         </main>
     </div>
 
-    <!-- Product Modal -->
-    <div id="product-modal" class="modal hidden">
-        <div class="modal-content">
-            <h2 id="modal-title">Editar Producto</h2>
-            <form id="product-form">
-                <input type="hidden" id="prod-id">
-
-                <div class="form-group">
-                    <label>Título</label>
-                    <input type="text" id="prod-title" required>
-                </div>
-
-                <div class="form-group">
-                    <label>Descripción</label>
-                    <textarea id="prod-description" rows="3"
-                        placeholder="Descripción detallada del diseño..."></textarea>
-                </div>
-
-                <div class="form-row">
-                    <div class="form-group">
-                        <label>Precio ($)</label>
-                        <input type="number" step="0.01" id="prod-price" required>
-                    </div>
-                    <div class="form-group">
-                        <label>Precio Anterior ($)</label>
-                        <input type="number" step="0.01" id="prod-old-price">
-                    </div>
-                    <div class="form-group">
-                        <label>Categoría</label>
-                        <select id="prod-category">
-                            <option value="Anime">Anime</option>
-                            <option value="Animales">Animales</option>
-                            <option value="Flores">Flores</option>
-                            <option value="Logos">Logos</option>
-                        </select>
-                    </div>
-                </div>
-
-                <div class="form-row">
-                    <div class="form-group">
-                        <label>Etiqueta (Badge)</label>
-                        <input type="text" id="prod-badge" placeholder="Oferta, Nuevo...">
-                    </div>
-                    <div class="form-group">
-                        <label>Color Etiqueta</label>
-                        <select id="prod-badge-color">
-                            <option value="red">Rojo</option>
-                            <option value="green">Verde</option>
-                            <option value="blue">Azul</option>
-                        </select>
-                    </div>
-                    <div class="form-group">
-                        <label>Color Fondo (CSS)</label>
-                        <input type="text" id="prod-image-color" placeholder="#f3f4f6">
-                    </div>
-                </div>
-
-                <div class="form-row">
-                    <div class="form-group">
-                        <label>Dimensiones</label>
-                        <input type="text" id="prod-size" placeholder="10x10 cm">
-                    </div>
-                    <div class="form-group">
-                        <label>Puntadas</label>
-                        <input type="number" id="prod-stitches" placeholder="5400">
-                    </div>
-                    <div class="form-group">
-                        <label>Formatos</label>
-                        <input type="text" id="prod-formats" placeholder="PES, DST, JEF...">
-                    </div>
-                </div>
-
-                <div class="form-group">
-                    <label>Imagen (URL o Subir)</label>
-                    <div class="image-upload-zone">
-                        <input type="text" id="prod-image" placeholder="URL de la imagen (omitir si subes archivo)">
-                        <input type="file" id="prod-image-file" accept="image/*">
-                    </div>
-                </div>
-
-                <div class="form-actions">
-                    <button type="button" class="btn btn--secondary" onclick="closeModal()">Cancelar</button>
-                    <button type="submit" class="btn btn--primary">Guardar</button>
-                </div>
-            </form>
-        </div>
-    </div>
+    <!-- Product Modal Removed -->
 
     <script type="module" src="js/admin.js"></script>
 </body>

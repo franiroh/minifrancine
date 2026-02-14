@@ -1,0 +1,182 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Editar Producto - Admin</title>
+    <link rel="stylesheet" href="css/main.css">
+    <link rel="stylesheet" href="css/components.css">
+    <link rel="stylesheet" href="css/admin.css">
+    <link
+        href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&family=DM+Sans:wght@400;500;700&display=swap"
+        rel="stylesheet">
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <script src="https://unpkg.com/lucide@latest"></script>
+</head>
+
+<body>
+    <div class="admin-layout">
+        <aside class="sidebar">
+            <div class="sidebar__logo">
+                <i data-lucide="shield"></i>
+                <span>Admin</span>
+            </div>
+            <nav class="sidebar__nav">
+                <button class="nav-item" onclick="window.location.href='admin.html'">
+                    <i data-lucide="arrow-left"></i> Volver al Dashboard
+                </button>
+            </nav>
+        </aside>
+
+        <main class="main-content">
+            <header class="topbar">
+                <!-- Reusing topbar class from admin.html for consistency, 
+                     but we want custom actions here. 
+                     Let's use a simpler header inside content-area or just override topbar content -->
+                <h1 id="page-title">Nuevo Producto</h1>
+                <div class="user-info" id="admin-email">Admin</div> <!-- Placceholder or fetch -->
+            </header>
+
+            <div id="content-area">
+                <div class="page-header">
+                    <!-- Title is now in topbar, maybe move actions there or keep here? 
+                          Let's keep consistent with admin.html: Topbar has Title + User. 
+                          Content Area has specific Page Header/Actions. -->
+                    <div>
+                        <h2 style="font-size: 24px; font-weight: 700; margin-bottom: 8px;">Detalles del Producto</h2>
+                        <p class="text-gray">Completa la información para publicar el diseño.</p>
+                    </div>
+                    <div class="actions">
+                        <button type="button" class="btn btn--secondary"
+                            onclick="window.location.href='admin.html'">Cancelar</button>
+                        <button type="button" class="btn btn--primary" id="btn-save">Guardar Producto</button>
+                    </div>
+                </div>
+
+                <form id="product-form" class="edit-form">
+                    <input type="hidden" id="prod-id">
+
+                    <div class="card">
+                        <h3>Información Básica</h3>
+                        <div class="form-group">
+                            <label>Título</label>
+                            <input type="text" id="prod-title" required>
+                        </div>
+
+                        <div class="form-group">
+                            <label>Descripción</label>
+                            <textarea id="prod-description" rows="4"
+                                placeholder="Descripción detallada del diseño..."></textarea>
+                        </div>
+
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label>Precio ($)</label>
+                                <input type="number" step="0.01" id="prod-price" required>
+                            </div>
+                            <div class="form-group">
+                                <label>Precio Anterior ($)</label>
+                                <input type="number" step="0.01" id="prod-old-price">
+                            </div>
+                            <div class="form-group">
+                                <label>Categoría</label>
+                                <select id="prod-category">
+                                    <option value="Anime">Anime</option>
+                                    <option value="Animales">Animales</option>
+                                    <option value="Flores">Flores</option>
+                                    <option value="Logos">Logos</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="card" style="margin-top: 2rem;">
+                        <h3>Imágenes del Producto</h3>
+                        <p class="text-sm text-gray">Sube varias imágenes. La primera será la principal.</p>
+
+                        <div class="image-gallery" id="image-gallery">
+                            <!-- Dynamic Images -->
+                        </div>
+
+                        <div class="drop-zone" id="images-drop-zone">
+                            <i data-lucide="upload-cloud"
+                                style="width: 32px; height: 32px; margin-bottom: 0.5rem; color: #9ca3af;"></i>
+                            <p>Arrastra imágenes aquí o haz clic para subir</p>
+                            <input type="file" id="prod-images-input" accept="image/*" multiple style="display: none;">
+                        </div>
+
+                        <!-- Fallback backward compatibility for single color/gradient -->
+                        <div class="form-group"
+                            style="margin-top: 1.5rem; border-top: 1px solid #eee; padding-top: 1rem;">
+                            <label>Color Fondo (CSS Fallback)</label>
+                            <input type="text" id="prod-image-color" placeholder="#f3f4f6 or linear-gradient(...)">
+                        </div>
+                    </div>
+
+                    <div class="card" style="margin-top: 2rem;">
+                        <h3>Archivo Digital (Privado)</h3>
+                        <div class="form-group">
+                            <label>Archivo del Producto (.zip, .rar, etc)</label>
+
+                            <div id="current-file-display" class="hidden">
+                                <div class="file-status-box">
+                                    <span id="current-filename">archivo.zip</span>
+                                    <button type="button" class="btn-icon text-red" id="btn-delete-file"><i
+                                            data-lucide="trash-2"></i></button>
+                                </div>
+                            </div>
+
+                            <div class="drop-zone" id="file-drop-zone">
+                                <i data-lucide="file"
+                                    style="width: 32px; height: 32px; margin-bottom: 0.5rem; color: #9ca3af;"></i>
+                                <p>Subir archivo digital del producto</p>
+                                <input type="file" id="prod-file-input" style="display: none;">
+                            </div>
+                        </div>
+
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label>Formatos Incluidos</label>
+                                <input type="text" id="prod-formats" placeholder="PES, DST, JEF...">
+                            </div>
+                            <div class="form-group">
+                                <label>Dimensiones</label>
+                                <input type="text" id="prod-size" placeholder="10x10 cm">
+                            </div>
+                            <div class="form-group">
+                                <label>Puntadas</label>
+                                <input type="number" id="prod-stitches" placeholder="5400">
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="card" style="margin-top: 2rem;">
+                        <h3>Etiquetas</h3>
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label>Etiqueta (Badge)</label>
+                                <input type="text" id="prod-badge" placeholder="Oferta, Nuevo...">
+                            </div>
+                            <div class="form-group">
+                                <label>Color Etiqueta</label>
+                                <select id="prod-badge-color">
+                                    <option value="red">Rojo</option>
+                                    <option value="green">Verde</option>
+                                    <option value="blue">Azul</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+
+                </form>
+            </div> <!-- End content-area -->
+        </main>
+    </div>
+
+    <!-- Modals or Toasts could go here -->
+
+    <script type="module" src="js/admin-product.js"></script>
+</body>
+
+</html>

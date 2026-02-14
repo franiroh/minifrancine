@@ -2,10 +2,7 @@
 import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js/+esm'
 import { getUser, signOut, fetchProducts } from './api.js';
 
-// Re-init Supabase locally here or expose from API if easier, 
-// using API is better but need to export supabase instance or add Admin methods there.
-// For expediency, we'll use the API methods we are about to add.
-import { fetchAllOrders, fetchAdminStats, createProduct, updateProduct, deleteProduct, uploadProductImage, fetchProductById } from './api.js';
+import { fetchAllOrders, fetchAdminStats, deleteProduct } from './api.js';
 
 let currentView = 'dashboard';
 
@@ -40,15 +37,6 @@ async function init() {
     document.getElementById('exit-admin-btn').onclick = () => {
         window.location.href = 'index.html';
     };
-
-    // Modal Close
-    window.closeModal = () => document.getElementById('product-modal').classList.add('hidden');
-
-    // Add Product Btn
-    document.getElementById('btn-add-product').onclick = () => openProductModal();
-
-    // Form Submit
-    document.getElementById('product-form').onsubmit = handleProductSubmit;
 }
 
 function setupNavigation() {
@@ -85,12 +73,12 @@ async function loadProducts() {
 
     tbody.innerHTML = products.map(p => `
         <tr>
-            <td><img src="${p.imageColor}" alt="${p.title}" class="img-preview"></td>
+            <td><img src="${p.mainImage || p.imageColor}" alt="${p.title}" class="img-preview" style="object-fit: cover;"></td>
             <td><strong>${p.title}</strong></td>
             <td>$${p.price}</td>
             <td><span class="tag">${p.category}</span></td>
             <td>
-                <button class="btn-icon" onclick="openProductModal('${p.id}')"><i data-lucide="edit-3"></i></button>
+                <button class="btn-icon" onclick="window.location.href='admin-product.html?id=${p.id}'"><i data-lucide="edit-3"></i></button>
                 <button class="btn-icon" onclick="deleteProductHandler('${p.id}')"><i data-lucide="trash-2"></i></button>
             </td>
         </tr>
@@ -116,89 +104,6 @@ async function loadOrders() {
     if (window.lucide) window.lucide.createIcons();
 }
 
-// Product Management
-window.openProductModal = async (productId = null) => {
-    const modal = document.getElementById('product-modal');
-    const form = document.getElementById('product-form');
-
-    if (productId) {
-        document.getElementById('modal-title').textContent = 'Editar Producto';
-        document.getElementById('prod-id').value = productId;
-
-        // Fetch full product data
-        const p = await fetchProductById(productId);
-        if (p) {
-            document.getElementById('prod-title').value = p.title || '';
-            document.getElementById('prod-description').value = p.description || '';
-            document.getElementById('prod-price').value = p.price || 0;
-            document.getElementById('prod-old-price').value = p.oldPrice || '';
-            document.getElementById('prod-category').value = p.category || 'Anime';
-            document.getElementById('prod-badge').value = p.badge || '';
-            document.getElementById('prod-badge-color').value = p.badgeColor || 'red';
-            document.getElementById('prod-image-color').value = p.imageColor || '#f3f4f6';
-            document.getElementById('prod-size').value = p.size || '';
-            document.getElementById('prod-stitches').value = p.stitches || '';
-            document.getElementById('prod-formats').value = p.formats || '';
-            document.getElementById('prod-image').value = p.imageColor || ''; // imageColor is often used for the URL in this mockup
-        }
-    } else {
-        document.getElementById('modal-title').textContent = 'Nuevo Producto';
-        form.reset();
-        document.getElementById('prod-id').value = '';
-    }
-
-    modal.classList.remove('hidden');
-};
-
-async function handleProductSubmit(e) {
-    e.preventDefault();
-    const id = document.getElementById('prod-id').value;
-    const title = document.getElementById('prod-title').value;
-    const description = document.getElementById('prod-description').value;
-    const price = parseFloat(document.getElementById('prod-price').value);
-    const old_price = parseFloat(document.getElementById('prod-old-price').value) || null;
-    const category = document.getElementById('prod-category').value;
-    const badge = document.getElementById('prod-badge').value;
-    const badge_color = document.getElementById('prod-badge-color').value;
-    const image_color = document.getElementById('prod-image-color').value;
-    const size = document.getElementById('prod-size').value;
-    const stitches = parseInt(document.getElementById('prod-stitches').value) || null;
-    const formats = document.getElementById('prod-formats').value;
-
-    let image = document.getElementById('prod-image').value;
-    const imageFile = document.getElementById('prod-image-file').files[0];
-
-    // Upload Image if present
-    if (imageFile) {
-        const uploadRes = await uploadProductImage(imageFile);
-        if (uploadRes) image = uploadRes;
-    }
-
-    const data = {
-        title,
-        description,
-        price,
-        old_price,
-        category,
-        badge,
-        badge_color,
-        image_color: image || image_color, // Use uploaded image URL or the color/url field
-        size,
-        stitches,
-        formats
-    };
-
-    if (id) {
-        await updateProduct(id, data);
-    } else {
-        await createProduct(data);
-    }
-
-    window.closeModal();
-    loadProducts();
-    loadDashboard();
-}
-
 window.deleteProductHandler = async (id) => {
     if (confirm('¿Seguro que quieres eliminar este producto?')) {
         await deleteProduct(id);
@@ -206,10 +111,6 @@ window.deleteProductHandler = async (id) => {
     }
 };
 
-// Temp Supabase instance needed for auth check inside init, 
-// but we can import from API if we export it.
-// Let's rely on api.js functions for everything to be clean.
-// Hack for the role check inside init:
-import { supabase } from './api.js'; // Need to export supabase from api.js
+import { supabase } from './api.js';
 
 document.addEventListener('DOMContentLoaded', init);

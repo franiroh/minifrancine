@@ -54,6 +54,7 @@ export async function fetchProductById(id) {
         price: data.price,
         oldPrice: data.old_price,
         imageColor: data.image_color,
+        mainImage: data.main_image,
         badge: data.badge,
         badgeColor: data.badge_color,
         size: data.size,
@@ -328,11 +329,13 @@ export async function fetchAdminStats() {
     }
 }
 
+
 export async function createProduct(productData) {
     const { data, error } = await supabase
         .from('products')
         .insert(productData)
         .select()
+        .single()
     return { data, error }
 }
 
@@ -342,10 +345,14 @@ export async function updateProduct(id, productData) {
         .update(productData)
         .eq('id', id)
         .select()
+        .single()
     return { data, error }
 }
 
 export async function deleteProduct(id) {
+    // Cascading delete should handle images/files from DB, 
+    // but we might want to clean up storage too. 
+    // For now, relying on DB cascade for records.
     const { error } = await supabase
         .from('products')
         .delete()
@@ -368,5 +375,114 @@ export async function uploadProductImage(file) {
         .from('product-images')
         .getPublicUrl(fileName);
 
-    return publicUrl;
+    return { publicUrl, storagePath: fileName };
 }
+
+export async function saveProductImageRecord(productId, storagePath, publicUrl) {
+    const { error } = await supabase
+        .from('product_images')
+        .insert({
+            product_id: productId,
+            storage_path: storagePath,
+            public_url: publicUrl
+        })
+    return { error }
+}
+
+export async function fetchProductImages(productId) {
+    const { data, error } = await supabase
+        .from('product_images')
+        .select('*')
+        .eq('product_id', productId)
+        .order('created_at', { ascending: true })
+
+    if (error) {
+        console.error('Error fetching images:', error)
+        return []
+    }
+    return data
+}
+
+export async function deleteProductImage(imageId) {
+    // Get path first to delete from storage
+    const { data: img, error: fetchError } = await supabase
+        .from('product_images')
+        .select('storage_path')
+        .eq('id', imageId)
+        .single()
+
+    if (img) {
+        await supabase.storage
+            .from('product-images')
+            .remove([img.storage_path])
+    }
+
+    const { error } = await supabase
+        .from('product_images')
+        .delete()
+        .eq('id', imageId)
+    return { error }
+}
+
+export async function uploadProductFile(file) {
+    const fileName = `${Date.now()}-${file.name}`;
+    const { data, error } = await supabase.storage
+        .from('product-files')
+        .upload(fileName, file);
+
+    if (error) {
+        console.error('File Upload Error', error);
+        return null;
+    }
+    return { storagePath: fileName, filename: file.name };
+}
+
+export async function saveProductFileRecord(productId, storagePath, filename) {
+    // Upsert: One file per product for now? Or multiple? 
+    // Schema allows multiple, but UI might treat as one. 
+    // Let's Insert for now, UI can manage deletion of old ones.
+    const { error } = await supabase
+        .from('product_files')
+        .insert({
+            product_id: productId,
+            storage_path: storagePath,
+            filename: filename
+        })
+    return { error }
+}
+
+export async function fetchProductFile(productId) {
+    const { data, error } = await supabase
+        .from('product_files')
+        .select('*')
+        .eq('product_id', productId)
+        .limit(1) // Just get one for now
+        .maybeSingle()
+
+    if (error) {
+        console.error('Error fetching file record', error)
+        return null
+    }
+    return data;
+}
+
+export async function deleteProductFile(fileRowId) {
+    const { data: fileRec } = await supabase
+        .from('product_files')
+        .select('storage_path')
+        .eq('id', fileRowId)
+        .single()
+
+    if (fileRec) {
+        await supabase.storage
+            .from('product-files')
+            .remove([fileRec.storage_path])
+    }
+
+    const { error } = await supabase
+        .from('product_files')
+        .delete()
+        .eq('id', fileRowId)
+    return { error }
+}
+
