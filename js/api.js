@@ -290,9 +290,7 @@ export async function downloadProductFile(productId) {
 
 export async function fetchAllOrders() {
     const { data, error } = await supabase
-        .from('orders')
-        .select('*')
-        .order('created_at', { ascending: false })
+        .rpc('get_admin_orders')
 
     if (error) {
         console.error('Error fetching all orders:', error)
