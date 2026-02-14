@@ -20,10 +20,20 @@ async function init() {
 
     // 3. Fetch & Render Products
     products = await fetchProducts();
-    renderCatalog();
+
+    // Check URL for category filter
+    const urlParams = new URLSearchParams(window.location.search);
+    const initialCategory = urlParams.get('category');
+
+    if (initialCategory) {
+        filterProducts(initialCategory);
+    } else {
+        renderCatalog(products); // Render all
+    }
 
     // 4. Setup Listeners
     setupAuthListener();
+    setupFilterListeners();
 
     // Listen for state updates from other components
     window.addEventListener('cart-updated', () => {
@@ -31,8 +41,57 @@ async function init() {
     });
 
     window.addEventListener('favorites-updated', () => {
-        renderCatalog(); // Re-render to update hearts
+        const activeCategory = document.querySelector('.filter-chip--active').textContent;
+        // Re-render keeping current filter
+        if (activeCategory === 'Todos') {
+            renderCatalog(products);
+        } else {
+            const filtered = products.filter(p => p.category === activeCategory);
+            renderCatalog(filtered);
+        }
     });
+}
+
+function setupFilterListeners() {
+    const chips = document.querySelectorAll('.filter-chip');
+    chips.forEach(chip => {
+        chip.addEventListener('click', () => {
+            // Update UI
+            chips.forEach(c => c.classList.remove('filter-chip--active'));
+            chip.classList.add('filter-chip--active');
+
+            // Filter Data
+            const category = chip.textContent;
+            filterProducts(category);
+        });
+    });
+}
+
+function filterProducts(category) {
+    // Update UI active state if function called manually (e.g. from URL)
+    const chips = document.querySelectorAll('.filter-chip');
+    chips.forEach(c => {
+        if (c.textContent === category) {
+            c.classList.add('filter-chip--active');
+        } else {
+            c.classList.remove('filter-chip--active');
+        }
+    });
+
+    // Special case for "Todos" or when category not found in chips (optional)
+    if (category === 'Todos' || !category) {
+        // Reset UI to 'Todos' if necessary
+        const allChip = Array.from(chips).find(c => c.textContent === 'Todos');
+        if (allChip) {
+            chips.forEach(c => c.classList.remove('filter-chip--active'));
+            allChip.classList.add('filter-chip--active');
+        }
+        renderCatalog(products);
+        return;
+    }
+
+    const filtered = products.filter(p => p.category === category);
+    renderCatalog(filtered);
 }
 
 function setupAuthListener() {
@@ -40,20 +99,24 @@ function setupAuthListener() {
         const user = session ? session.user : null;
         updateNavbarAuth(user);
         await loadFavorites(user);
-        renderCatalog();
+
+        // Re-render with current filter
+        const activeChip = document.querySelector('.filter-chip--active');
+        const currentCategory = activeChip ? activeChip.textContent : 'Todos';
+        filterProducts(currentCategory);
     });
 }
 
-function renderCatalog() {
+function renderCatalog(items) {
     const grid = document.getElementById('catalog-grid');
     if (!grid) return;
 
-    if (products.length === 0) {
-        grid.innerHTML = '<p>No se encontraron productos.</p>';
+    if (!items || items.length === 0) {
+        grid.innerHTML = '<p class="col-span-full text-center py-12 text-gray-500">No se encontraron productos en esta categoría.</p>';
         return;
     }
 
-    grid.innerHTML = products.map(product => `
+    grid.innerHTML = items.map(product => `
     <div class="product-card" data-id="${product.id}">
       <div class="product-card__image" style="background: ${product.imageColor};">
         ${product.badge ? `<span class="product-card__badge ${product.badgeColor === 'green' ? 'product-card__badge--green' : ''}">${product.badge}</span>` : ''}

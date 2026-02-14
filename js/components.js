@@ -12,7 +12,7 @@ export const loadComponents = async () => {
       </div>
       <div class="navbar__links">
         <a href="index.html" class="navbar__link ${window.location.pathname.includes('index.html') || window.location.pathname === '/' ? 'navbar__link--active' : ''}">Catálogo</a>
-        <a href="#" class="navbar__link">Categorías</a>
+        <a href="categories.html" class="navbar__link ${window.location.pathname.includes('categories.html') ? 'navbar__link--active' : ''}">Categorías</a>
         <a href="#" class="navbar__link">Novedades</a>
         <a href="#" class="navbar__link">Ayuda</a>
       </div>
