@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PatchFiles — Login</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:wght@700;800&family=DM+Sans:wght@400;500;600;700&display=swap"
+        rel="stylesheet">
+    <script src="https://unpkg.com/lucide@latest"></script>
+
+    <link rel="stylesheet" href="css/main.css">
+    <link rel="stylesheet" href="css/components.css">
+    <link rel="stylesheet" href="css/login.css">
+</head>
+
+<body>
+
+    <div class="page">
+
+        <div id="navbar-placeholder"></div>
+
+        <section class="login-body">
+            <div class="login-card">
+                <div class="login-card__header">
+                    <div class="login-card__logo">
+                        <i data-lucide="scissors" style="color: #FF6B6B;"></i>
+                        <span>PatchFiles</span>
+                    </div>
+                    <h2 id="auth-title">Bienvenido de nuevo</h2>
+                    <p id="auth-desc">Inicia sesión para acceder a tus diseños</p>
+                </div>
+
+                <div class="login-card__tabs">
+                    <button class="login-card__tab login-card__tab--active" data-tab="login">Iniciar Sesión</button>
+                    <button class="login-card__tab" data-tab="register">Registrarse</button>
+                </div>
+
+                <div class="login-card__form" id="login-form">
+                    <div class="form-field">
+                        <label>Email</label>
+                        <div class="form-input">
+                            <i data-lucide="mail"></i>
+                            <input type="email" id="login-email" placeholder="tu@email.com">
+                        </div>
+                    </div>
+                    <div class="form-field">
+                        <div class="form-field__header">
+                            <label>Contraseña</label>
+                            <a href="#" class="form-field__link">¿Olvidaste tu contraseña?</a>
+                        </div>
+                        <div class="form-input">
+                            <i data-lucide="lock"></i>
+                            <input type="password" id="login-password" placeholder="••••••••">
+                            <i data-lucide="eye-off" class="form-input__trail"></i>
+                        </div>
+                    </div>
+                    <button id="login-btn" class="btn btn--primary btn--block btn--lg">Iniciar Sesión</button>
+                </div>
+
+                <div class="login-card__form hidden" id="register-form">
+                    <div class="form-field">
+                        <label>Email</label>
+                        <div class="form-input">
+                            <i data-lucide="mail"></i>
+                            <input type="email" id="register-email" placeholder="tu@email.com">
+                        </div>
+                    </div>
+                    <div class="form-field">
+                        <div class="form-field__header">
+                            <label>Contraseña</label>
+                        </div>
+                        <div class="form-input">
+                            <i data-lucide="lock"></i>
+                            <input type="password" id="register-password" placeholder="••••••••">
+                            <i data-lucide="eye-off" class="form-input__trail"></i>
+                        </div>
+                    </div>
+                    <button id="register-btn" class="btn btn--primary btn--block btn--lg">Registrarse</button>
+                </div>
+
+                <div class="login-card__divider">
+                    <hr><span>o continúa con</span>
+                    <hr>
+                </div>
+
+                <div class="login-card__social">
+                    <button class="btn btn--outline btn--block">Google</button>
+                    <button class="btn btn--outline btn--block">Facebook</button>
+                </div>
+            </div>
+        </section>
+
+        <div id="footer-placeholder"></div>
+
+    </div>
+
+    <script type="module" src="js/auth.js"></script>
+</body>
+
+</html>

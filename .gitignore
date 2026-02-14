@@ -1,0 +1,14 @@
+# System Files
+.DS_Store
+Thumbs.db
+
+# IDES
+.vscode/
+.idea/
+*.swp
+*.bak
+
+# Temporary/Gemini
+.gemini/
+.agent/
+brain/

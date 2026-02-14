@@ -1,0 +1,173 @@
+/* ============================================================
+   Product Detail Styles
+   ============================================================ */
+
+/* --- Breadcrumb --- */
+.breadcrumb {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 12px 80px;
+    background: #F6F7F8;
+    font-size: 13px;
+    color: #9CA3AF;
+}
+
+.breadcrumb__sep {
+    color: #D1D5DB;
+}
+
+.breadcrumb__current {
+    color: #1A1A1A;
+    font-weight: 500;
+}
+
+/* --- Detail --- */
+.detail {
+    display: flex;
+    gap: 48px;
+    padding: 48px 80px;
+}
+
+.detail__images {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+}
+
+.detail__main-img {
+    width: 100%;
+    height: 500px;
+    border-radius: 20px;
+    background-size: cover;
+    background-position: center;
+}
+
+.detail__thumbs {
+    display: flex;
+    gap: 12px;
+}
+
+.detail__thumb {
+    width: 80px;
+    height: 80px;
+    border-radius: 12px;
+    cursor: pointer;
+}
+
+.detail__thumb--active {
+    border: 2px solid #FF6B6B;
+}
+
+.detail__info {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 24px;
+}
+
+.detail__cat-badge {
+    display: inline-block;
+    padding: 4px 12px;
+    border-radius: 12px;
+    background: #FFF0F0;
+    color: #FF6B6B;
+    font-size: 12px;
+    font-weight: 600;
+    width: fit-content;
+}
+
+.detail__title {
+    font-family: 'Bricolage Grotesque', serif;
+    font-size: 32px;
+    font-weight: 800;
+}
+
+.detail__rating {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.detail__star {
+    font-size: 18px;
+    color: #E5E7EB;
+}
+
+.detail__star--filled {
+    color: #FCD34D;
+}
+
+.detail__rating-text {
+    font-size: 14px;
+    color: #6B7280;
+}
+
+.detail__desc {
+    font-size: 15px;
+    color: #6B7280;
+    line-height: 1.6;
+}
+
+.detail__price {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.detail__price-current {
+    font-family: 'Bricolage Grotesque', serif;
+    font-size: 36px;
+    font-weight: 800;
+}
+
+.detail__price-old {
+    font-size: 18px;
+    color: #D1D5DB;
+    text-decoration: line-through;
+}
+
+.detail__divider {
+    border: none;
+    height: 1px;
+    background: #F3F4F6;
+}
+
+.detail__specs {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+}
+
+.detail__specs-title {
+    font-family: 'Bricolage Grotesque', serif;
+    font-size: 18px;
+    font-weight: 700;
+}
+
+.detail__specs-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+}
+
+.detail__spec-item {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    padding: 14px;
+    border-radius: 12px;
+    background: #F6F7F8;
+}
+
+.detail__spec-label {
+    font-size: 12px;
+    font-weight: 500;
+    color: #9CA3AF;
+}
+
+.detail__spec-value {
+    font-size: 15px;
+    font-weight: 600;
+}

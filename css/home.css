@@ -1,0 +1,271 @@
+/* ============================================================
+   Home / Catalog Styles
+   ============================================================ */
+
+/* --- Hero --- */
+.hero {
+    display: flex;
+    align-items: center;
+    height: 480px;
+    padding: 0 80px;
+    background: linear-gradient(135deg, #FFF5F5 0%, #FFFFFF 60%, #FFF0F5 100%);
+}
+
+.hero__left {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    gap: 24px;
+}
+
+.hero__badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 6px 14px;
+    border-radius: 20px;
+    background: #FFF0F0;
+    color: #FF6B6B;
+    font-size: 13px;
+    font-weight: 600;
+    width: fit-content;
+}
+
+.hero__badge i {
+    font-size: 14px;
+}
+
+.hero__title {
+    font-family: 'Bricolage Grotesque', serif;
+    font-size: 48px;
+    font-weight: 800;
+    line-height: 1.1;
+    max-width: 520px;
+}
+
+.hero__sub {
+    font-size: 18px;
+    color: #6B7280;
+    line-height: 1.5;
+    max-width: 480px;
+}
+
+.hero__ctas {
+    display: flex;
+    gap: 16px;
+}
+
+.hero__right {
+    width: 500px;
+    flex-shrink: 0;
+}
+
+.hero__image {
+    width: 500px;
+    height: 400px;
+    border-radius: 24px;
+    background: linear-gradient(135deg, #fecdd3, #fda4af, #fed7aa);
+}
+
+/* --- Trust Bar --- */
+.trust-bar {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 48px;
+    padding: 24px 80px;
+    background: #F6F7F8;
+}
+
+.trust-bar__item {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 14px;
+    font-weight: 500;
+}
+
+.trust-bar__item i {
+    font-size: 20px;
+    color: #FF6B6B;
+}
+
+/* --- Catalog --- */
+.catalog {
+    padding: 48px 80px;
+    display: flex;
+    flex-direction: column;
+    gap: 32px;
+}
+
+.catalog__header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.catalog__title {
+    font-family: 'Bricolage Grotesque', serif;
+    font-size: 32px;
+    font-weight: 700;
+}
+
+.catalog__count {
+    color: #9CA3AF;
+    font-size: 14px;
+}
+
+.catalog__filters {
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+}
+
+.filter-chip {
+    padding: 8px 20px;
+    border-radius: 20px;
+    font-size: 13px;
+    font-weight: 500;
+    color: #6B7280;
+    background: #F6F7F8;
+    transition: all 0.2s;
+}
+
+.filter-chip:hover {
+    background: #E5E7EB;
+}
+
+.filter-chip--active {
+    background: #1A1A1A;
+    color: #FFF;
+    font-weight: 600;
+}
+
+/* --- Product Grid & Card --- */
+.product-grid {
+    display: flex;
+    gap: 24px;
+    justify-content: center;
+    flex-wrap: wrap;
+}
+
+.product-card {
+    width: 296px;
+    border-radius: 16px;
+    border: 1px solid #F3F4F6;
+    background: #FFFFFF;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    cursor: pointer;
+    transition: transform 0.2s;
+}
+
+.product-card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+}
+
+.product-card__image {
+    height: 260px;
+    position: relative;
+    border-radius: 16px 16px 0 0;
+}
+
+.product-card__badge {
+    position: absolute;
+    top: 12px;
+    left: 12px;
+    padding: 4px 10px;
+    border-radius: 12px;
+    background: #FF6B6B;
+    color: #FFF;
+    font-size: 11px;
+    font-weight: 600;
+}
+
+.product-card__badge--green {
+    background: #22C55E;
+}
+
+.product-card__heart {
+    position: absolute;
+    top: 12px;
+    right: 12px;
+    width: 32px;
+    height: 32px;
+    border-radius: 16px;
+    background: rgba(255, 255, 255, 0.8);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.product-card__heart:hover {
+    background: #fff;
+    transform: scale(1.1);
+}
+
+.product-card__heart--active {
+    background: #fff;
+}
+
+.product-card__heart--active i {
+    fill: #FF6B6B;
+}
+
+.product-card__heart i {
+    font-size: 16px;
+    color: #FF6B6B;
+}
+
+.product-card__info {
+    padding: 16px;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    flex: 1;
+}
+
+.product-card__category {
+    font-size: 12px;
+    font-weight: 500;
+    color: #FF6B6B;
+}
+
+.product-card__title {
+    font-family: 'Bricolage Grotesque', serif;
+    font-size: 16px;
+    font-weight: 700;
+}
+
+.product-card__tags {
+    display: flex;
+    gap: 12px;
+    flex-wrap: wrap;
+}
+
+.tag {
+    padding: 3px 8px;
+    border-radius: 8px;
+    background: #F6F7F8;
+    font-size: 11px;
+    font-weight: 500;
+    color: #6B7280;
+}
+
+.product-card__price-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-top: auto;
+}
+
+.product-card__price {
+    font-family: 'Bricolage Grotesque', serif;
+    font-size: 22px;
+    font-weight: 800;
+}

@@ -1,0 +1,285 @@
+/* ============================================================
+   Components: Navbar, Footer, Buttons, Inputs
+   ============================================================ */
+
+/* --- Navbar --- */
+.navbar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    height: 72px;
+    padding: 0 80px;
+    background: #FFFFFF;
+    border-bottom: 1px solid #F3F4F6;
+    flex-shrink: 0;
+}
+
+.navbar__left {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.navbar__logo-icon {
+    font-size: 28px;
+    color: #FF6B6B;
+}
+
+.navbar__logo-text {
+    font-family: 'Bricolage Grotesque', serif;
+    font-size: 24px;
+    font-weight: 700;
+}
+
+.navbar__links {
+    display: flex;
+    align-items: center;
+    gap: 32px;
+}
+
+.navbar__link {
+    font-size: 15px;
+    font-weight: 500;
+    color: #6B7280;
+    transition: color 0.2s;
+}
+
+.navbar__link:hover {
+    color: #1A1A1A;
+}
+
+.navbar__link--active {
+    color: #1A1A1A;
+}
+
+.navbar__right {
+    display: flex;
+    align-items: center;
+    gap: 20px;
+}
+
+.navbar__icon {
+    font-size: 22px;
+    color: #6B7280;
+    cursor: pointer;
+}
+
+.navbar__cart-wrap {
+    position: relative;
+    width: 40px;
+    height: 40px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+}
+
+.navbar__cart-badge {
+    position: absolute;
+    top: 2px;
+    right: 0;
+    width: 18px;
+    height: 18px;
+    border-radius: 9px;
+    background: #FF6B6B;
+    color: #FFF;
+    font-size: 10px;
+    font-weight: 700;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.navbar__user-btn {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 8px 16px;
+    border-radius: 20px;
+    background: #F6F7F8;
+    font-size: 14px;
+    font-weight: 600;
+    color: #1A1A1A;
+}
+
+.navbar__user-btn i {
+    font-size: 18px;
+}
+
+/* --- Buttons --- */
+.btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    border-radius: 24px;
+    font-weight: 600;
+    font-size: 14px;
+    transition: all 0.2s;
+    white-space: nowrap;
+}
+
+.btn--sm {
+    padding: 8px 16px;
+    font-size: 13px;
+    gap: 6px;
+    border-radius: 20px;
+}
+
+.btn--lg {
+    padding: 14px 28px;
+    font-size: 16px;
+}
+
+.btn--block {
+    width: 100%;
+}
+
+.btn--primary {
+    background: #FF6B6B;
+    color: #FFF;
+}
+
+.btn--primary:hover {
+    background: #e85d5d;
+}
+
+.btn--outline {
+    border: 2px solid #1A1A1A;
+    color: #1A1A1A;
+    background: transparent;
+}
+
+.btn--outline:hover {
+    background: #F6F7F8;
+}
+
+.btn--dark {
+    background: #1A1A1A;
+    color: #FFF;
+    padding: 0 16px;
+    height: 44px;
+    border-radius: 12px;
+}
+
+.btn--paypal {
+    background: #0070BA;
+    color: #FFF;
+}
+
+.btn--paypal:hover {
+    background: #005a9e;
+}
+
+.btn i {
+    font-size: 14px;
+}
+
+.btn--lg i {
+    font-size: 18px;
+}
+
+/* --- Inputs --- */
+.input {
+    flex: 1;
+    height: 44px;
+    padding: 0 14px;
+    border-radius: 12px;
+    border: 1px solid #E5E7EB;
+    background: #FFFFFF;
+    font-size: 13px;
+    font-family: 'DM Sans', sans-serif;
+}
+
+.input::placeholder {
+    color: #D1D5DB;
+}
+
+/* --- Footer --- */
+.footer {
+    background: #1A1A1A;
+    color: #FFF;
+    padding: 64px 80px 32px;
+    margin-top: auto;
+}
+
+.footer__top {
+    display: flex;
+    justify-content: space-between;
+    gap: 40px;
+    margin-bottom: 48px;
+}
+
+.footer__brand {
+    max-width: 300px;
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+}
+
+.footer__brand-logo {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-family: 'Bricolage Grotesque', serif;
+    font-size: 24px;
+    font-weight: 700;
+}
+
+.footer__brand-logo i {
+    color: #FF6B6B;
+}
+
+.footer__brand-desc {
+    font-size: 14px;
+    color: #9CA3AF;
+    line-height: 1.5;
+}
+
+.footer__col {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+}
+
+.footer__col h4 {
+    font-size: 16px;
+    font-weight: 600;
+    color: #FFF;
+}
+
+.footer__col a {
+    font-size: 14px;
+    color: #9CA3AF;
+    transition: color 0.2s;
+}
+
+.footer__col a:hover {
+    color: #FFF;
+}
+
+.footer__bottom {
+    border-top: 1px solid #333;
+    padding-top: 32px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-size: 13px;
+    color: #6B7280;
+}
+
+.footer__social {
+    display: flex;
+    gap: 16px;
+}
+
+.footer__social i {
+    font-size: 18px;
+    color: #9CA3AF;
+    cursor: pointer;
+    transition: color 0.2s;
+}
+
+.footer__social i:hover {
+    color: #FFF;
+}

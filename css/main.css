@@ -1,0 +1,68 @@
+/* ============================================================
+   PatchFiles — Main Styles
+   Fonts: Bricolage Grotesque (headings), DM Sans (body)
+   ============================================================ */
+
+/* --- Reset & Base --- */
+*,
+*::before,
+*::after {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
+html {
+    font-size: 16px;
+    -webkit-font-smoothing: antialiased;
+}
+
+body {
+    font-family: 'DM Sans', sans-serif;
+    color: #1A1A1A;
+    background: #F0F0F0;
+    min-height: 100vh;
+}
+
+a {
+    text-decoration: none;
+    color: inherit;
+}
+
+button {
+    cursor: pointer;
+    border: none;
+    background: none;
+    font-family: inherit;
+}
+
+input {
+    font-family: inherit;
+    border: none;
+    outline: none;
+    background: transparent;
+    width: 100%;
+}
+
+/* --- Utilities --- */
+.hidden {
+    display: none !important;
+}
+
+.text-gray {
+    color: #6B7280;
+}
+
+.text-green {
+    color: #22C55E;
+}
+
+/* --- Page Container --- */
+.page {
+    max-width: 1440px;
+    margin: 0 auto;
+    background: #FFFFFF;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+}

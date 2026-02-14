@@ -1,0 +1,176 @@
+/* ============================================================
+   Login / Register Styles
+   ============================================================ */
+
+.login-body {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 48px 80px;
+}
+
+.login-card {
+    width: 440px;
+    padding: 40px;
+    border-radius: 24px;
+    background: #FFFFFF;
+    border: 1px solid #F3F4F6;
+    display: flex;
+    flex-direction: column;
+    gap: 28px;
+}
+
+.login-card__header {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.login-card__logo {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.login-card__logo i {
+    font-size: 28px;
+}
+
+.login-card__logo span {
+    font-family: 'Bricolage Grotesque', serif;
+    font-size: 24px;
+    font-weight: 700;
+}
+
+.login-card__header h2 {
+    font-family: 'Bricolage Grotesque', serif;
+    font-size: 24px;
+    font-weight: 700;
+}
+
+.login-card__header p {
+    color: #9CA3AF;
+    font-size: 14px;
+}
+
+.login-card__tabs {
+    display: flex;
+    height: 44px;
+    padding: 4px;
+    border-radius: 22px;
+    background: #F6F7F8;
+}
+
+.login-card__tab {
+    flex: 1;
+    border-radius: 18px;
+    font-size: 13px;
+    font-weight: 500;
+    color: #9CA3AF;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.login-card__tab--active {
+    background: #FFFFFF;
+    color: #1A1A1A;
+    font-weight: 600;
+}
+
+.login-card__form {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+}
+
+.form-field {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    flex: 1;
+}
+
+.form-field label {
+    font-size: 13px;
+    font-weight: 500;
+}
+
+.form-field__header {
+    display: flex;
+    justify-content: space-between;
+}
+
+.form-field__link {
+    font-size: 12px;
+    color: #FF6B6B;
+    font-weight: 500;
+}
+
+.form-input {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    height: 48px;
+    padding: 0 16px;
+    border-radius: 12px;
+    border: 1px solid #E5E7EB;
+}
+
+.form-input i {
+    font-size: 18px;
+    color: #9CA3AF;
+    flex-shrink: 0;
+}
+
+.form-input input {
+    font-size: 14px;
+}
+
+.form-input input::placeholder {
+    color: #D1D5DB;
+}
+
+.form-input__trail {
+    margin-left: auto;
+}
+
+.form-input--select {
+    cursor: pointer;
+}
+
+.form-input--select span {
+    flex: 1;
+}
+
+.login-card__divider {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+}
+
+.login-card__divider hr {
+    flex: 1;
+    border: none;
+    height: 1px;
+    background: #E5E7EB;
+}
+
+.login-card__divider span {
+    font-size: 12px;
+    color: #9CA3AF;
+    white-space: nowrap;
+}
+
+.login-card__social {
+    display: flex;
+    gap: 12px;
+}
+
+.login-card__social .btn {
+    flex: 1;
+    height: 48px;
+    border-radius: 12px;
+    font-weight: 500;
+}

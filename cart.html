@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PatchFiles — Carrito</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:wght@700;800&family=DM+Sans:wght@400;500;600;700&display=swap"
+        rel="stylesheet">
+    <script src="https://unpkg.com/lucide@latest"></script>
+
+    <link rel="stylesheet" href="css/main.css">
+    <link rel="stylesheet" href="css/components.css">
+    <link rel="stylesheet" href="css/cart.css">
+</head>
+
+<body>
+
+    <div class="page">
+
+        <div id="navbar-placeholder"></div>
+
+        <section class="cart-body">
+            <div class="cart-body__left">
+                <div class="cart-body__header">
+                    <h2 class="cart-body__title">Tu Carrito (<span id="cart-count">0</span>)</h2>
+                    <a href="#" id="clear-cart-btn" class="cart-body__clear">Vaciar carrito</a>
+                </div>
+
+                <div class="cart-items" id="cart-items-container">
+                    <!-- Cart items rendered by js/cart.js -->
+                </div>
+            </div>
+
+            <aside class="cart-summary">
+                <h3 class="cart-summary__title">Resumen del Pedido</h3>
+                <hr class="cart-summary__divider">
+                <div class="cart-summary__row"><span>Subtotal</span><span id="cart-subtotal">$0.00</span></div>
+                <div class="cart-summary__row"><span>Descuento</span><span
+                        class="cart-summary__val cart-summary__val--green">-$0.00</span></div>
+                <div class="cart-summary__row"><span>Impuestos</span><span class="cart-summary__val">$0.00</span></div>
+                <hr class="cart-summary__divider">
+                <div class="cart-summary__total">
+                    <span>Total</span>
+                    <span class="cart-summary__total-val" id="cart-total">$0.00</span>
+                </div>
+                <div class="cart-summary__coupon">
+                    <input type="text" placeholder="Código de descuento" class="input">
+                    <button class="btn btn--dark btn--sm">Aplicar</button>
+                </div>
+                <button class="btn btn--primary btn--block btn--lg" onclick="window.location.href='checkout.html'">
+                    <i data-lucide="credit-card"></i> Proceder al Pago
+                </button>
+            </aside>
+        </section>
+
+        <div id="footer-placeholder"></div>
+
+    </div>
+
+    <script type="module" src="js/cart.js"></script>
+</body>
+
+</html>

@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PatchFiles — Checkout</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:wght@700;800&family=DM+Sans:wght@400;500;600;700&display=swap"
+        rel="stylesheet">
+    <script src="https://unpkg.com/lucide@latest"></script>
+
+
+    <link rel="stylesheet" href="css/main.css">
+    <link rel="stylesheet" href="css/components.css">
+    <link rel="stylesheet" href="css/checkout.css">
+</head>
+
+<body>
+
+    <div class="page">
+
+        <div id="navbar-placeholder"></div>
+
+        <!-- Checkout Steps -->
+        <div class="checkout-steps">
+            <div class="checkout-steps__item checkout-steps__item--done">
+                <span class="checkout-steps__num checkout-steps__num--done"><i data-lucide="check"></i></span>
+                <span>Carrito</span>
+            </div>
+            <div class="checkout-steps__line"></div>
+            <div class="checkout-steps__item checkout-steps__item--active">
+                <span class="checkout-steps__num checkout-steps__num--active">2</span>
+                <span>Pago</span>
+            </div>
+            <div class="checkout-steps__line"></div>
+            <div class="checkout-steps__item">
+                <span class="checkout-steps__num">3</span>
+                <span>Confirmación</span>
+            </div>
+        </div>
+
+        <section class="checkout-body">
+            <div class="checkout-body__left">
+                <h2 class="checkout-body__title">Método de Pago</h2>
+
+                <div class="pay-methods">
+                    <div class="pay-method pay-method--active">
+                        <span class="pay-method__radio pay-method__radio--active"><span
+                                class="pay-method__dot"></span></span>
+                        <span class="pay-method__logo pay-method__logo--paypal">PayPal</span>
+                        <span>Pago seguro con PayPal</span>
+                    </div>
+                </div>
+
+                <h3 class="checkout-body__subtitle">Información de Facturación</h3>
+
+                <div class="checkout-form">
+                    <div class="checkout-form__row">
+                        <div class="form-field">
+                            <label>Nombre completo</label>
+                            <div class="form-input"><input type="text" placeholder="Tu nombre"></div>
+                        </div>
+                        <div class="form-field">
+                            <label>Email</label>
+                            <div class="form-input"><input type="email" placeholder="tu@email.com"></div>
+                        </div>
+                    </div>
+                    <div class="form-field">
+                        <label>País</label>
+                        <div class="form-input form-input--select">
+                            <span>Argentina</span>
+                            <i data-lucide="chevron-down" class="form-input__trail"></i>
+                        </div>
+                    </div>
+                </div>
+
+                <div id="paypal-button-container"></div>
+                <!-- <button class="btn btn--paypal btn--block btn--lg" id="pay-btn">Pagar con PayPal — $0.00</button> -->
+                <div class="checkout-secure">
+                    <i data-lucide="lock" style="color: #22C55E;"></i>
+                    <span>Pago seguro con encriptación SSL de 256 bits</span>
+                </div>
+            </div>
+
+            <aside class="checkout-summary">
+                <h3 class="checkout-summary__title">Tu Pedido</h3>
+                <hr class="checkout-summary__divider">
+
+                <div id="checkout-items">
+                    <!-- Items rendered by JS -->
+                </div>
+
+                <hr class="checkout-summary__divider">
+                <div class="checkout-summary__row"><span class="text-gray">Subtotal</span><span
+                        id="checkout-subtotal">$0.00</span></div>
+                <div class="checkout-summary__row"><span class="text-gray">Descuento</span><span
+                        class="text-green">-$0.00</span></div>
+                <hr class="checkout-summary__divider">
+                <div class="checkout-summary__total"><span>Total</span><span class="checkout-summary__total-val"
+                        id="checkout-total">$0.00</span></div>
+            </aside>
+        </section>
+
+        <div id="footer-placeholder"></div>
+
+    </div>
+
+    <script type="module" src="js/checkout.js"></script>
+</body>
+
+</html>

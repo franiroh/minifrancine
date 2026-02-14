@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>PatchFiles — Catálogo</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link
+    href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:wght@700;800&family=DM+Sans:wght@400;500;600;700&display=swap"
+    rel="stylesheet">
+  <script src="https://unpkg.com/lucide@latest"></script>
+
+  <link rel="stylesheet" href="css/main.css">
+  <link rel="stylesheet" href="css/components.css">
+  <link rel="stylesheet" href="css/home.css">
+</head>
+
+<body>
+
+  <div class="page">
+
+    <div id="navbar-placeholder"></div>
+
+    <!-- Hero -->
+    <section class="hero">
+      <div class="hero__left">
+        <span class="hero__badge"><i data-lucide="sparkles"></i> Más de 5,000 diseños disponibles</span>
+        <h1 class="hero__title">Diseños de Bordado Profesionales</h1>
+        <p class="hero__sub">Archivos digitales listos para tu máquina bordadora. Formatos DST, PES, JEF, VP3 y más.
+          Descarga instantánea.</p>
+        <div class="hero__ctas">
+          <a href="#catalog" class="btn btn--primary btn--lg">Explorar Catálogo <i data-lucide="arrow-right"></i></a>
+          <a href="#" class="btn btn--outline btn--lg">Ver Novedades</a>
+        </div>
+      </div>
+      <div class="hero__right">
+        <div class="hero__image"></div>
+      </div>
+    </section>
+
+    <!-- Trust bar -->
+    <section class="trust-bar">
+      <div class="trust-bar__item"><i data-lucide="download"></i> Descarga instantánea</div>
+      <div class="trust-bar__item"><i data-lucide="file-check"></i> Todos los formatos</div>
+      <div class="trust-bar__item"><i data-lucide="shield-check"></i> Pago seguro</div>
+      <div class="trust-bar__item"><i data-lucide="headphones"></i> Soporte 24/7</div>
+    </section>
+
+    <!-- Catalog -->
+    <section class="catalog" id="catalog">
+      <div class="catalog__header">
+        <h2 class="catalog__title">Catálogo de Diseños</h2>
+        <span class="catalog__count">Mostrando diseños recientes</span>
+      </div>
+
+      <div class="catalog__filters">
+        <button class="filter-chip filter-chip--active">Todos</button>
+        <button class="filter-chip">Flores</button>
+        <button class="filter-chip">Animales</button>
+        <button class="filter-chip">Letras</button>
+        <button class="filter-chip">Infantil</button>
+        <button class="filter-chip">Deportes</button>
+        <button class="filter-chip">Geométricos</button>
+        <button class="filter-chip">Navidad</button>
+      </div>
+
+      <!-- Product Grid (Dynamic) -->
+      <div class="product-grid" id="catalog-grid">
+        <!-- Products rendered by js/home.js -->
+        <p style="width:100%; text-align:center;">Cargando productos...</p>
+      </div>
+    </section>
+
+    <div id="footer-placeholder"></div>
+
+  </div>
+
+  <script type="module" src="js/home.js"></script>
+</body>
+
+</html>
