@@ -300,38 +300,45 @@ export async function fetchAllOrders() {
     return data
 }
 
-export async function fetchAdminStats() {
-    // For V1, simple aggregation. Large scale needs RPC or Edge Function.
-    const { count: orderCount, error: orderError } = await supabase
-        .from('orders')
-        .select('*', { count: 'exact', head: true })
+export async function fetchAdminStats(startDate, endDate) {
+    // Helper to apply date filter
+    const applyDates = (query) => {
+        if (startDate) query = query.gte('created_at', startDate);
+        if (endDate) query = query.lte('created_at', endDate + ' 23:59:59'); // Include full end day
+        return query;
+    };
 
-    const { count: productCount, error: prodError } = await supabase
+    // Orders Count
+    let orderQuery = supabase.from('orders').select('*', { count: 'exact', head: true });
+    orderQuery = applyDates(orderQuery);
+    const { count: orderCount } = await orderQuery;
+
+    // Products Count (Usually not filtered by date in this context, but let's keep it total)
+    // Actually, dashboard usually shows current total products. 
+    // Let's NOT filter products by date unless asked (usually inventory doesn't depend on sales date range).
+    const { count: productCount } = await supabase
         .from('products')
         .select('*', { count: 'exact', head: true })
 
-    // Total Revenue (manual sum for now)
-    const { data: sales, error: salesError } = await supabase
-        .from('orders')
-        .select('total')
-        .eq('status', 'paid')
+    // Total Revenue
+    let salesQuery = supabase.from('orders').select('total').eq('status', 'paid');
+    salesQuery = applyDates(salesQuery);
+    const { data: sales } = await salesQuery;
 
     let totalSales = 0;
     if (sales) {
         totalSales = sales.reduce((sum, order) => sum + parseFloat(order.total || 0), 0);
     }
 
-    // Count Paid Orders
-    const { count: paidCount } = await supabase
-        .from('orders')
-        .select('*', { count: 'exact', head: true })
-        .eq('status', 'paid')
+    // Paid Orders Count
+    let paidQuery = supabase.from('orders').select('*', { count: 'exact', head: true }).eq('status', 'paid');
+    paidQuery = applyDates(paidQuery);
+    const { count: paidCount } = await paidQuery;
 
-    // Count Pending Orders
-    const { count: pendingCount } = await supabase
-        .from('orders')
-        .select('*', { count: 'exact', head: true })
-        .eq('status', 'pending')
+    // Pending Orders Count
+    let pendingQuery = supabase.from('orders').select('*', { count: 'exact', head: true }).eq('status', 'pending');
+    pendingQuery = applyDates(pendingQuery);
+    const { count: pendingCount } = await pendingQuery;
 
     return {
         totalOrders: orderCount || 0,

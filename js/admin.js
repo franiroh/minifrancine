@@ -39,6 +39,24 @@ async function init() {
     // 4. Icons
     if (window.lucide) window.lucide.createIcons();
 
+    // 5. Date Filter Logic
+    const dateStartEl = document.getElementById('date-start');
+    const dateEndEl = document.getElementById('date-end');
+    const btnFilter = document.getElementById('btn-filter-date');
+
+    // Set defaults (First day of current month to Today)
+    const today = new Date();
+    const firstDay = new Date(today.getFullYear(), today.getMonth(), 1);
+
+    if (dateStartEl && dateEndEl) {
+        dateStartEl.valueAsDate = firstDay;
+        dateEndEl.valueAsDate = today;
+
+        btnFilter.onclick = () => {
+            loadDashboard();
+        };
+    }
+
     // Exit Admin
     document.getElementById('exit-admin-btn').onclick = () => {
         window.location.href = 'index.html';
@@ -47,37 +65,14 @@ async function init() {
     fadeOutPreloader();
 }
 
-function fadeOutPreloader() {
-    const preloader = document.getElementById('preloader');
-    if (preloader) {
-        preloader.classList.add('hidden');
-        setTimeout(() => preloader.remove(), 300);
-    }
-}
-
-function setupNavigation() {
-    const navItems = document.querySelectorAll('.nav-item[data-tab]');
-    navItems.forEach(item => {
-        item.onclick = () => {
-            // UI Update
-            navItems.forEach(n => n.classList.remove('active'));
-            item.classList.add('active');
-
-            // View Update
-            const viewId = item.dataset.tab;
-            document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
-            document.getElementById(`view-${viewId}`).classList.add('active');
-
-            // Load Data
-            if (viewId === 'dashboard') loadDashboard();
-            if (viewId === 'products') loadProducts();
-            if (viewId === 'orders') loadOrders();
-        };
-    });
-}
+// ... existing code ...
 
 async function loadDashboard() {
-    const stats = await fetchAdminStats();
+    const dateStart = document.getElementById('date-start')?.value;
+    const dateEnd = document.getElementById('date-end')?.value;
+
+    const stats = await fetchAdminStats(dateStart, dateEnd);
+
     document.getElementById('stat-total-sales').textContent = `$${stats.totalSales.toFixed(2)}`;
     document.getElementById('stat-total-orders').textContent = stats.totalOrders;
     document.getElementById('stat-paid-orders').textContent = stats.paidOrders;

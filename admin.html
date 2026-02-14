@@ -43,6 +43,13 @@
         <main class="main-content">
             <header class="topbar">
                 <h1 id="page-title">Dashboard</h1>
+                <div class="dashboard-controls" style="display:flex;gap:10px;align-items:center;">
+                    <input type="date" id="date-start" class="form-input" style="width: auto;">
+                    <input type="date" id="date-end" class="form-input" style="width: auto;">
+                    <button id="btn-filter-date" class="btn-primary" style="padding: 8px 16px;">
+                        <i data-lucide="filter" style="width:16px;height:16px;margin-right:4px;"></i> Filtrar
+                    </button>
+                </div>
                 <div class="user-info" id="admin-email">Cargando...</div>
             </header>
 
