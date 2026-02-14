@@ -485,3 +485,37 @@ export async function deleteProductFile(fileRowId) {
     return { error }
 }
 
+export async function fetchOrderById(orderId) {
+    const { data, error } = await supabase
+        .from('orders')
+        .select('*')
+        .eq('id', orderId)
+        .single()
+
+    if (error) {
+        console.error('Error fetching order:', error)
+        return null
+    }
+    return data
+}
+
+export async function fetchOrderItems(orderId) {
+    const { data, error } = await supabase
+        .from('order_items')
+        .select(`
+            *,
+            products (
+                title,
+                main_image,
+                image_color
+            )
+        `)
+        .eq('order_id', orderId)
+
+    if (error) {
+        console.error('Error fetching order items:', error)
+        return []
+    }
+    return data
+}
+
