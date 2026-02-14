@@ -65,6 +65,15 @@ async function init() {
     fadeOutPreloader();
 }
 
+// Preloader Logic
+function fadeOutPreloader() {
+    const preloader = document.getElementById('preloader');
+    if (preloader) {
+        preloader.classList.add('hidden');
+        setTimeout(() => preloader.remove(), 300);
+    }
+}
+
 // Navigation Logic
 function setupNavigation() {
     const navItems = document.querySelectorAll('.nav-item[data-tab]');
