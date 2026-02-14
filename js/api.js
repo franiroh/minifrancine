@@ -487,9 +487,7 @@ export async function deleteProductFile(fileRowId) {
 
 export async function fetchOrderById(orderId) {
     const { data, error } = await supabase
-        .from('orders')
-        .select('*')
-        .eq('id', orderId)
+        .rpc('get_admin_order_by_id', { order_uuid: orderId })
         .single()
 
     if (error) {

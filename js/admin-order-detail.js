@@ -52,7 +52,8 @@ async function loadOrderDetails(orderId) {
     // Render Order Info
     document.getElementById('order-id-display').textContent = `Pedido #${order.id.slice(0, 8).toUpperCase()}`;
     document.getElementById('order-date-display').textContent = new Date(order.created_at).toLocaleString();
-    document.getElementById('order-user').textContent = order.user_id;
+    document.getElementById('order-email').textContent = order.email || 'N/A';
+    document.getElementById('order-user').textContent = `ID: ${order.user_id}`;
     document.getElementById('order-total').textContent = `$${order.total}`;
 
     // Status Badge
