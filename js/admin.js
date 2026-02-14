@@ -65,7 +65,27 @@ async function init() {
     fadeOutPreloader();
 }
 
-// ... existing code ...
+// Navigation Logic
+function setupNavigation() {
+    const navItems = document.querySelectorAll('.nav-item[data-tab]');
+    navItems.forEach(item => {
+        item.onclick = () => {
+            // UI Update
+            navItems.forEach(n => n.classList.remove('active'));
+            item.classList.add('active');
+
+            // View Update
+            const viewId = item.dataset.tab;
+            document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
+            document.getElementById(`view-${viewId}`).classList.add('active');
+
+            // Load Data
+            if (viewId === 'dashboard') loadDashboard();
+            if (viewId === 'products') loadProducts();
+            if (viewId === 'orders') loadOrders();
+        };
+    });
+}
 
 async function loadDashboard() {
     const dateStart = document.getElementById('date-start')?.value;
