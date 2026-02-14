@@ -37,6 +37,16 @@ async function init() {
     document.getElementById('exit-admin-btn').onclick = () => {
         window.location.href = 'index.html';
     };
+
+    fadeOutPreloader();
+}
+
+function fadeOutPreloader() {
+    const preloader = document.getElementById('preloader');
+    if (preloader) {
+        preloader.classList.add('hidden');
+        setTimeout(() => preloader.remove(), 300);
+    }
 }
 
 function setupNavigation() {
