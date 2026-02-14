@@ -41,8 +41,12 @@ async function init() {
 }
 
 async function loadOrderDetails(orderId) {
-    // Fetch Order
-    const order = await fetchOrderById(orderId);
+    // Fetch Order and Items in parallel
+    const [order, items] = await Promise.all([
+        fetchOrderById(orderId),
+        fetchOrderItems(orderId)
+    ]);
+
     if (!order) throw new Error('Order not found');
 
     // Render Order Info
@@ -55,9 +59,13 @@ async function loadOrderDetails(orderId) {
     const statusEl = document.getElementById('order-status');
     statusEl.innerHTML = `<span class="status-badge status-${order.status}">${order.status}</span>`;
 
-    // Fetch Items
-    const items = await fetchOrderItems(orderId);
+    // Render Items
     const tbody = document.querySelector('#order-items-table tbody');
+
+    if (!items || items.length === 0) {
+        tbody.innerHTML = '<tr><td colspan="4" style="text-align:center;padding:20px;">No hay productos en este pedido</td></tr>';
+        return;
+    }
 
     tbody.innerHTML = items.map(item => {
         const p = item.products;
@@ -70,7 +78,7 @@ async function loadOrderDetails(orderId) {
 
         const imgHtml = img
             ? `<img src="${img}" class="img-preview" style="width:40px;height:40px;">`
-            : `<div class="img-preview" style="background:${p?.image_color};width:40px;height:40px;"></div>`;
+            : `<div class="img-preview" style="background:${p?.image_color || '#ccc'};width:40px;height:40px;border-radius:8px;"></div>`;
 
         return `
             <tr>
