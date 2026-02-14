@@ -27,8 +27,14 @@ async function init() {
     // 2. Setup Navigation
     setupNavigation();
 
-    // 3. Load Initial View
-    loadDashboard();
+    // 3. Load Initial View (Hash Routing)
+    const hash = window.location.hash.replace('#', '');
+    if (hash && ['dashboard', 'products', 'orders'].includes(hash)) {
+        const navItem = document.querySelector(`.nav-item[data-tab="${hash}"]`);
+        if (navItem) navItem.click();
+    } else {
+        loadDashboard();
+    }
 
     // 4. Icons
     if (window.lucide) window.lucide.createIcons();
