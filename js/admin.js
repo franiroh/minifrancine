@@ -104,9 +104,9 @@ async function loadOrders() {
             <td>
                 <div style="font-weight: 600; color: var(--admin-text);">${o.email || 'N/A'}</div>
                 <div style="font-size: 11px; color: var(--admin-text-light);">${o.user_id}</div>
-                <small class="text-gray">${new Date(o.created_at).toLocaleDateString()}</small>
+                <small class="text-gray">${o.created_at ? new Date(o.created_at).toLocaleDateString() : '-'}</small>
             </td>
-            <td>${new Date(o.created_at).toLocaleTimeString()}</td>
+            <td>${o.created_at ? new Date(o.created_at).toLocaleTimeString() : '-'}</td>
             <td><strong>$${o.total}</strong></td>
             <td><span class="status-badge status-${o.status}">${o.status}</span></td>
         </tr>
