@@ -119,7 +119,12 @@ async function loadOrders() {
             </td>
             <td>${o.created_at ? new Date(o.created_at).toLocaleTimeString() : '-'}</td>
             <td><strong>$${o.total}</strong></td>
-            <td><span class="status-badge status-${o.status}">${o.status}</span></td>
+            <td>
+                <span class="status-badge status-${o.status}">${o.status}</span>
+                <button class="btn-icon" style="margin-left:8px;" onclick="window.location.href='admin-order-detail.html?id=${o.id}'">
+                    <i data-lucide="eye"></i>
+                </button>
+            </td>
         </tr>
     `).join('');
 
