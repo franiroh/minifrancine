@@ -321,8 +321,22 @@ export async function fetchAdminStats() {
         totalSales = sales.reduce((sum, order) => sum + parseFloat(order.total || 0), 0);
     }
 
+    // Count Paid Orders
+    const { count: paidCount } = await supabase
+        .from('orders')
+        .select('*', { count: 'exact', head: true })
+        .eq('status', 'paid')
+
+    // Count Pending Orders
+    const { count: pendingCount } = await supabase
+        .from('orders')
+        .select('*', { count: 'exact', head: true })
+        .eq('status', 'pending')
+
     return {
         totalOrders: orderCount || 0,
+        paidOrders: paidCount || 0,
+        pendingOrders: pendingCount || 0,
         totalProducts: productCount || 0,
         totalSales: totalSales
     }

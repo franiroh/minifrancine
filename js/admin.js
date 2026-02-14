@@ -80,6 +80,8 @@ async function loadDashboard() {
     const stats = await fetchAdminStats();
     document.getElementById('stat-total-sales').textContent = `$${stats.totalSales.toFixed(2)}`;
     document.getElementById('stat-total-orders').textContent = stats.totalOrders;
+    document.getElementById('stat-paid-orders').textContent = stats.paidOrders;
+    document.getElementById('stat-pending-orders').textContent = stats.pendingOrders;
     document.getElementById('stat-total-products').textContent = stats.totalProducts;
 }
 
