@@ -96,6 +96,7 @@ async function loadProducts() {
 
 async function loadOrders() {
     const orders = await fetchAllOrders();
+    console.log('Orders fetched:', orders);
     const tbody = document.querySelector('#orders-table tbody');
 
     tbody.innerHTML = orders.map(o => `

@@ -293,7 +293,8 @@ export async function fetchAllOrders() {
         .rpc('get_admin_orders')
 
     if (error) {
-        console.error('Error fetching all orders:', error)
+        console.error('CRITICAL ERROR fetching orders:', error);
+        alert('Error al cargar pedidos: ' + error.message);
         return []
     }
     return data
