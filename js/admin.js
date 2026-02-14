@@ -73,7 +73,14 @@ async function loadProducts() {
 
     tbody.innerHTML = products.map(p => `
         <tr>
-            <td><img src="${p.mainImage || p.imageColor}" alt="${p.title}" class="img-preview" style="object-fit: cover;"></td>
+            <td>
+                ${(p.mainImage)
+            ? `<img src="${p.mainImage}" alt="${p.title}" class="img-preview" style="object-fit: cover;">`
+            : (p.imageColor && p.imageColor.includes('gradient'))
+                ? `<div class="img-preview" style="background: ${p.imageColor}; width: 48px; height: 48px; border-radius: 12px;"></div>`
+                : `<img src="${p.imageColor || 'https://placehold.co/48'}" alt="${p.title}" class="img-preview" style="object-fit: cover;">`
+        }
+            </td>
             <td><strong>${p.title}</strong></td>
             <td>$${p.price}</td>
             <td><span class="tag">${p.category}</span></td>
