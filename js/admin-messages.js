@@ -27,7 +27,8 @@ export async function loadAdminMessages() {
         .from('conversations')
         .select(`
             *,
-            profiles:user_id (full_name)
+            *,
+            profiles:user_id (full_name, role)
         `)
         .order('updated_at', { ascending: false });
 
@@ -36,6 +37,8 @@ export async function loadAdminMessages() {
         listContainer.innerHTML = '<p style="text-align:center; padding:20px; color:red;">Error al cargar mensajes.</p>';
         return;
     }
+
+    console.log('DEBUG: Conversations Data:', conversations);
 
     if (!conversations || conversations.length === 0) {
         listContainer.innerHTML = '<p style="text-align:center; padding:20px;">No hay mensajes.</p>';
@@ -78,7 +81,14 @@ function renderAdminConversationsList() {
     const previousScroll = listContainer.scrollTop;
 
     listContainer.innerHTML = window.adminConversations.map(conv => {
-        const userEmail = window.adminEmails?.[conv.user_id] || conv.profiles?.full_name || 'Usuario';
+        const userEmail = window.adminEmails?.[conv.user_id] || 'N/A';
+        const userName = conv.profiles?.full_name || 'Sin Nombre';
+        const userRole = conv.profiles?.role || '';
+
+        // Logic: Show Name (bold) + Email (small)
+        let primaryText = userName !== 'Sin Nombre' ? userName : (userEmail !== 'N/A' ? userEmail : 'Usuario');
+        let secondaryText = (userName !== 'Sin Nombre' && userEmail !== 'N/A') ? userEmail : '';
+
         const active = window.currentAdminConversationId === conv.id ? 'active' : '';
         const isUnread = conv.unreadCount > 0;
 
@@ -88,7 +98,11 @@ function renderAdminConversationsList() {
                 ${escapeHtml(conv.subject || 'Sin asunto')}
                 ${isUnread ? '<span class="unread-badge"></span>' : ''}
             </div>
-            <div class="conversation-preview">${escapeHtml(userEmail)}</div>
+            <div class="conversation-preview">
+                <div style="font-weight:600; color:var(--text-color);">${escapeHtml(primaryText)}</div>
+                ${secondaryText ? `<div style="font-size:12px; color:var(--text-light);">${escapeHtml(secondaryText)}</div>` : ''}
+                ${userRole && userRole !== 'user' ? `<div style="font-size:10px; color:var(--primary-color); text-transform:uppercase; font-weight:700;">${escapeHtml(userRole)}</div>` : ''}
+            </div>
             <div class="conversation-meta">
                 <span>${new Date(conv.updated_at).toLocaleDateString()}</span>
                 <span style="text-transform: capitalize;">${escapeHtml(conv.status)}</span>
@@ -124,14 +138,23 @@ async function loadAdminChatArea(conversationId) {
     const conversation = window.adminConversations.find(c => c.id === conversationId);
     if (!conversation) return;
 
-    const userEmail = window.adminEmails?.[conversation.user_id] || conversation.profiles?.full_name || 'Usuario';
+    const userEmail = window.adminEmails?.[conversation.user_id] || 'N/A';
+    const userName = conversation.profiles?.full_name || 'Sin Nombre';
+    const userRole = conversation.profiles?.role || '';
+
+    let headerDisplay = userName !== 'Sin Nombre' ? userName : (userEmail !== 'N/A' ? userEmail : 'Usuario');
+    let subDisplay = (userName !== 'Sin Nombre' && userEmail !== 'N/A') ? userEmail : '';
 
     // UI
     chatArea.innerHTML = `
         <div class="chat-header">
             <div>
                 <span>${escapeHtml(conversation.subject)}</span>
-                <div style="font-size: 12px; font-weight: normal; color: #6b7280;">${escapeHtml(userEmail)}</div>
+                <div style="font-size: 13px; font-weight: 600; color: var(--text-color); margin-top:2px;">
+                    ${escapeHtml(headerDisplay)} 
+                    ${subDisplay ? `<span style="font-weight:400; color:#6b7280;">&lt;${escapeHtml(subDisplay)}&gt;</span>` : ''}
+                    ${userRole && userRole !== 'user' ? `<span style="font-size:10px; color:var(--primary-color); border:1px solid currentColor; padding:1px 4px; border-radius:4px; margin-left:4px; text-transform:uppercase;">${escapeHtml(userRole)}</span>` : ''}
+                </div>
             </div>
             <span style="font-size: 12px; font-weight: normal; color: #6b7280;">#${conversationId.slice(0, 8)}</span>
         </div>
@@ -146,7 +169,7 @@ async function loadAdminChatArea(conversationId) {
                 </button>
             </form>
         </div>
-    `;
+        `;
     if (window.lucide) window.lucide.createIcons();
 
     // Fetch messages
@@ -176,7 +199,7 @@ async function loadAdminChatArea(conversationId) {
                     ${new Date(msg.created_at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
                 </div>
             </div>
-        `;
+            `;
     }).join('');
 
     messagesContainer.scrollTop = messagesContainer.scrollHeight;

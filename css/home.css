@@ -144,14 +144,16 @@
 
 /* --- Product Grid & Card --- */
 .product-grid {
-    display: flex;
+    display: grid;
     gap: 24px;
-    justify-content: center;
-    flex-wrap: wrap;
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    width: 100%;
 }
 
 .product-card {
-    width: 296px;
+    width: 100%;
+    /* max-width kept to avoid super wide cards on large screens if desired, 
+       but usually let grid handle it. Let's remove fixed width. */
     border-radius: 16px;
     border: 1px solid #F3F4F6;
     background: #FFFFFF;

@@ -147,7 +147,9 @@ function renderOrderCard(order, reviewsMap = {}) {
             return `
             <div class="order-item">
                 <div class="order-item__thumb" style="background: ${sanitizeCssValue(imageColor)};">
-                    ${thumbContent}
+                    <a href="product.html?id=${productId}" style="display:block; height:100%;">
+                        ${thumbContent}
+                    </a>
                 </div>
                 <div class="order-item__info">
                     <div class="order-item__title">${escapeHtml(title)}</div>
@@ -258,8 +260,17 @@ const ratingForm = document.getElementById('rating-form');
 const ratingContainer = document.querySelector('.star-rating');
 const ratingValueInput = document.getElementById('rating-value');
 const deleteBtn = document.getElementById('delete-review-btn');
+const charCount = document.getElementById('char-count');
+const commentInput = document.getElementById('rating-comment');
 
 function setupRatingModal() {
+    // Character Count Listener
+    if (commentInput && charCount) {
+        commentInput.addEventListener('input', () => {
+            charCount.textContent = commentInput.value.length;
+        });
+    }
+
     // Close modal
     closeModal.onclick = () => {
         modal.style.display = 'none';
@@ -298,7 +309,19 @@ function setupRatingModal() {
         const productId = parseInt(document.getElementById('rating-product-id').value);
         const reviewId = document.getElementById('rating-review-id').value;
         const rating = parseInt(ratingValueInput.value);
-        const comment = document.getElementById('rating-comment').value;
+        let comment = document.getElementById('rating-comment').value.trim();
+
+        // 1. Validation: Rating Range
+        if (!rating || rating < 1 || rating > 5) {
+            showToast('Por favor selecciona una puntuación válida (1-5).', 'error');
+            return;
+        }
+
+        // 2. Validation: Comment Length
+        if (comment.length > 1000) {
+            showToast('El comentario no puede exceder los 1000 caracteres.', 'error');
+            return;
+        }
 
         if (!rating) {
             showToast('Por favor selecciona una puntuación.', 'error');
@@ -394,8 +417,11 @@ async function openRatingModal(productId, productTitle) {
     if (review) {
         document.getElementById('rating-review-id').value = review.id;
         document.getElementById('rating-comment').value = review.comment || '';
+        if (charCount) charCount.textContent = (review.comment || '').length;
         setRating(review.rating);
         deleteBtn.style.display = 'inline-block';
+    } else {
+        if (charCount) charCount.textContent = '0';
     }
 
     modal.style.display = 'block';

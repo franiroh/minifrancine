@@ -1,7 +1,7 @@
 
 import { loadComponents, updateNavbarAuth, updateNavbarCartCount, createProductCard, createSkeletonCard } from './components.js';
 import { fetchFavoriteProducts, getUser, onAuthStateChange } from './api.js';
-import { state, loadCart, getCartCount, loadFavorites } from './state.js';
+import { state, loadCart, getCartCount, loadFavorites, loadPurchases } from './state.js';
 
 async function init() {
     await loadComponents();
@@ -25,7 +25,9 @@ async function init() {
     updateNavbarAuth(user);
     await loadCart(user);
     updateNavbarCartCount(getCartCount());
+    updateNavbarCartCount(getCartCount());
     await loadFavorites(user);
+    await loadPurchases(user); // Load purchases to update button states (e.g. "Comprado")
 
     await renderFavorites(user);
     setupAuthListener();
