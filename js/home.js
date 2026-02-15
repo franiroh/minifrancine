@@ -171,7 +171,10 @@ function filterProducts(category) {
         return;
     }
 
-    showCategoryView(currentCategory);
+    // We want to KEEP the home view (Hero, Trust Bar) even when filtering
+    // showCategoryView(currentCategory); <--- REMOVED
+    showHomeView();
+
     const filtered = products.filter(p => p.category === currentCategory);
     renderCatalog(filtered);
 }

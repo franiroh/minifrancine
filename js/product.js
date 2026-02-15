@@ -49,7 +49,7 @@ function renderProductBreadcrumbs() {
         placeholder.innerHTML = renderBreadcrumbs([
             { label: 'Inicio', href: 'index.html' },
             { label: 'Categorías', href: 'categories.html' },
-            { label: currentProduct.category, href: `index.html?category=${encodeURIComponent(currentProduct.category)}` },
+            { label: currentProduct.category, href: `catalog.html?category=${encodeURIComponent(currentProduct.category)}` },
             { label: currentProduct.title, href: null }
         ]);
     }

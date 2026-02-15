@@ -47,10 +47,10 @@
         display: block !important;
     }
 
-    /* Tag View: Both might need adjustment, but usually Tag View uses Catalog Header with different text */
-    /* If we want to hide default text for Tag view too, we can do: */
-    /* html[data-view="tag"] .catalog__title { visibility: hidden; } */
-    /* But JS updates it fast enough usually. The main issue was the large Hero section swap. */
+    /* Tag View: Hide Filters */
+    html[data-view="tag"] #catalog-filters {
+        display: none !important;
+    }
 </style>
 
 <body>
