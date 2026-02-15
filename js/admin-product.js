@@ -285,7 +285,7 @@ async function handleSave(e) {
             badge_color: document.getElementById('prod-badge-color').value,
             image_color: document.getElementById('prod-image-color').value,
             size: document.getElementById('prod-size').value,
-            stitches: parseInt(document.getElementById('prod-stitches').value) || null,
+            stitches: document.getElementById('prod-stitches').value || '',
             formats: document.getElementById('prod-formats').value,
         };
 
