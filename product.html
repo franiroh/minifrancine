@@ -22,78 +22,70 @@
     <div class="page">
 
         <div id="navbar-placeholder"></div>
+    </div>
 
-        <!-- Breadcrumb -->
-        <div class="breadcrumb">
-            <a href="index.html">Inicio</a>
-            <span class="breadcrumb__sep">/</span>
-            <span id="detail-category-crumb">Categoría</span>
-            <span class="breadcrumb__sep">/</span>
-            <span class="breadcrumb__current" id="detail-title-crumb">Producto</span>
+    <!-- Detail Content -->
+    <section class="detail">
+        <div class="detail__images">
+            <div id="detail-img" class="detail__main-img"></div>
+            <div class="detail__thumbs">
+                <div class="detail__thumb detail__thumb--active" id="detail-thumb"></div>
+                <!-- Thumbs could be dynamic -->
+            </div>
         </div>
 
-        <!-- Detail Content -->
-        <section class="detail">
-            <div class="detail__images">
-                <div id="detail-img" class="detail__main-img"></div>
-                <div class="detail__thumbs">
-                    <div class="detail__thumb detail__thumb--active" id="detail-thumb"></div>
-                    <!-- Thumbs could be dynamic -->
-                </div>
+        <div class="detail__info">
+            <span id="detail-category" class="detail__cat-badge">Categoría</span>
+            <h1 id="detail-title" class="detail__title">Título Producto</h1>
+
+            <div class="detail__rating">
+                <i data-lucide="star" class="detail__star detail__star--filled"></i>
+                <i data-lucide="star" class="detail__star detail__star--filled"></i>
+                <i data-lucide="star" class="detail__star detail__star--filled"></i>
+                <i data-lucide="star" class="detail__star detail__star--filled"></i>
+                <i data-lucide="star" class="detail__star"></i>
+                <span class="detail__rating-text">4.8 (124 reseñas)</span>
             </div>
 
-            <div class="detail__info">
-                <span id="detail-category" class="detail__cat-badge">Categoría</span>
-                <h1 id="detail-title" class="detail__title">Título Producto</h1>
+            <p id="detail-desc" class="detail__desc">Descripción...</p>
 
-                <div class="detail__rating">
-                    <i data-lucide="star" class="detail__star detail__star--filled"></i>
-                    <i data-lucide="star" class="detail__star detail__star--filled"></i>
-                    <i data-lucide="star" class="detail__star detail__star--filled"></i>
-                    <i data-lucide="star" class="detail__star detail__star--filled"></i>
-                    <i data-lucide="star" class="detail__star"></i>
-                    <span class="detail__rating-text">4.8 (124 reseñas)</span>
-                </div>
+            <div class="detail__price">
+                <span id="detail-price" class="detail__price-current">$0.00</span>
+                <!-- <span class="detail__price-old">$0.00</span> -->
+            </div>
 
-                <p id="detail-desc" class="detail__desc">Descripción...</p>
+            <hr class="detail__divider">
 
-                <div class="detail__price">
-                    <span id="detail-price" class="detail__price-current">$0.00</span>
-                    <!-- <span class="detail__price-old">$0.00</span> -->
-                </div>
-
-                <hr class="detail__divider">
-
-                <div class="detail__specs">
-                    <h3 class="detail__specs-title">Especificaciones</h3>
-                    <div class="detail__specs-grid">
-                        <div class="detail__spec-item">
-                            <span class="detail__spec-label">Tamaño</span>
-                            <span id="detail-size" class="detail__spec-value">-</span>
-                        </div>
-                        <div class="detail__spec-item">
-                            <span class="detail__spec-label">Puntadas</span>
-                            <span id="detail-stitches" class="detail__spec-value">-</span>
-                        </div>
-                        <div class="detail__spec-item">
-                            <span class="detail__spec-label">Formatos</span>
-                            <span id="detail-formats" class="detail__spec-value">-</span>
-                        </div>
+            <div class="detail__specs">
+                <h3 class="detail__specs-title">Especificaciones</h3>
+                <div class="detail__specs-grid">
+                    <div class="detail__spec-item">
+                        <span class="detail__spec-label">Tamaño</span>
+                        <span id="detail-size" class="detail__spec-value">-</span>
+                    </div>
+                    <div class="detail__spec-item">
+                        <span class="detail__spec-label">Puntadas</span>
+                        <span id="detail-stitches" class="detail__spec-value">-</span>
+                    </div>
+                    <div class="detail__spec-item">
+                        <span class="detail__spec-label">Formatos</span>
+                        <span id="detail-formats" class="detail__spec-value">-</span>
                     </div>
                 </div>
-
-                <hr class="detail__divider">
-
-                <button id="detail-add-btn" class="btn btn--primary btn--block btn--lg">
-                    <i data-lucide="shopping-cart"></i> Agregar al Carrito
-                </button>
-                <button id="detail-fav-btn" class="btn btn--outline btn--block btn--lg">
-                    <i data-lucide="heart"></i> Agregar a Favoritos
-                </button>
             </div>
-        </section>
 
-        <div id="footer-placeholder"></div>
+            <hr class="detail__divider">
+
+            <button id="detail-add-btn" class="btn btn--primary btn--block btn--lg">
+                <i data-lucide="shopping-cart"></i> Agregar al Carrito
+            </button>
+            <button id="detail-fav-btn" class="btn btn--outline btn--block btn--lg">
+                <i data-lucide="heart"></i> Agregar a Favoritos
+            </button>
+        </div>
+    </section>
+
+    <div id="footer-placeholder"></div>
 
     </div>
 

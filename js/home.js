@@ -2,6 +2,7 @@
 import { loadComponents, updateNavbarAuth, updateNavbarCartCount } from './components.js';
 import { fetchProducts, getUser, onAuthStateChange } from './api.js';
 import { state, loadCart, getCartCount, addToCart, loadFavorites, isFavorite, toggleFavorite } from './state.js';
+import { renderBreadcrumbs } from './utils.js';
 
 let products = [];
 
@@ -28,7 +29,8 @@ async function init() {
     if (initialCategory) {
         filterProducts(initialCategory);
     } else {
-        renderCatalog(products); // Render all
+        showHomeView(); // Default view
+        renderCatalog(products);
     }
 
     // 4. Setup Listeners
@@ -52,6 +54,48 @@ async function init() {
     });
 }
 
+function showCategoryView(category) {
+    // Hide Home Elements
+    const hero = document.getElementById('home-hero');
+    const trustBar = document.querySelector('.trust-bar');
+    if (hero) hero.style.display = 'none';
+    if (trustBar) trustBar.style.display = 'none';
+
+    // Show Category Header
+    const catHeader = document.getElementById('category-header');
+    const catTitle = document.getElementById('category-title');
+    if (catHeader) {
+        catHeader.style.display = 'block';
+        catTitle.textContent = category;
+    }
+
+    // Render Breadcrumbs
+    const breadcrumbsContainer = document.getElementById('breadcrumbs-placeholder');
+    if (breadcrumbsContainer) {
+        breadcrumbsContainer.innerHTML = renderBreadcrumbs([
+            { label: 'Inicio', href: 'index.html' },
+            { label: 'Categorías', href: 'categories.html' },
+            { label: category, href: null } // Current page
+        ]);
+    }
+}
+
+function showHomeView() {
+    // Show Home Elements
+    const hero = document.getElementById('home-hero');
+    const trustBar = document.querySelector('.trust-bar');
+    if (hero) hero.style.display = 'flex';
+    if (trustBar) trustBar.style.display = 'flex';
+
+    // Hide Category Header
+    const catHeader = document.getElementById('category-header');
+    if (catHeader) catHeader.style.display = 'none';
+
+    // Clear Breadcrumbs
+    const breadcrumbsContainer = document.getElementById('breadcrumbs-placeholder');
+    if (breadcrumbsContainer) breadcrumbsContainer.innerHTML = '';
+}
+
 function setupFilterListeners() {
     const chips = document.querySelectorAll('.filter-chip');
     chips.forEach(chip => {
@@ -62,6 +106,10 @@ function setupFilterListeners() {
 
             // Filter Data
             const category = chip.textContent;
+
+            // Should clicking a chip switch view? check with user intent.
+            // "Si entras a una categoría... El Banner desaparece"
+            // Let's assume manual filtering also triggers this view change for consistency.
             filterProducts(category);
         });
     });
@@ -78,7 +126,7 @@ function filterProducts(category) {
         }
     });
 
-    // Special case for "Todos" or when category not found in chips (optional)
+    // Special case for "Todos"
     if (category === 'Todos' || !category) {
         // Reset UI to 'Todos' if necessary
         const allChip = Array.from(chips).find(c => c.textContent === 'Todos');
@@ -86,10 +134,12 @@ function filterProducts(category) {
             chips.forEach(c => c.classList.remove('filter-chip--active'));
             allChip.classList.add('filter-chip--active');
         }
+        showHomeView();
         renderCatalog(products);
         return;
     }
 
+    showCategoryView(category);
     const filtered = products.filter(p => p.category === category);
     renderCatalog(filtered);
 }

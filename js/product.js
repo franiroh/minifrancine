@@ -2,7 +2,7 @@
 import { loadComponents, updateNavbarAuth, updateNavbarCartCount } from './components.js';
 import { fetchProducts, getUser, onAuthStateChange } from './api.js';
 import { state, loadCart, getCartCount, addToCart, loadFavorites, isFavorite, toggleFavorite } from './state.js';
-import { getUrlParam } from './utils.js';
+import { getUrlParam, renderBreadcrumbs } from './utils.js';
 
 let currentProduct = null;
 
@@ -32,12 +32,25 @@ async function init() {
     }
 
     renderProduct();
+    renderProductBreadcrumbs();
     setupListeners();
     setupAuthListener();
 
     window.addEventListener('cart-updated', () => {
         updateNavbarCartCount(getCartCount());
     });
+}
+
+function renderProductBreadcrumbs() {
+    const placeholder = document.getElementById('breadcrumbs-placeholder');
+    if (placeholder && currentProduct) {
+        placeholder.innerHTML = renderBreadcrumbs([
+            { label: 'Inicio', href: 'index.html' },
+            { label: 'Categorías', href: 'categories.html' },
+            { label: currentProduct.category, href: `index.html?category=${encodeURIComponent(currentProduct.category)}` },
+            { label: currentProduct.title, href: null }
+        ]);
+    }
 }
 
 function setupAuthListener() {
