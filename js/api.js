@@ -331,7 +331,9 @@ export async function fetchMyOrders(userId) {
                 quantity,
                 price,
                 products (
-                    title
+                    title,
+                    main_image,
+                    image_color
                 )
             )
         `)

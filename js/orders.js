@@ -2,7 +2,7 @@
 import { loadComponents, updateNavbarAuth, updateNavbarCartCount } from './components.js';
 import { getUser, onAuthStateChange, fetchMyOrders, downloadProductFile } from './api.js';
 import { state, loadCart, getCartCount } from './state.js';
-import { escapeHtml } from './utils.js';
+import { escapeHtml, sanitizeCssValue } from './utils.js';
 
 async function init() {
     await loadComponents();
@@ -25,6 +25,10 @@ async function init() {
         }
     });
 
+    window.addEventListener('cart-updated', () => {
+        updateNavbarCartCount(getCartCount());
+    });
+
     if (window.lucide) window.lucide.createIcons();
 
     loadOrders(user.id);
@@ -38,10 +42,10 @@ async function loadOrders(userId) {
 
         if (!orders || orders.length === 0) {
             listContainer.innerHTML = `
-                <div class="empty-state">
-                    <i data-lucide="shopping-bag" style="font-size: 3rem; opacity: 0.5;"></i>
-                    <p style="margin-top: 16px;">Aún no has realizado ninguna compra.</p>
-                    <a href="index.html" class="btn btn--primary" style="margin-top: 16px; display: inline-block;">Ir al Catálogo</a>
+                <div class="orders-empty">
+                    <i data-lucide="shopping-bag"></i>
+                    <p>Aún no has realizado ninguna compra.</p>
+                    <a href="index.html" class="btn btn--primary" style="margin-top: 8px;">Explorar Catálogo</a>
                 </div>
             `;
             if (window.lucide) window.lucide.createIcons();
@@ -50,11 +54,12 @@ async function loadOrders(userId) {
 
         listContainer.innerHTML = orders.map(order => renderOrderCard(order)).join('');
         if (window.lucide) window.lucide.createIcons();
+        attachDownloadListeners();
 
     } catch (error) {
         console.error("Error loading orders:", error);
         listContainer.innerHTML = `
-            <div class="empty-state">
+            <div class="orders-empty">
                 <p>Hubo un error al cargar tus compras.</p>
             </div>
         `;
@@ -63,80 +68,114 @@ async function loadOrders(userId) {
 
 function renderOrderCard(order) {
     const date = new Date(order.created_at).toLocaleDateString('es-ES', {
-        year: 'numeric', month: 'long', day: 'numeric', hour: '2-digit', minute: '2-digit'
+        year: 'numeric', month: 'short', day: 'numeric'
     });
 
-    const statusClass = order.status === 'paid' ? 'status-paid' : 'status-pending';
-    const statusText = order.status === 'paid' ? 'Pagado' : 'Pendiente';
+    const isPaid = order.status === 'paid';
+    const statusClass = isPaid ? 'order-card__status--paid' : 'order-card__status--pending';
+    const statusText = isPaid ? 'Pagado' : 'Pendiente';
 
     let itemsHtml = '';
     if (order.order_items && order.order_items.length > 0) {
         itemsHtml = order.order_items.map(item => {
-            const productTitle = item.products ? item.products.title : 'Producto';
-            const safeTitle = escapeHtml(productTitle);
-            // For the onclick attribute, encode for safe use in JS string
-            const jsTitle = productTitle.replace(/\\/g, '\\\\').replace(/'/g, "\\'").replace(/"/g, '\\"');
+            const product = item.products || {};
+            const title = product.title || 'Producto';
+            const mainImage = product.main_image || '';
+            const imageColor = product.image_color || '#F3F4F6';
 
-            const downloadBtn = order.status === 'paid'
-                ? `<button onclick="handleDownload(${parseInt(item.product_id)}, '${jsTitle}')" class="btn-download" style="margin-left: auto; font-size: 0.8rem; padding: 4px 12px; border: 1px solid var(--color-border); border-radius: 4px; background: white; cursor: pointer;">
-                     <i data-lucide="download" style="width: 14px; height: 14px; vertical-align: middle; margin-right: 4px;"></i> Descargar
+            const thumbContent = mainImage
+                ? `<img src="${escapeHtml(mainImage)}" alt="${escapeHtml(title)}" loading="lazy">`
+                : `<i data-lucide="image" style="width:24px; height:24px; color:#D1D5DB;"></i>`;
+
+            const downloadBtn = isPaid
+                ? `<button class="order-item__download" data-id="${parseInt(item.product_id)}" data-title="${escapeHtml(title)}">
+                     <i data-lucide="download"></i> Descargar
                    </button>`
                 : '';
 
             return `
-            <div class="order-item" style="align-items: center;">
-                <span>${parseInt(item.quantity)}x ${safeTitle}</span>
+            <div class="order-item">
+                <div class="order-item__thumb" style="background: ${sanitizeCssValue(imageColor)};">
+                    ${thumbContent}
+                </div>
+                <div class="order-item__info">
+                    <div class="order-item__title">${escapeHtml(title)}</div>
+                    <div class="order-item__qty">Cant: ${parseInt(item.quantity)}</div>
+                </div>
                 ${downloadBtn}
-                <span style="font-weight: 600; margin-left: 12px;">$${parseFloat(item.price).toFixed(2)}</span>
+                <span class="order-item__price">$${parseFloat(item.price).toFixed(2)}</span>
             </div>
             `;
         }).join('');
-    } else {
-        itemsHtml = '<p class="text-gray" style="font-size: 0.9rem;">Detalles del pedido...</p>';
     }
 
     return `
         <div class="order-card">
-            <div class="order-header">
-                <div>
-                    <div class="order-id">Pedido #${order.id.slice(0, 8).toUpperCase()}</div>
-                    <div class="order-date">${date}</div>
+            <div class="order-card__header">
+                <div class="order-card__meta">
+                    <span class="order-card__id">#${order.id.slice(0, 8).toUpperCase()}</span>
+                    <span class="order-card__date">
+                        <i data-lucide="calendar"></i> ${date}
+                    </span>
                 </div>
-                <div class="order-status ${statusClass}">${statusText}</div>
+                <span class="order-card__status ${statusClass}">${statusText}</span>
             </div>
-            
-            <div class="order-items">
+
+            <div class="order-card__items">
                 ${itemsHtml}
             </div>
 
-            <div class="order-total">
-                Total: $${order.total}
+            <div class="order-card__footer">
+                <span class="order-card__total-label">Total</span>
+                <span class="order-card__total">$${parseFloat(order.total).toFixed(2)}</span>
             </div>
         </div>
     `;
 }
 
-window.handleDownload = async (productId, productName) => {
-    if (!productId) {
-        console.error("No product ID for download");
-        return;
-    }
-    try {
-        const result = await downloadProductFile(productId);
-        if (result && result.url) {
-            const link = document.createElement('a');
-            link.href = result.url;
-            link.download = result.filename || productName + '.zip';
-            document.body.appendChild(link);
-            link.click();
-            document.body.removeChild(link);
-        } else {
-            alert('El archivo digital para este producto no está disponible todavía.');
-        }
-    } catch (err) {
-        console.error('Download error:', err);
-        alert('Error al generar el enlace de descarga.');
-    }
-};
+function attachDownloadListeners() {
+    document.querySelectorAll('.order-item__download').forEach(btn => {
+        btn.addEventListener('click', async () => {
+            const productId = parseInt(btn.dataset.id);
+            const productTitle = btn.dataset.title;
+
+            const originalHTML = btn.innerHTML;
+            btn.innerHTML = '<i data-lucide="loader"></i> Descargando...';
+            btn.disabled = true;
+            if (window.lucide) window.lucide.createIcons();
+
+            try {
+                const result = await downloadProductFile(productId);
+                if (result && result.url) {
+                    const link = document.createElement('a');
+                    link.href = result.url;
+                    link.download = result.filename || productTitle + '.zip';
+                    document.body.appendChild(link);
+                    link.click();
+                    document.body.removeChild(link);
+
+                    btn.innerHTML = '<i data-lucide="check"></i> Descargado';
+                    if (window.lucide) window.lucide.createIcons();
+                    setTimeout(() => {
+                        btn.innerHTML = originalHTML;
+                        btn.disabled = false;
+                        if (window.lucide) window.lucide.createIcons();
+                    }, 2000);
+                } else {
+                    alert('El archivo digital para este producto no está disponible todavía.');
+                    btn.innerHTML = originalHTML;
+                    btn.disabled = false;
+                    if (window.lucide) window.lucide.createIcons();
+                }
+            } catch (err) {
+                console.error('Download error:', err);
+                alert('Error al generar el enlace de descarga.');
+                btn.innerHTML = originalHTML;
+                btn.disabled = false;
+                if (window.lucide) window.lucide.createIcons();
+            }
+        });
+    });
+}
 
 document.addEventListener('DOMContentLoaded', init);

@@ -1,0 +1,236 @@
+/* ============================================================
+   Orders / Mis Compras
+   ============================================================ */
+
+.orders-header {
+    padding: 48px 80px 24px;
+    text-align: center;
+}
+
+.orders-header h1 {
+    font-family: 'Bricolage Grotesque', serif;
+    font-size: 36px;
+    font-weight: 800;
+    margin-bottom: 8px;
+    color: var(--color-foreground);
+}
+
+.orders-header p {
+    font-size: 16px;
+    color: #6B7280;
+}
+
+.orders-container {
+    max-width: 900px;
+    margin: 0 auto;
+    padding: 24px 24px 64px;
+}
+
+.orders-list {
+    display: flex;
+    flex-direction: column;
+    gap: 24px;
+}
+
+/* --- Order Card --- */
+.order-card {
+    background: #FFFFFF;
+    border: 1px solid #E5E7EB;
+    border-radius: 16px;
+    overflow: hidden;
+    transition: box-shadow 0.2s;
+}
+
+.order-card:hover {
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.06);
+}
+
+/* Card Header */
+.order-card__header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 20px 24px;
+    background: #F9FAFB;
+    border-bottom: 1px solid #E5E7EB;
+}
+
+.order-card__meta {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+}
+
+.order-card__id {
+    font-weight: 700;
+    font-size: 15px;
+    color: #1A1A1A;
+}
+
+.order-card__date {
+    font-size: 13px;
+    color: #9CA3AF;
+    display: flex;
+    align-items: center;
+    gap: 4px;
+}
+
+.order-card__date i {
+    width: 14px;
+    height: 14px;
+}
+
+.order-card__status {
+    font-size: 13px;
+    font-weight: 600;
+    padding: 5px 14px;
+    border-radius: 999px;
+    letter-spacing: 0.02em;
+}
+
+.order-card__status--paid {
+    background: #dcfce7;
+    color: #166534;
+}
+
+.order-card__status--pending {
+    background: #fef9c3;
+    color: #854d0e;
+}
+
+/* Card Items */
+.order-card__items {
+    padding: 16px 24px;
+    display: flex;
+    flex-direction: column;
+    gap: 0;
+}
+
+/* Single Item Row */
+.order-item {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    padding: 12px 0;
+    border-bottom: 1px solid #F3F4F6;
+}
+
+.order-item:last-child {
+    border-bottom: none;
+}
+
+/* Product Thumbnail */
+.order-item__thumb {
+    width: 56px;
+    height: 56px;
+    border-radius: 10px;
+    flex-shrink: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+}
+
+.order-item__thumb img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+/* Product Info */
+.order-item__info {
+    flex: 1;
+    min-width: 0;
+}
+
+.order-item__title {
+    font-size: 14px;
+    font-weight: 600;
+    color: #1A1A1A;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.order-item__qty {
+    font-size: 12px;
+    color: #9CA3AF;
+    margin-top: 2px;
+}
+
+/* Item Price */
+.order-item__price {
+    font-size: 14px;
+    font-weight: 700;
+    color: #1A1A1A;
+    white-space: nowrap;
+}
+
+/* Download button */
+.order-item__download {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 6px 14px;
+    border-radius: 8px;
+    background: #F0FDF4;
+    border: 1px solid #BBF7D0;
+    color: #166534;
+    font-size: 13px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.15s;
+    font-family: 'DM Sans', sans-serif;
+    white-space: nowrap;
+}
+
+.order-item__download:hover {
+    background: #dcfce7;
+    border-color: #86efac;
+}
+
+.order-item__download i {
+    width: 14px;
+    height: 14px;
+}
+
+/* Card Footer / Total */
+.order-card__footer {
+    display: flex;
+    justify-content: flex-end;
+    align-items: center;
+    padding: 16px 24px;
+    background: #F9FAFB;
+    border-top: 1px solid #E5E7EB;
+    gap: 8px;
+}
+
+.order-card__total-label {
+    font-size: 14px;
+    color: #6B7280;
+    font-weight: 500;
+}
+
+.order-card__total {
+    font-size: 18px;
+    font-weight: 800;
+    color: #1A1A1A;
+    font-family: 'Bricolage Grotesque', serif;
+}
+
+/* Empty State */
+.orders-empty {
+    text-align: center;
+    padding: 64px 24px;
+    color: #6B7280;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 16px;
+}
+
+.orders-empty i {
+    width: 48px;
+    height: 48px;
+    opacity: 0.4;
+}
