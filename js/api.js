@@ -240,6 +240,19 @@ export async function createOrder() {
     return { data, error }
 }
 
+export async function getPayPalClientId() {
+    const { data, error } = await supabase.functions.invoke('paypal-order', {
+        body: { action: 'getClientId' }
+    });
+
+    if (error) {
+        console.error('Error fetching PayPal Client ID:', error);
+        return { error };
+    }
+    return { data };
+}
+}
+
 export async function confirmOrderPayment(orderId, paymentId) {
     const { error } = await supabase
         .rpc('confirm_order_payment', {
