@@ -197,20 +197,38 @@ export async function clearCartDB(userId) {
 
 // --- Orders ---
 
-// --- Secure Payment RPC ---
+// --- Secure Payment (Edge Function) ---
 export async function createOrderSecure(items) {
     const user = await getUser();
     if (!user) throw new Error("User must be logged in");
 
-    // items should be [{ id: 1, quantity: 1 }, ...]
-    const { data, error } = await supabase
-        .rpc('create_order_secure', {
-            p_user_id: user.id,
-            p_items: items
-        });
+    // items: [{ id: 1, quantity: 1 }, ...]
+    const { data, error } = await supabase.functions.invoke('paypal-order', {
+        body: {
+            action: 'create',
+            items: items,
+            user_id: user.id
+        }
+    });
 
     if (error) {
         console.error('Error creating secure order:', error);
+        throw error;
+    }
+    return data; // { orderID, dbOrderId }
+}
+
+export async function captureOrderSecure(orderID, dbOrderId) {
+    const { data, error } = await supabase.functions.invoke('paypal-order', {
+        body: {
+            action: 'capture',
+            orderID: orderID,
+            dbOrderId: dbOrderId
+        }
+    });
+
+    if (error) {
+        console.error('Error capturing secure order:', error);
         throw error;
     }
     return data;

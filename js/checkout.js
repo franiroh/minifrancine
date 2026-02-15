@@ -88,17 +88,7 @@ function renderCheckout() {
                     }
 
                     try {
-                        // 1. Create Order on Server (Secure)
-                        // Prepare items for RPC: [{id: 1, quantity: 1}, ...]
-                        // Currently cart items in state might differ from DB if we don't sync, 
-                        // but RPC will pull prices from DB based on ID.
-                        // We need to map state.cart to the expected format. 
-                        // Assuming state.cart contains full product objects.
-                        // We need to aggregate quantities if duplicates exist, 
-                        // or if cart is flat list of products, count them.
-                        // Let's check state.js implementation of cart.
-                        // It seems cart is array of products.
-
+                        // 1. Prepare items
                         const cartItemsMap = {};
                         state.cart.forEach(p => {
                             if (cartItemsMap[p.id]) {
@@ -113,27 +103,23 @@ function renderCheckout() {
                             quantity: cartItemsMap[id]
                         }));
 
-                        const { data: orderData, error } = await import('./api.js').then(m => m.createOrderSecure(rpcItems));
+                        // 2. Call Edge Function to Create Order
+                        // Returns { orderID: 'PAYPAL-ID', dbOrderId: 'UUID' }
+                        const result = await import('./api.js').then(m => m.createOrderSecure(rpcItems));
 
-                        if (error) {
-                            throw new Error(error.message);
-                        }
+                        // Store dbOrderId needed for capture later
+                        // We can store it in a variable accessible to onApprove, 
+                        // or better, encoding it in custom_id if we were creating it client side, 
+                        // but here we just return the ID.
+                        // We can use a global or closure variable? 
+                        // Actually, 'actions.resolved' is deprecated or specific.
+                        // Standard flow: return orderID string.
 
-                        console.log('Order created on DB:', orderData);
+                        window.currentDbOrderId = result.dbOrderId; // Hacky but works for SPA context
 
-                        // Check if total matches expectation? 
-                        // The server total is the source of truth.
+                        console.log('Server created PayPal Order:', result.orderID);
+                        return result.orderID;
 
-                        // 2. Tell PayPal to create a transaction with SERVER Calculated total
-                        return actions.order.create({
-                            purchase_units: [{
-                                description: `Order #${orderData.order_id}`,
-                                amount: {
-                                    value: orderData.total // Secure Total from DB
-                                },
-                                custom_id: orderData.order_id
-                            }]
-                        });
                     } catch (err) {
                         alert('Error al crear la orden: ' + err.message);
                         return Promise.reject(err);
@@ -141,36 +127,23 @@ function renderCheckout() {
                 },
                 onApprove: async (data, actions) => {
                     try {
-                        // 3. Capture Payment
-                        const details = await actions.order.capture();
-                        console.log('PayPal Transaction completed:', details);
+                        console.log('PayPal Approved, capturing...', data);
+                        // data.orderID is the PayPal ID
 
-                        const dbOrderId = details.purchase_units[0].custom_id;
-                        const paymentId = details.id;
+                        // 3. Call Edge Function to Capture
+                        const result = await import('./api.js').then(m => m.captureOrderSecure(data.orderID, window.currentDbOrderId));
 
-                        // 4. Confirm Payment via Secure Edge Function
-                        const { data: result, error } = await import('./api.js').then(m => m.verifyPayment(dbOrderId, paymentId));
-
-                        if (error) {
-                            console.error('Edge Function Error:', error);
-
-                            // Log to server for debugging
-                            await import('./api.js').then(m => m.logError({ error, paymentId, dbOrderId }));
-
-                            let errMsg = error.message || JSON.stringify(error);
-                            if (error && error.context && error.context.json && error.context.json.error) {
-                                errMsg = error.context.json.error;
-                            }
-
-                            alert(`Error de verificación: ${errMsg}\nID: ${paymentId}`);
-                        } else {
-                            alert(`¡Pago verificado exitosamente! ID: ${paymentId}`);
+                        if (result.status === 'success') {
+                            alert(`¡Pago exitoso! ID: ${result.data.id}`);
                             state.cart = [];
                             window.location.href = 'index.html';
+                        } else {
+                            throw new Error(result.message || 'Payment failed');
                         }
+
                     } catch (err) {
-                        console.error('Capture/Verify error:', err);
-                        alert('Hubo un error al procesar el pago.');
+                        console.error('Capture error:', err);
+                        alert('Hubo un error al procesar el pago: ' + err.message);
                     }
                 },
                 onError: (err) => {
