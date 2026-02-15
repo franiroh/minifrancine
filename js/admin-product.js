@@ -99,6 +99,8 @@ async function loadProductData(id) {
     document.getElementById('prod-badge').value = product.badge || '';
     document.getElementById('prod-badge-color').value = product.badgeColor || 'red';
     document.getElementById('prod-image-color').value = product.imageColor || '';
+    document.getElementById('prod-color-count').value = product.colorCount || '';
+    document.getElementById('prod-color-change-count').value = product.colorChangeCount || '';
     document.getElementById('prod-size').value = product.size || '';
     document.getElementById('prod-stitches').value = product.stitches ? Number(product.stitches).toLocaleString('en-US') : '';
     document.getElementById('prod-formats').value = product.formats || '';
@@ -313,7 +315,10 @@ async function handleSave(e) {
             category_id: parseInt(document.getElementById('prod-category').value, 10),
             badge: document.getElementById('prod-badge').value,
             badge_color: document.getElementById('prod-badge-color').value,
+            badge_color: document.getElementById('prod-badge-color').value,
             image_color: document.getElementById('prod-image-color').value,
+            color_count: parseInt(document.getElementById('prod-color-count').value) || 0,
+            color_change_count: parseInt(document.getElementById('prod-color-change-count').value) || 0,
             size: document.getElementById('prod-size').value,
             stitches: parseInt(document.getElementById('prod-stitches').value.replace(/,/g, ''), 10) || 0,
             formats: document.getElementById('prod-formats').value,

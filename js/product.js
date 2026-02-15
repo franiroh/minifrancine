@@ -110,6 +110,8 @@ async function renderProduct() {
     setText('detail-price', `$${p.price}`);
 
     setText('detail-size', p.size);
+    setText('detail-color-count', p.colorCount || '-');
+    setText('detail-color-change-count', p.colorChangeCount || '-');
     setText('detail-stitches', p.stitches ? Number(p.stitches).toLocaleString('en-US') : '');
     setText('detail-formats', p.formats);
 
@@ -146,13 +148,23 @@ function updateFavoriteButton() {
     const btn = document.getElementById('detail-fav-btn');
     if (!btn || !currentProduct) return;
 
-    if (isFavorite(currentProduct.id)) {
-        btn.innerHTML = `<i class="icon lucide-heart" style="fill: #FF6B6B; color: #FF6B6B;"></i> Quitar de Favoritos`;
-    } else {
-        btn.innerHTML = `<i class="icon lucide-heart"></i> Agregar a Favoritos`;
-    }
+    const icon = btn.querySelector('svg') || btn.querySelector('i');
 
-    if (window.lucide) window.lucide.createIcons();
+    if (isFavorite(currentProduct.id)) {
+        btn.classList.add('detail__heart--active');
+        if (icon) {
+            icon.setAttribute('fill', '#FF6B6B');
+            icon.style.fill = '#FF6B6B';
+            icon.style.color = '#FF6B6B';
+        }
+    } else {
+        btn.classList.remove('detail__heart--active');
+        if (icon) {
+            icon.setAttribute('fill', 'none');
+            icon.style.fill = 'none';
+            icon.style.color = '#FF6B6B'; // Keep outline red
+        }
+    }
 }
 
 function setupListeners() {
@@ -222,7 +234,8 @@ function setupListeners() {
     // Favorite button (always active)
     const favBtn = document.getElementById('detail-fav-btn');
     if (favBtn) {
-        favBtn.addEventListener('click', async () => {
+        favBtn.addEventListener('click', async (e) => {
+            e.stopPropagation(); // prevent bubbling if needed
             if (currentProduct) {
                 await toggleFavorite(currentProduct.id);
                 updateFavoriteButton();

@@ -67,7 +67,8 @@
                             <input type="checkbox" id="prod-published" checked>
                             <span class="slider"></span>
                         </label>
-                        <span id="prod-published-label" style="font-size:13px;font-weight:600;color:#22C55E;">Publicado</span>
+                        <span id="prod-published-label"
+                            style="font-size:13px;font-weight:600;color:#22C55E;">Publicado</span>
                         <button type="button" class="btn btn--secondary"
                             onclick="window.location.href='admin.html#products'">Cancelar</button>
                         <button type="button" class="btn btn--primary" id="btn-save">Guardar Producto</button>
@@ -164,6 +165,16 @@
                             <div class="form-group">
                                 <label>Puntadas</label>
                                 <input type="text" inputmode="numeric" id="prod-stitches" placeholder="5,400">
+                            </div>
+                        </div>
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label>Cantidad de Colores</label>
+                                <input type="number" id="prod-color-count" placeholder="Ej: 5">
+                            </div>
+                            <div class="form-group">
+                                <label>Cambios de Color</label>
+                                <input type="number" id="prod-color-change-count" placeholder="Ej: 7">
                             </div>
                         </div>
                     </div>

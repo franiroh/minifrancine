@@ -26,6 +26,7 @@ export const loadComponents = async () => {
           <button class="navbar__user-btn" id="navbar-user-btn" onclick="window.location.href='login.html'">
             <i data-lucide="user"></i>
             <span id="navbar-user-text">Login</span>
+            <i data-lucide="chevron-down" id="navbar-user-arrow" style="width: 16px; height: 16px; margin-left: -2px; display: none;"></i>
           </button>
           <div class="navbar__dropdown" id="navbar-dropdown">
             <a href="mis-disenos.html" class="navbar__dropdown-item">
@@ -95,6 +96,10 @@ export const updateNavbarAuth = async (user) => {
     if (user) {
       userText.textContent = escapeHtml(user.email);
 
+      // Show arrow
+      const arrow = document.getElementById('navbar-user-arrow');
+      if (arrow) arrow.style.display = 'block';
+
       // Toggle dropdown on click
       userBtn.onclick = (e) => {
         e.stopPropagation();
@@ -137,6 +142,10 @@ export const updateNavbarAuth = async (user) => {
       }
     } else {
       userText.textContent = 'Login';
+      // Hide arrow
+      const arrow = document.getElementById('navbar-user-arrow');
+      if (arrow) arrow.style.display = 'none';
+
       userBtn.onclick = () => window.location.href = 'login.html';
       // Hide dropdown when logged out
       if (dropdown) dropdown.style.display = 'none';
