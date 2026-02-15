@@ -1,6 +1,7 @@
 
+
 import { loadComponents, updateNavbarAuth, updateNavbarCartCount } from './components.js';
-import { signIn, signUp, onAuthStateChange, getUser, signOut } from './api.js';
+import { signIn, signUp, onAuthStateChange, getUser, signOut, checkNameExists } from './api.js';
 import { loadCart, getCartCount, loadFavorites } from './state.js';
 import { showToast } from './utils.js';
 
@@ -19,7 +20,7 @@ async function init() {
         // But maybe user wants to see account page or logout. 
         // For now, let's keep it.
         document.getElementById('auth-title').textContent = 'Tu Cuenta';
-        document.getElementById('auth-desc').textContent = `Hola, ${user.email}`;
+        document.getElementById('auth-desc').textContent = `Hola, ${user.email} `;
 
         // Hide forms, show logout?
         const card = document.querySelector('.login-card');
@@ -28,8 +29,8 @@ async function init() {
                 <h2 style="font-family: 'Bricolage Grotesque'; font-size: 24px; font-weight:700;">Tu Cuenta</h2>
                 <p style="color:#6B7280;">${user.email}</p>
             </div>
-            <button id="logout-btn" class="btn btn--outline btn--block btn--lg" style="margin-top:20px;">Cerrar Sesión</button>
-        `;
+    <button id="logout-btn" class="btn btn--outline btn--block btn--lg" style="margin-top:20px;">Cerrar Sesión</button>
+`;
         document.getElementById('logout-btn').addEventListener('click', async () => {
             await signOut();
             window.location.reload();
@@ -108,25 +109,68 @@ function setupForms() {
 
     if (registerBtn) {
         registerBtn.addEventListener('click', async () => {
-            const email = document.getElementById('register-email').value;
-            const password = document.getElementById('register-password').value;
-            if (!email || !password) {
-                showToast('Completa todos los campos', 'error');
-                return;
-            }
+            console.log('Register button clicked');
+            try {
+                const nameInput = document.getElementById('register-name');
+                const emailInput = document.getElementById('register-email');
+                const passInput = document.getElementById('register-password');
 
-            registerBtn.textContent = 'Cargando...';
-            registerBtn.disabled = true;
+                if (!nameInput || !emailInput || !passInput) {
+                    console.error('Missing form elements');
+                    showToast('Error interno del formulario', 'error');
+                    return;
+                }
 
-            const { error } = await signUp(email, password);
+                const name = nameInput.value;
+                const email = emailInput.value;
+                const password = passInput.value;
 
-            if (error) {
-                showToast('Error: ' + error.message, 'error');
+                console.log('Attempting to register:', { name, email });
+
+                if (!name || !email || !password) {
+                    showToast('Completa todos los campos', 'error');
+                    return;
+                }
+
+                registerBtn.textContent = 'Verificando...';
+                registerBtn.disabled = true;
+
+                // Check if name exists
+                console.log('Checking name availability...');
+                const exists = await checkNameExists(name);
+                console.log('Name exists:', exists);
+
+                if (exists) {
+                    showToast('Ese nombre ya está en uso. Por favor elige otro.', 'error');
+                    registerBtn.textContent = 'Registrarse';
+                    registerBtn.disabled = false;
+                    return;
+                }
+
+                registerBtn.textContent = 'Cargando...';
+
+                console.log('Calling signUp...');
+                const { data, error } = await signUp(email, password, name);
+                console.log('SignUp result:', { data, error });
+
+                if (error) {
+                    console.error('SignUp Error:', error);
+                    if (error.status === 429 || error.message.includes('429') || error.message.includes('rate limit')) {
+                        showToast('Demasiados intentos. Por favor espera unos minutos.', 'error');
+                    } else {
+                        showToast('Error: ' + error.message, 'error');
+                    }
+                    registerBtn.textContent = 'Registrarse';
+                    registerBtn.disabled = false;
+                } else {
+                    showToast('¡Registro exitoso! Por favor verifica tu email.', 'success');
+                    // Depending on settings, might auto login
+                }
+            } catch (err) {
+                console.error('Unexpected error during registration:', err);
+                showToast('Error inesperado: ' + err.message, 'error');
                 registerBtn.textContent = 'Registrarse';
                 registerBtn.disabled = false;
-            } else {
-                showToast('¡Registro exitoso! Por favor verifica tu email.', 'success');
-                // Depending on settings, might auto login
             }
         });
     }

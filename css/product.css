@@ -140,6 +140,20 @@
     font-weight: 800;
 }
 
+.detail__badge {
+    display: inline-block;
+    padding: 6px 12px;
+    border-radius: 6px;
+    color: #FFF;
+    font-size: 13px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    margin-top: 4px;
+    margin-bottom: 8px;
+    width: fit-content;
+}
+
 .detail__rating {
     display: flex;
     align-items: center;
@@ -166,10 +180,37 @@
     line-height: 1.6;
 }
 
+.detail__tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-bottom: 24px;
+}
+
+.detail__tag {
+    display: inline-block;
+    padding: 4px 10px;
+    border-radius: 4px;
+    background: #F3F4F6;
+    color: #4B5563;
+    font-size: 12px;
+    font-weight: 500;
+    text-transform: capitalize;
+    text-decoration: none;
+    /* For links */
+    transition: background 0.2s, color 0.2s;
+}
+
+.detail__tag:hover {
+    background: #E5E7EB;
+    color: #111827;
+}
+
 .detail__price {
     display: flex;
     align-items: center;
     gap: 12px;
+    margin-bottom: 24px;
 }
 
 .detail__price-current {

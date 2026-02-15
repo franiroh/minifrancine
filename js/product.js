@@ -110,11 +110,54 @@ async function renderProduct() {
 
     // Info
     document.title = `${p.title} — PatchFiles`;
-    setText('detail-category', p.category);
+
+    // Make category clickable
+    const catEl = document.getElementById('detail-category');
+    if (catEl) {
+        catEl.innerHTML = `<a href="catalog.html?category=${encodeURIComponent(p.category)}" style="color:inherit; text-decoration:none; transition:opacity 0.2s;">${p.category}</a>`;
+        catEl.querySelector('a').onmouseover = e => e.target.style.opacity = '0.7';
+        catEl.querySelector('a').onmouseout = e => e.target.style.opacity = '1';
+    }
+
     setText('detail-category-crumb', p.category);
     setText('detail-title', p.title);
     setText('detail-title-crumb', p.title);
+
+    // Badge logic
+    const titleEl = document.getElementById('detail-title');
+    if (titleEl) {
+        // Remove existing badge if any (for re-renders)
+        const existingBadge = titleEl.nextElementSibling;
+        if (existingBadge && existingBadge.classList.contains('detail__badge')) {
+            existingBadge.remove();
+        }
+
+        if (p.badge) {
+            const badgeEl = document.createElement('div');
+            badgeEl.className = 'detail__badge';
+            badgeEl.textContent = p.badge;
+            badgeEl.style.backgroundColor = p.badgeColor || '#000';
+            titleEl.insertAdjacentElement('afterend', badgeEl);
+        }
+    }
+
     setText('detail-desc', p.description || 'Sin descripción.');
+
+    // Tags
+    const tagsContainer = document.getElementById('detail-tags');
+    if (tagsContainer) {
+        tagsContainer.innerHTML = '';
+        if (p.tags && p.tags.length > 0) {
+            p.tags.forEach(tag => {
+                const tagEl = document.createElement('a'); // Changed to <a>
+                tagEl.href = `catalog.html?tag=${encodeURIComponent(tag)}`; // Link to catalog
+                tagEl.className = 'detail__tag';
+                tagEl.textContent = tag;
+                tagsContainer.appendChild(tagEl);
+            });
+        }
+    }
+
     setText('detail-price', `$${p.price}`);
 
     // Specs

@@ -1,11 +1,17 @@
 
-import { loadComponents, updateNavbarAuth, updateNavbarCartCount } from './components.js';
+import { loadComponents, updateNavbarAuth, updateNavbarCartCount, createSkeletonCard } from './components.js';
 import { getUser, onAuthStateChange, fetchPurchasedProducts, downloadProductFile } from './api.js';
 import { loadCart, getCartCount } from './state.js';
 import { escapeHtml, sanitizeCssValue, showToast } from './utils.js';
 
 async function init() {
     await loadComponents();
+
+    // Show skeletons immediately
+    const grid = document.getElementById('designs-grid');
+    if (grid) {
+        grid.innerHTML = Array(4).fill(0).map(() => createSkeletonCard()).join('');
+    }
 
     const user = await getUser();
     updateNavbarAuth(user);

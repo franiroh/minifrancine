@@ -56,6 +56,14 @@ async function init() {
     if (productId) {
         document.getElementById('page-title').textContent = 'Editar Producto';
         document.getElementById('prod-id').value = productId;
+
+        // Configure View Button
+        const viewBtn = document.getElementById('btn-view-product');
+        if (viewBtn) {
+            viewBtn.classList.remove('hidden');
+            viewBtn.onclick = () => window.open(`product.html?id=${productId}`, '_blank');
+        }
+
         await loadProductData(productId);
     } else {
         document.getElementById('page-title').textContent = 'Nuevo Producto';
@@ -98,6 +106,7 @@ async function loadProductData(id) {
     document.getElementById('prod-category').value = product.categoryId || '';
     document.getElementById('prod-badge').value = product.badge || '';
     document.getElementById('prod-badge-color').value = product.badgeColor || 'red';
+    document.getElementById('prod-tags').value = (product.tags || []).join(', ');
     document.getElementById('prod-image-color').value = product.imageColor || '';
     document.getElementById('prod-color-count').value = product.colorCount || '';
     document.getElementById('prod-color-change-count').value = product.colorChangeCount || '';
@@ -315,7 +324,7 @@ async function handleSave(e) {
             category_id: parseInt(document.getElementById('prod-category').value, 10),
             badge: document.getElementById('prod-badge').value,
             badge_color: document.getElementById('prod-badge-color').value,
-            badge_color: document.getElementById('prod-badge-color').value,
+            tags: document.getElementById('prod-tags').value.split(',').map(t => t.trim()).filter(t => t),
             image_color: document.getElementById('prod-image-color').value,
             color_count: parseInt(document.getElementById('prod-color-count').value) || 0,
             color_change_count: parseInt(document.getElementById('prod-color-change-count').value) || 0,
@@ -371,7 +380,21 @@ async function handleSave(e) {
         }
 
         alert('Producto guardado correctamente');
-        window.location.href = 'admin.html#products';
+
+        // If it was a new product, redirect to edit mode for this product
+        if (!productId) {
+            window.location.href = `admin-product.html?id=${savedProductId}`;
+        } else {
+            // If existing, just refresh data (optional) or just stay here
+            // Ensure View button is visible
+            const viewBtn = document.getElementById('btn-view-product');
+            if (viewBtn) {
+                viewBtn.classList.remove('hidden');
+                viewBtn.onclick = () => window.open(`product.html?id=${savedProductId}`, '_blank');
+            }
+            // Optionally reload data to confirm consistent state
+            await loadProductData(savedProductId);
+        }
 
     } catch (err) {
         console.error(err);

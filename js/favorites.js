@@ -1,10 +1,19 @@
 
-import { loadComponents, updateNavbarAuth, updateNavbarCartCount, createProductCard } from './components.js';
+import { loadComponents, updateNavbarAuth, updateNavbarCartCount, createProductCard, createSkeletonCard } from './components.js';
 import { fetchFavoriteProducts, getUser, onAuthStateChange } from './api.js';
 import { state, loadCart, getCartCount, loadFavorites } from './state.js';
 
 async function init() {
     await loadComponents();
+
+    // Show skeletons immediately
+    const grid = document.getElementById('favorites-grid');
+    const loading = document.getElementById('loading');
+    if (loading) loading.style.display = 'none';
+    if (grid) {
+        grid.style.display = 'grid'; // Ensure grid is visible
+        grid.innerHTML = Array(4).fill(0).map(() => createSkeletonCard()).join('');
+    }
 
     // Auth Check
     const user = await getUser();
@@ -42,16 +51,10 @@ function setupAuthListener() {
 
 async function renderFavorites(user) {
     const grid = document.getElementById('favorites-grid');
-    const loading = document.getElementById('loading');
     const emptyState = document.getElementById('empty-state');
 
     if (!grid) return;
 
-    // Show loading only if grid is empty (initial load)
-    if (grid.children.length === 0) {
-        grid.style.display = 'none';
-        if (loading) loading.style.display = 'block';
-    }
     if (emptyState) emptyState.style.display = 'none';
 
     try {
@@ -59,15 +62,13 @@ async function renderFavorites(user) {
         const currentFavIds = Array.from(state.favorites);
         const products = await fetchFavoriteProducts(user.id, currentFavIds);
 
-        if (loading) loading.style.display = 'none';
-
         if (products.length === 0) {
             grid.style.display = 'none'; // Ensure grid is hidden if empty
             if (emptyState) emptyState.style.display = 'block';
             return;
         }
 
-        grid.style.display = 'flex';
+        grid.style.display = 'grid'; // Was 'flex' in previous code, but css says 'grid' usually. Checked catalog it uses product-grid class.
         // Note: Replacing innerHTML causes image reload. For a perfect experience we'd diff, 
         // but removing the loading flicker is the big win here.
         grid.innerHTML = products.map(product => createProductCard(product)).join('');

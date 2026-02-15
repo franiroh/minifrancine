@@ -1,8 +1,8 @@
-
-import { loadComponents, updateNavbarAuth, updateNavbarCartCount, createProductCard } from './components.js';
-import { fetchProducts, fetchCategories, getUser, onAuthStateChange } from './api.js';
+import { loadComponents, updateNavbarAuth, updateNavbarCartCount, createProductCard, createSkeletonCard } from './components.js';
+import { fetchProducts, fetchCategories, getUser, onAuthStateChange, addToFavorites, removeFromFavorites, fetchFavoriteProducts } from './api.js';
 import { state, loadCart, getCartCount, addToCart, loadFavorites, isFavorite, toggleFavorite, loadPurchases, isPurchased } from './state.js';
 import { renderBreadcrumbs, escapeHtml, sanitizeCssValue } from './utils.js';
+import { supabase } from './api.js';
 
 let products = [];
 let currentCategory = 'Todos';
@@ -11,13 +11,27 @@ async function init() {
     // 1. Load Navbar/Footer
     await loadComponents();
 
-    // 2. Load State (User, Cart, Favorites)
-    const user = await getUser();
-    updateNavbarAuth(user);
+    const grid = document.getElementById('catalog-grid'); // Changed from product-grid to catalog-grid
+    // Show Skeletons
+    if (grid) {
+        grid.innerHTML = Array(8).fill(0).map(() => createSkeletonCard()).join('');
+    }
 
-    await loadCart(user);
+    // 2. Check Auth & Init Navbar
+    let user = null;
+    const { data: { session } } = await supabase.auth.getSession();
+    if (session) {
+        user = session.user;
+        updateNavbarAuth(user);
+    } else {
+        updateNavbarAuth(null);
+    }
+
+    // 3. Init Cart Count
     updateNavbarCartCount(getCartCount());
 
+    // 4. Load State (Cart, Favorites, Purchases)
+    await loadCart(user);
     await loadFavorites(user);
     await loadPurchases(user);
 

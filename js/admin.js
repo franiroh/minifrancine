@@ -2,6 +2,7 @@
 import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js/+esm'
 import { getUser, signOut, fetchProducts, updateProduct } from './api.js';
 import { fetchAllOrders, fetchAdminStats, deleteProduct, fetchCategories, createCategory, updateCategory, deleteCategory } from './api.js';
+import { loadAdminMessages } from './admin-messages.js';
 import { escapeHtml, sanitizeCssValue } from './utils.js';
 
 let currentView = 'dashboard';
@@ -29,7 +30,7 @@ async function init() {
 
     // 3. Load Initial View (Hash Routing)
     const hash = window.location.hash.replace('#', '');
-    if (hash && ['dashboard', 'products', 'orders', 'categories'].includes(hash)) {
+    if (hash && ['dashboard', 'products', 'orders', 'categories', 'messages'].includes(hash)) {
         const navItem = document.querySelector(`.nav-item[data-tab="${hash}"]`);
         if (navItem) navItem.click();
     } else {
@@ -53,14 +54,12 @@ async function init() {
         dateEndEl.valueAsDate = today;
 
         btnFilter.onclick = () => {
-            loadDashboard();
+            if (currentView === 'dashboard') loadDashboard();
+            if (currentView === 'orders') loadOrders();
         };
     }
 
-    // Exit Admin
-    document.getElementById('exit-admin-btn').onclick = () => {
-        window.location.href = 'index.html';
-    };
+
 
     fadeOutPreloader();
 }
@@ -77,27 +76,61 @@ function fadeOutPreloader() {
 // Navigation Logic
 function setupNavigation() {
     const navItems = document.querySelectorAll('.nav-item[data-tab]');
+    const pageTitle = document.getElementById('page-title');
+    const controls = document.querySelector('.dashboard-controls');
+
+    // Helper to update UI state
+    const updateUIState = (viewId, title) => {
+        currentView = viewId;
+
+        // 1. Update Title
+        if (pageTitle) pageTitle.textContent = title;
+
+        // 2. Toggle Controls (Only show for Orders)
+        if (controls) {
+            controls.style.display = (viewId === 'orders') ? 'flex' : 'none';
+        }
+
+        // 3. Nav Active State
+        navItems.forEach(n => n.classList.remove('active'));
+        const activeNav = document.querySelector(`.nav-item[data-tab="${viewId}"]`);
+        if (activeNav) activeNav.classList.add('active');
+
+        // 4. View Active State
+        document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
+        document.getElementById(`view-${viewId}`).classList.add('active');
+    };
+
     navItems.forEach(item => {
         item.onclick = () => {
-            // UI Update
-            navItems.forEach(n => n.classList.remove('active'));
-            item.classList.add('active');
-
-            // View Update
             const viewId = item.dataset.tab;
-            document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
-            document.getElementById(`view-${viewId}`).classList.add('active');
+            const title = item.innerText.trim();
+
+            updateUIState(viewId, title);
 
             // Load Data
             if (viewId === 'dashboard') loadDashboard();
             if (viewId === 'products') loadProducts();
             if (viewId === 'orders') loadOrders();
             if (viewId === 'categories') loadCategories();
+            if (viewId === 'messages') loadAdminMessages();
         };
     });
+
+    // Handle Initial State (for hash loading)
+    const hash = window.location.hash.replace('#', '');
+    if (hash && ['dashboard', 'products', 'orders', 'categories', 'messages'].includes(hash)) {
+        const navItem = document.querySelector(`.nav-item[data-tab="${hash}"]`);
+        if (navItem) navItem.click(); // This triggers onclick logic
+    } else {
+        // Default Dashboard state
+        updateUIState('dashboard', 'Dashboard');
+        loadDashboard();
+    }
 }
 
 async function loadDashboard() {
+    // Dashboard loads with default dates (or current input values hidden)
     const dateStart = document.getElementById('date-start')?.value;
     const dateEnd = document.getElementById('date-end')?.value;
 
@@ -176,10 +209,32 @@ async function loadProducts() {
 
 async function loadOrders() {
     const orders = await fetchAllOrders();
-    console.log('Orders fetched:', orders);
     const tbody = document.querySelector('#orders-table tbody');
 
-    tbody.innerHTML = orders.map(o => `
+    // Client-side date filtering
+    const dateStartVal = document.getElementById('date-start')?.value;
+    const dateEndVal = document.getElementById('date-end')?.value;
+
+    let filteredOrders = orders;
+
+    if (dateStartVal) {
+        const start = new Date(dateStartVal);
+        start.setHours(0, 0, 0, 0);
+        filteredOrders = filteredOrders.filter(o => new Date(o.created_at) >= start);
+    }
+
+    if (dateEndVal) {
+        const end = new Date(dateEndVal);
+        end.setHours(23, 59, 59, 999);
+        filteredOrders = filteredOrders.filter(o => new Date(o.created_at) <= end);
+    }
+
+    if (filteredOrders.length === 0) {
+        tbody.innerHTML = '<tr><td colspan="5" style="text-align:center; padding: 20px;">No hay pedidos en este rango de fechas.</td></tr>';
+        return;
+    }
+
+    tbody.innerHTML = filteredOrders.map(o => `
         <tr>
             <td><strong>#${escapeHtml(String(o.id).slice(0, 8).toUpperCase())}</strong></td>
             <td>

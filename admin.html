@@ -7,7 +7,8 @@
     <title>Admin Dashboard - PatchFiles</title>
     <link rel="stylesheet" href="css/main.css">
     <link rel="stylesheet" href="css/components.css">
-    <link rel="stylesheet" href="css/admin.css">
+    <link rel="stylesheet" href="css/admin.css?v=3">
+    <link rel="stylesheet" href="css/messages.css">
     <link
         href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&family=DM+Sans:wght@400;500;700&display=swap"
         rel="stylesheet">
@@ -24,6 +25,9 @@
                 <i data-lucide="shield"></i>
                 <span>Admin</span>
             </div>
+            <a href="index.html" class="nav-item" style="margin-bottom: 20px; color: var(--primary-color);">
+                <i data-lucide="external-link"></i> Ver Tienda
+            </a>
             <nav class="sidebar__nav">
                 <button class="nav-item active" data-tab="dashboard">
                     <i data-lucide="layout-dashboard"></i> Dashboard
@@ -37,8 +41,8 @@
                 <button class="nav-item" data-tab="categories">
                     <i data-lucide="tag"></i> Categorías
                 </button>
-                <button class="nav-item" id="exit-admin-btn">
-                    <i data-lucide="external-link"></i> Volver a Tienda
+                <button class="nav-item" data-tab="messages">
+                    <i data-lucide="message-square"></i> Mensajes
                 </button>
             </nav>
         </aside>
@@ -136,6 +140,29 @@
                             </thead>
                             <tbody><!-- Dynamic --></tbody>
                         </table>
+                    </div>
+                </div>
+                <!-- Messages View -->
+                <div id="view-messages" class="view">
+                    <div class="view-header" style="max-width: 1000px; margin: 0 auto 32px auto;">
+                        <h2>Mensajes de Usuarios</h2>
+                    </div>
+                    <div class="messages-container">
+                        <!-- Sidebar -->
+                        <aside class="messages-sidebar">
+                            <div class="conversations-list" id="admin-conversations-list">
+                                <!-- Dynamic -->
+                            </div>
+                        </aside>
+
+                        <!-- Chat Area -->
+                        <main class="chat-area" id="admin-chat-area">
+                            <div class="empty-chat-state">
+                                <i data-lucide="message-square"
+                                    style="width: 48px; height: 48px; margin-bottom: 16px; opacity: 0.5;"></i>
+                                <p>Selecciona una conversación.</p>
+                            </div>
+                        </main>
                     </div>
                 </div>
             </div>

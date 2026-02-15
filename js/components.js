@@ -1,9 +1,17 @@
 
+import { fetchCategories } from './api.js';
+
 export const loadComponents = async () => {
   const navbarPlaceholder = document.getElementById('navbar-placeholder');
   const footerPlaceholder = document.getElementById('footer-placeholder');
 
   if (navbarPlaceholder) {
+    // Fetch categories for dropdown
+    const categories = await fetchCategories();
+    const categoriesList = categories.map(c =>
+      `<a href="catalog.html?category=${encodeURIComponent(c.name)}" class="navbar__dropdown-item">${escapeHtml(c.name)}</a>`
+    ).join('');
+
     navbarPlaceholder.innerHTML = `
     <header class="navbar">
       <div class="navbar__left">
@@ -11,8 +19,19 @@ export const loadComponents = async () => {
         <a href="index.html" class="navbar__logo-text">PatchFiles</a>
       </div>
       <div class="navbar__links">
-        <a href="index.html" class="navbar__link ${window.location.pathname.includes('index.html') || window.location.pathname === '/' ? 'navbar__link--active' : ''}">Catálogo</a>
-        <a href="categories.html" class="navbar__link ${window.location.pathname.includes('categories.html') ? 'navbar__link--active' : ''}">Categorías</a>
+        <a href="index.html" class="navbar__link ${window.location.pathname.includes('index.html') || window.location.pathname === '/' ? 'navbar__link--active' : ''}">Inicio</a>
+        
+        <div class="navbar__menu-item">
+            <a href="categories.html" class="navbar__link ${window.location.pathname.includes('categories.html') ? 'navbar__link--active' : ''}" style="display:flex;align-items:center;gap:4px;">
+                Categorías <i data-lucide="chevron-down" style="width:14px;height:14px;"></i>
+            </a>
+            <div class="navbar__dropdown">
+                <a href="categories.html" class="navbar__dropdown-item" style="font-weight:700; color:var(--primary-color);">Ver todas</a>
+                <div class="navbar__dropdown-divider"></div>
+                ${categoriesList}
+            </div>
+        </div>
+
         <a href="help.html" class="navbar__link">Novedades</a>
         <a href="help.html" class="navbar__link">Ayuda</a>
       </div>
@@ -38,6 +57,9 @@ export const loadComponents = async () => {
             <a href="orders.html" class="navbar__dropdown-item">
               <i data-lucide="receipt"></i> Mis Compras
             </a>
+            <a href="messages.html" class="navbar__dropdown-item">
+              <i data-lucide="message-circle"></i> Mensajes
+            </a>
             <div class="navbar__dropdown-divider"></div>
             <button class="navbar__dropdown-item navbar__dropdown-item--danger" id="navbar-logout-btn">
               <i data-lucide="log-out"></i> Cerrar sesión
@@ -58,7 +80,7 @@ export const loadComponents = async () => {
           <p class="footer__brand-desc">Archivos digitales de bordado premium para máquinas industriales y domésticas.</p>
         </div>
         <div class="footer__col">
-          <h4>Menú</h4><a href="index.html">Catálogo</a><a href="categories.html">Categorías</a><a href="help.html">Novedades</a><a href="help.html">Ayuda</a>
+          <a href="index.html">Inicio</a><a href="categories.html">Categorías</a><a href="help.html">Novedades</a><a href="help.html">Ayuda</a>
         </div>
       </div>
       <div class="footer__bottom">
@@ -195,6 +217,23 @@ export const createProductCard = (product) => {
                     Comprar
                  </button>`}
           </div>
+        </div>
+      </div>
+    </div>
+  `;
+};
+
+export const createSkeletonCard = () => {
+  return `
+    <div class="product-card product-card--skeleton">
+      <div class="product-card__image">
+        <div class="skeleton skeleton-img"></div>
+      </div>
+      <div class="product-card__info">
+        <div class="skeleton skeleton-text" style="width: 50%;"></div>
+        <div class="skeleton skeleton-title"></div>
+        <div class="product-card__price-row">
+            <div class="skeleton skeleton-price"></div>
         </div>
       </div>
     </div>

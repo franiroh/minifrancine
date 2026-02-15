@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PatchFiles — Mensajes</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:wght@700;800&family=DM+Sans:wght@400;500;600;700&display=swap"
+        rel="stylesheet">
+    <script src="https://unpkg.com/lucide@latest"></script>
+
+    <link rel="stylesheet" href="css/main.css">
+    <link rel="stylesheet" href="css/components.css">
+    <link rel="stylesheet" href="css/messages.css">
+</head>
+
+<body>
+
+    <div class="page">
+        <div id="navbar-placeholder"></div>
+
+        <section class="messages-header">
+            <h1 class="messages-title">Mis Mensajes</h1>
+            <p class="messages-subtitle">Comunícate directamente con nosotros para resolver tus dudas.</p>
+        </section>
+
+        <section class="messages-container">
+            <!-- Sidebar -->
+            <aside class="messages-sidebar">
+                <div class="sidebar-header">
+                    <button class="btn btn--primary btn-new-message" id="btn-new-conversation">
+                        <i data-lucide="plus"></i> Nuevo Mensaje
+                    </button>
+                </div>
+                <div class="conversations-list" id="conversations-list">
+                    <!-- Conversations loaded dynamically -->
+                    <div style="text-align: center; padding: 20px; color: #9ca3af;">
+                        <i data-lucide="loader-2" class="animate-spin"></i>
+                    </div>
+                </div>
+            </aside>
+
+            <!-- Chat Area -->
+            <main class="chat-area" id="chat-area">
+                <div class="empty-chat-state">
+                    <i data-lucide="message-square"
+                        style="width: 48px; height: 48px; margin-bottom: 16px; opacity: 0.5;"></i>
+                    <p>Selecciona una conversación o inicia una nueva.</p>
+                </div>
+            </main>
+        </section>
+
+        <div id="footer-placeholder"></div>
+    </div>
+
+    <!-- New Conversation Modal -->
+    <div id="new-conversation-modal" class="modal hidden">
+        <div class="modal-content">
+            <h2 style="font-family: 'Bricolage Grotesque'; margin-bottom: 20px;">Nuevo Mensaje</h2>
+            <form id="new-conversation-form">
+                <div class="form-group">
+                    <label class="form-label">Asunto</label>
+                    <input type="text" id="new-subject" class="form-input" placeholder="Ej: Pregunta sobre pedido"
+                        required>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Mensaje</label>
+                    <textarea id="new-message" class="form-input" rows="4" placeholder="Escribe tu mensaje aquí..."
+                        required style="resize: vertical;"></textarea>
+                </div>
+                <div style="display: flex; gap: 10px; justify-content: flex-end; margin-top: 20px;">
+                    <button type="button" class="btn btn--outline" id="btn-cancel-new">Cancelar</button>
+                    <button type="submit" class="btn btn--primary">Enviar</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script type="module" src="js/messages.js"></script>
+</body>
+
+</html>

@@ -5,7 +5,7 @@ const supabaseUrl = 'https://dxqsdzktytehycpnrbtn.supabase.co'
 const supabaseKey = 'sb_publishable_crjG8THHPXfnLrtQityLWg_7pLdQPhG'
 export const supabase = createClient(supabaseUrl, supabaseKey)
 
-export async function fetchProducts({ publishedOnly = false } = {}) {
+export async function fetchProducts({ publishedOnly = false, tag = null } = {}) {
     let query = supabase
         .from('products')
         .select('*, categories(name)')
@@ -13,6 +13,10 @@ export async function fetchProducts({ publishedOnly = false } = {}) {
 
     if (publishedOnly) {
         query = query.eq('published', true)
+    }
+
+    if (tag) {
+        query = query.contains('tags', [tag])
     }
 
     const { data, error } = await query
@@ -35,6 +39,7 @@ export async function fetchProducts({ publishedOnly = false } = {}) {
         colorChangeCount: p.color_change_count,
         badge: p.badge,
         badgeColor: p.badge_color,
+        tags: p.tags || [],
         size: p.size,
         stitches: p.stitches,
         formats: p.formats,
@@ -71,6 +76,7 @@ export async function fetchProductById(id) {
         mainImage: data.main_image,
         badge: data.badge,
         badgeColor: data.badge_color,
+        tags: data.tags || [],
         size: data.size,
         stitches: data.stitches,
         formats: data.formats,
@@ -83,12 +89,31 @@ export async function fetchProductById(id) {
 
 // --- Auth ---
 
-export async function signUp(email, password) {
+export async function signUp(email, password, fullName) {
     const { data, error } = await supabase.auth.signUp({
         email,
         password,
+        options: {
+            data: {
+                full_name: fullName
+            }
+        }
     })
     return { data, error }
+}
+
+export async function checkNameExists(name) {
+    const { data, error } = await supabase
+        .from('profiles')
+        .select('id')
+        .ilike('full_name', name) // Case-insensitive check
+        .maybeSingle(); // Returns null if not found, instead of error
+
+    if (error) {
+        console.error('Error checking name:', error);
+        return false; // Fail safe
+    }
+    return !!data;
 }
 
 export async function signIn(email, password) {

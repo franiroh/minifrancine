@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PatchFiles — Catálogo</title>
+    <link rel="icon" type="image/svg+xml" href="favicon.svg">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:wght@700;800&family=DM+Sans:wght@400;500;600;700&display=swap"
+        rel="stylesheet">
+    <script src="https://unpkg.com/lucide@latest"></script>
+
+    <link rel="stylesheet" href="css/main.css">
+    <link rel="stylesheet" href="css/components.css">
+    <link rel="stylesheet" href="css/home.css">
+</head>
+<script>
+    // Immediate View State Handling to prevent Flash of Incorrect Content
+    (function () {
+        const params = new URLSearchParams(window.location.search);
+        if (params.get('category')) {
+            document.documentElement.setAttribute('data-view', 'category');
+        } else if (params.get('tag')) {
+            document.documentElement.setAttribute('data-view', 'tag');
+        }
+    })();
+</script>
+<style>
+    /* Default: Show Catalog Header, Hide Category Header */
+    #category-header {
+        display: none;
+    }
+
+    .catalog__header {
+        display: block;
+    }
+
+    /* Category View: Hide Catalog Header, Show Category Header */
+    html[data-view="category"] .catalog__header {
+        display: none !important;
+    }
+
+    html[data-view="category"] #category-header {
+        display: block !important;
+    }
+
+    /* Tag View: Both might need adjustment, but usually Tag View uses Catalog Header with different text */
+    /* If we want to hide default text for Tag view too, we can do: */
+    /* html[data-view="tag"] .catalog__title { visibility: hidden; } */
+    /* But JS updates it fast enough usually. The main issue was the large Hero section swap. */
+</style>
+
+<body>
+
+    <div class="page">
+        <div id="navbar-placeholder"></div>
+
+        <div id="breadcrumbs-placeholder"></div>
+
+        <!-- Category Header (Hidden by default, shown via JS if category selected) -->
+        <section id="category-header"
+            style="display: none; padding: 40px 80px; background: linear-gradient(135deg, #FFF5F5 0%, #FFFFFF 100%); text-align: center;">
+            <h1 id="category-title"
+                style="font-family: 'Bricolage Grotesque', serif; font-size: 36px; font-weight: 800; margin-bottom: 8px;">
+                Categoría</h1>
+            <p style="color: #6B7280;">Explora nuestra colección seleccionada.</p>
+        </section>
+
+        <section class="catalog" style="padding-top: 24px; min-height: 60vh;">
+            <div class="catalog__header">
+                <h1 id="page-title" class="catalog__title">Catálogo Completo</h1>
+                <span id="result-count" class="catalog__count">Cargando...</span>
+            </div>
+
+            <div class="catalog__filters" id="catalog-filters"
+                style="margin-bottom: 32px; display: flex; gap: 8px; flex-wrap: wrap; justify-content: center;">
+                <!-- Category chips populated dynamically -->
+            </div>
+
+            <div class="product-grid" id="catalog-grid">
+                <!-- Dynamic Content -->
+            </div>
+        </section>
+
+        <div id="footer-placeholder"></div>
+    </div>
+
+    <script type="module" src="js/catalog.js"></script>
+</body>
+
+</html>

@@ -25,6 +25,9 @@
                 <i data-lucide="shield"></i>
                 <span>Admin</span>
             </div>
+            <a href="index.html" class="nav-item" style="margin-bottom: 20px; color: var(--primary-color);">
+                <i data-lucide="external-link"></i> Ver Tienda
+            </a>
             <nav class="sidebar__nav">
                 <a href="admin.html#dashboard" class="nav-item">
                     <i data-lucide="layout-dashboard"></i> Dashboard
@@ -37,9 +40,6 @@
                 </a>
                 <a href="admin.html#categories" class="nav-item">
                     <i data-lucide="tag"></i> Categorías
-                </a>
-                <a href="index.html" class="nav-item">
-                    <i data-lucide="external-link"></i> Ver Tienda
                 </a>
             </nav>
         </aside>
@@ -71,6 +71,9 @@
                             style="font-size:13px;font-weight:600;color:#22C55E;">Publicado</span>
                         <button type="button" class="btn btn--secondary"
                             onclick="window.location.href='admin.html#products'">Cancelar</button>
+                        <button type="button" class="btn btn--outline hidden" id="btn-view-product" target="_blank">
+                            <i data-lucide="external-link" style="width:16px;"></i> Ver en Tienda
+                        </button>
                         <button type="button" class="btn btn--primary" id="btn-save">Guardar Producto</button>
                     </div>
                 </div>
@@ -194,6 +197,11 @@
                                     <option value="blue">Azul</option>
                                 </select>
                             </div>
+                        </div>
+                        <div class="form-group" style="margin-top: 1rem;">
+                            <label>Tags (separados por coma)</label>
+                            <input type="text" id="prod-tags" placeholder="ej: anime, bordado, oferta"
+                                style="width: 100%;">
                         </div>
                     </div>
 
