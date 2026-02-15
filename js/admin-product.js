@@ -292,7 +292,8 @@ async function handleSave(e) {
         let savedProductId = productId; // Existing or new
 
         if (productId) {
-            await updateProduct(productId, data);
+            const { error } = await updateProduct(productId, data);
+            if (error) throw error;
         } else {
             const { data: newProd, error } = await createProduct(data);
             if (error) throw error;
@@ -305,7 +306,8 @@ async function handleSave(e) {
             for (const file of pendingImages) {
                 const res = await uploadProductImage(file);
                 if (res) {
-                    await saveProductImageRecord(savedProductId, res.storagePath, res.publicUrl);
+                    const { error: imgErr } = await saveProductImageRecord(savedProductId, res.storagePath, res.publicUrl);
+                    if (imgErr) throw imgErr;
                     if (!firstImageUrl) firstImageUrl = res.publicUrl;
                 }
             }
@@ -314,7 +316,8 @@ async function handleSave(e) {
             // Or just always update main_image to the latest or first? 
             // Simplified: If product has no main_image, set it.
             if ((!currentProduct || !currentProduct.mainImage) && firstImageUrl) {
-                await updateProduct(savedProductId, { main_image: firstImageUrl });
+                const { error: mainImgErr } = await updateProduct(savedProductId, { main_image: firstImageUrl });
+                if (mainImgErr) throw mainImgErr;
             }
         }
 
@@ -326,7 +329,8 @@ async function handleSave(e) {
             }
             const res = await uploadProductFile(pendingFile);
             if (res) {
-                await saveProductFileRecord(savedProductId, res.storagePath, res.filename);
+                const { error: fileErr } = await saveProductFileRecord(savedProductId, res.storagePath, res.filename);
+                if (fileErr) throw fileErr;
             }
         }
 
