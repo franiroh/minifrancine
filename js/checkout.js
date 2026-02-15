@@ -89,7 +89,31 @@ function renderCheckout() {
 
                     try {
                         // 1. Create Order on Server (Secure)
-                        const { data: orderData, error } = await import('./api.js').then(m => m.createOrder());
+                        // Prepare items for RPC: [{id: 1, quantity: 1}, ...]
+                        // Currently cart items in state might differ from DB if we don't sync, 
+                        // but RPC will pull prices from DB based on ID.
+                        // We need to map state.cart to the expected format. 
+                        // Assuming state.cart contains full product objects.
+                        // We need to aggregate quantities if duplicates exist, 
+                        // or if cart is flat list of products, count them.
+                        // Let's check state.js implementation of cart.
+                        // It seems cart is array of products.
+
+                        const cartItemsMap = {};
+                        state.cart.forEach(p => {
+                            if (cartItemsMap[p.id]) {
+                                cartItemsMap[p.id]++;
+                            } else {
+                                cartItemsMap[p.id] = 1;
+                            }
+                        });
+
+                        const rpcItems = Object.keys(cartItemsMap).map(id => ({
+                            id: parseInt(id),
+                            quantity: cartItemsMap[id]
+                        }));
+
+                        const { data: orderData, error } = await import('./api.js').then(m => m.createOrderSecure(rpcItems));
 
                         if (error) {
                             throw new Error(error.message);
@@ -97,12 +121,15 @@ function renderCheckout() {
 
                         console.log('Order created on DB:', orderData);
 
-                        // 2. Tell PayPal to create a transaction
+                        // Check if total matches expectation? 
+                        // The server total is the source of truth.
+
+                        // 2. Tell PayPal to create a transaction with SERVER Calculated total
                         return actions.order.create({
                             purchase_units: [{
                                 description: `Order #${orderData.order_id}`,
                                 amount: {
-                                    value: orderData.total
+                                    value: orderData.total // Secure Total from DB
                                 },
                                 custom_id: orderData.order_id
                             }]

@@ -197,6 +197,25 @@ export async function clearCartDB(userId) {
 
 // --- Orders ---
 
+// --- Secure Payment RPC ---
+export async function createOrderSecure(items) {
+    const user = await getUser();
+    if (!user) throw new Error("User must be logged in");
+
+    // items should be [{ id: 1, quantity: 1 }, ...]
+    const { data, error } = await supabase
+        .rpc('create_order_secure', {
+            p_user_id: user.id,
+            p_items: items
+        });
+
+    if (error) {
+        console.error('Error creating secure order:', error);
+        throw error;
+    }
+    return data;
+}
+
 export async function createOrder() {
     const { data, error } = await supabase
         .rpc('create_order_from_cart')
