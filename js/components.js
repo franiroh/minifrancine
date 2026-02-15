@@ -22,10 +22,24 @@ export const loadComponents = async () => {
           <i data-lucide="shopping-cart" class="navbar__icon"></i>
           <span class="navbar__cart-badge">0</span>
         </div>
-        <button class="navbar__user-btn" id="navbar-user-btn" onclick="window.location.href='login.html'">
-          <i data-lucide="user"></i>
-          <span id="navbar-user-text">Login</span>
-        </button>
+        <div class="navbar__account" id="navbar-account">
+          <button class="navbar__user-btn" id="navbar-user-btn" onclick="window.location.href='login.html'">
+            <i data-lucide="user"></i>
+            <span id="navbar-user-text">Login</span>
+          </button>
+          <div class="navbar__dropdown" id="navbar-dropdown">
+            <a href="mis-disenos.html" class="navbar__dropdown-item">
+              <i data-lucide="palette"></i> Mis Diseños
+            </a>
+            <a href="orders.html" class="navbar__dropdown-item">
+              <i data-lucide="receipt"></i> Mis Compras
+            </a>
+            <div class="navbar__dropdown-divider"></div>
+            <button class="navbar__dropdown-item navbar__dropdown-item--danger" id="navbar-logout-btn">
+              <i data-lucide="log-out"></i> Cerrar sesión
+            </button>
+          </div>
+        </div>
       </div>
     </header>
         `;
@@ -44,6 +58,9 @@ export const loadComponents = async () => {
         </div>
         <div class="footer__col">
           <h4>Soporte</h4><a href="#">Centro de ayuda</a><a href="#">Formatos compatibles</a><a href="#">Guía de uso</a><a href="#">Contacto</a>
+        </div>
+        <div class="footer__col">
+          <h4>Mi Cuenta</h4><a href="mis-disenos.html">Mis Diseños</a><a href="orders.html">Mis Compras</a>
         </div>
         <div class="footer__col">
           <h4>Legal</h4><a href="#">Términos de uso</a><a href="#">Política de privacidad</a><a href="#">Licencias</a>
@@ -70,12 +87,38 @@ export const updateNavbarAuth = async (user) => {
   const userBtn = document.getElementById('navbar-user-btn');
   const userText = document.getElementById('navbar-user-text');
   const navLinks = document.querySelector('.navbar__links');
+  const accountWrap = document.getElementById('navbar-account');
+  const dropdown = document.getElementById('navbar-dropdown');
+  const logoutBtn = document.getElementById('navbar-logout-btn');
 
   if (userBtn && userText) {
     if (user) {
-      userText.textContent = user.email;
-      userBtn.onclick = () => window.location.href = 'mis-disenos.html';
-      userText.innerHTML = `${escapeHtml(user.email)} <br> <span style="font-size:0.8em; opacity:0.8;">Mis Diseños</span>`;
+      userText.textContent = escapeHtml(user.email);
+
+      // Toggle dropdown on click
+      userBtn.onclick = (e) => {
+        e.stopPropagation();
+        accountWrap.classList.toggle('navbar__account--open');
+      };
+
+      // Close dropdown when clicking outside
+      document.addEventListener('click', (e) => {
+        if (accountWrap && !accountWrap.contains(e.target)) {
+          accountWrap.classList.remove('navbar__account--open');
+        }
+      });
+
+      // Show dropdown
+      if (dropdown) dropdown.style.display = '';
+
+      // Logout button
+      if (logoutBtn) {
+        logoutBtn.onclick = async () => {
+          const { supabase } = await import('./api.js');
+          await supabase.auth.signOut();
+          window.location.href = 'login.html';
+        };
+      }
 
       // Check for Admin role
       const { data: profile } = await getProfile(user.id);
@@ -95,6 +138,8 @@ export const updateNavbarAuth = async (user) => {
     } else {
       userText.textContent = 'Login';
       userBtn.onclick = () => window.location.href = 'login.html';
+      // Hide dropdown when logged out
+      if (dropdown) dropdown.style.display = 'none';
       // Remove Admin link if logging out
       const adminLink = document.getElementById('admin-link');
       if (adminLink) adminLink.remove();
