@@ -1,7 +1,7 @@
 
 import { loadComponents, updateNavbarAuth, updateNavbarCartCount } from './components.js';
 import { fetchProducts, getUser, onAuthStateChange } from './api.js';
-import { state, loadCart, getCartCount, addToCart, loadFavorites, isFavorite, toggleFavorite } from './state.js';
+import { state, loadCart, getCartCount, addToCart, loadFavorites, isFavorite, toggleFavorite, loadPurchases, isPurchased } from './state.js';
 import { renderBreadcrumbs, escapeHtml, sanitizeCssValue } from './utils.js';
 
 let products = [];
@@ -19,6 +19,7 @@ async function init() {
     updateNavbarCartCount(getCartCount());
 
     await loadFavorites(user);
+    await loadPurchases(user);
 
     // Check URL for category filter immediately to prevent flash
     const urlParams = new URLSearchParams(window.location.search);
@@ -51,16 +52,11 @@ async function init() {
     });
 
     window.addEventListener('favorites-updated', () => {
-        const activeChip = document.querySelector('.filter-chip--active');
-        const activeCategory = activeChip ? activeChip.textContent : 'Todos';
+        filterProducts(currentCategory);
+    });
 
-        // Re-render keeping current filter
-        if (activeCategory === 'Todos') {
-            renderCatalog(products);
-        } else {
-            const filtered = products.filter(p => p.category === activeCategory);
-            renderCatalog(filtered);
-        }
+    window.addEventListener('purchases-updated', () => {
+        filterProducts(currentCategory);
     });
 }
 
@@ -161,6 +157,7 @@ function setupAuthListener() {
         const user = session ? session.user : null;
         updateNavbarAuth(user);
         await loadFavorites(user);
+        await loadPurchases(user);
 
         // Re-render with current filter
         filterProducts(currentCategory);
@@ -176,10 +173,14 @@ function renderCatalog(items) {
         return;
     }
 
-    grid.innerHTML = items.map(product => `
-    <div class="product-card" data-id="${parseInt(product.id)}">
+    grid.innerHTML = items.map(product => {
+        const purchased = isPurchased(product.id);
+        return `
+    <div class="product-card ${purchased ? 'product-card--purchased' : ''}" data-id="${parseInt(product.id)}">
       <div class="product-card__image" style="background: ${sanitizeCssValue(product.imageColor)};">
-        ${product.badge ? `<span class="product-card__badge ${product.badgeColor === 'green' ? 'product-card__badge--green' : ''}">${escapeHtml(product.badge)}</span>` : ''}
+        ${purchased
+            ? `<span class="product-card__badge product-card__badge--purchased"><i data-lucide="check-circle"></i> Comprado</span>`
+            : (product.badge ? `<span class="product-card__badge ${product.badgeColor === 'green' ? 'product-card__badge--green' : ''}">${escapeHtml(product.badge)}</span>` : '')}
         <div class="product-card__heart ${isFavorite(product.id) ? 'product-card__heart--active' : ''}" data-id="${parseInt(product.id)}">
             <i data-lucide="heart"></i>
         </div>
@@ -193,17 +194,22 @@ function renderCatalog(items) {
         <div class="product-card__price-row">
           <span class="product-card__price">$${parseFloat(product.price).toFixed(2)}</span>
           <div class="product-card__btns">
-            <button class="btn btn--sm btn--outline btn-add-cart" data-id="${parseInt(product.id)}">
-               <i data-lucide="shopping-cart"></i>
-            </button>
-            <button class="btn btn--sm btn--primary btn-buy-now" data-id="${parseInt(product.id)}">
-               Comprar
-            </button>
+            ${purchased
+              ? `<a href="orders.html" class="btn btn--sm btn--purchased">
+                   <i data-lucide="download"></i> Descargar
+                 </a>`
+              : `<button class="btn btn--sm btn--outline btn-add-cart" data-id="${parseInt(product.id)}">
+                   <i data-lucide="shopping-cart"></i>
+                 </button>
+                 <button class="btn btn--sm btn--primary btn-buy-now" data-id="${parseInt(product.id)}">
+                    Comprar
+                 </button>`}
           </div>
         </div>
       </div>
     </div>
-  `).join('');
+  `;
+    }).join('');
 
     // Re-init icons
     if (window.lucide) window.lucide.createIcons();
@@ -256,7 +262,7 @@ function renderCatalog(items) {
     // Navigate to Detail
     grid.querySelectorAll('.product-card').forEach(card => {
         card.addEventListener('click', (e) => {
-            if (!e.target.closest('.btn-add-cart') && !e.target.closest('.btn-buy-now') && !e.target.closest('.product-card__heart')) {
+            if (!e.target.closest('.btn-add-cart') && !e.target.closest('.btn-buy-now') && !e.target.closest('.btn--purchased') && !e.target.closest('.product-card__heart')) {
                 const id = card.dataset.id;
                 window.location.href = `product.html?id=${id}`;
             }

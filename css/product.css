@@ -182,3 +182,20 @@
 .detail__actions .btn {
     flex: 1;
 }
+
+/* --- Purchased State (Detail) --- */
+.btn--purchased-download {
+    background: #22C55E;
+    color: #FFF;
+}
+
+.btn--purchased-download:hover {
+    background: #16A34A;
+}
+
+.btn--purchased-indicator {
+    border: 2px solid #22C55E;
+    color: #22C55E;
+    cursor: default;
+    opacity: 0.8;
+}

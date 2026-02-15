@@ -1,9 +1,10 @@
 
-import { fetchFavorites, addToFavorites, removeFromFavorites, fetchCart, addToCartDB, removeFromCartDB, clearCartDB } from './api.js';
+import { fetchFavorites, addToFavorites, removeFromFavorites, fetchCart, addToCartDB, removeFromCartDB, clearCartDB, fetchPurchasedProductIds } from './api.js';
 
 export const state = {
     cart: [],
     favorites: new Set(),
+    purchases: new Set(),
     user: null,
 };
 
@@ -41,6 +42,12 @@ export const loadCart = async (user = null) => {
 };
 
 export const addToCart = async (product) => {
+    // Block adding already-purchased products
+    if (isPurchased(product.id)) {
+        alert('Ya compraste este producto. Puedes descargarlo desde "Mis Compras".');
+        return;
+    }
+
     if (state.user) {
         // DB Add
         const { data, error } = await addToCartDB(state.user.id, product.id, 1);
@@ -148,4 +155,21 @@ export const toggleFavorite = async (productId) => {
 
 export const isFavorite = (productId) => {
     return state.favorites.has(productId);
+};
+
+// --- Purchased Products Logic ---
+
+export const loadPurchases = async (user) => {
+    if (!user) {
+        state.purchases.clear();
+        return;
+    }
+    state.user = user;
+    const purchasedIds = await fetchPurchasedProductIds();
+    state.purchases = new Set(purchasedIds);
+    window.dispatchEvent(new CustomEvent('purchases-updated'));
+};
+
+export const isPurchased = (productId) => {
+    return state.purchases.has(productId);
 };

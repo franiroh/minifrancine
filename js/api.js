@@ -140,7 +140,18 @@ export async function removeFromFavorites(userId, productId) {
     return { error }
 }
 
+// --- Purchased Products ---
 
+export async function fetchPurchasedProductIds() {
+    const { data, error } = await supabase
+        .rpc('get_purchased_product_ids')
+
+    if (error) {
+        console.error('Error fetching purchased products:', error)
+        return []
+    }
+    return data || []
+}
 
 // --- Cart ---
 
@@ -170,10 +181,12 @@ export async function fetchCart(userId) {
 }
 
 export async function addToCartDB(userId, productId, quantity = 1) {
-    // Check if item exists to increment? For now assuming simple add or ignore
     const { data, error } = await supabase
         .from('cart_items')
-        .insert({ user_id: userId, product_id: productId, quantity })
+        .upsert(
+            { user_id: userId, product_id: productId, quantity },
+            { onConflict: 'user_id,product_id', ignoreDuplicates: true }
+        )
         .select()
 
     return { data, error }

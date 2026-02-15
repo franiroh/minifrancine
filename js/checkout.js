@@ -1,7 +1,7 @@
 
 import { loadComponents, updateNavbarAuth, updateNavbarCartCount } from './components.js';
 import { getUser, onAuthStateChange } from './api.js';
-import { state, loadCart, getCartCount, getCartTotal } from './state.js';
+import { state, loadCart, getCartCount, getCartTotal, removeFromCart, loadPurchases, isPurchased } from './state.js';
 import { escapeHtml } from './utils.js';
 import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js/+esm'
 
@@ -33,6 +33,19 @@ async function init() {
 
     await loadCart(user);
     updateNavbarCartCount(getCartCount());
+
+    // Remove any already-purchased products from cart (safety net)
+    await loadPurchases(user);
+    const purchasedInCart = state.cart.filter(item => isPurchased(item.id));
+    if (purchasedInCart.length > 0) {
+        alert(`${purchasedInCart.length} producto(s) en tu carrito ya fueron comprados. Se han removido.`);
+        for (let i = state.cart.length - 1; i >= 0; i--) {
+            if (isPurchased(state.cart[i].id)) {
+                await removeFromCart(i);
+            }
+        }
+        updateNavbarCartCount(getCartCount());
+    }
 
     try {
         // Fetch Client ID from server

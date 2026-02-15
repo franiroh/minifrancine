@@ -284,3 +284,31 @@
     width: 14px;
     height: 14px;
 }
+
+/* --- Purchased Product State --- */
+.product-card__badge--purchased {
+    background: #22C55E;
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+}
+
+.product-card__badge--purchased i {
+    width: 12px;
+    height: 12px;
+}
+
+.btn--purchased {
+    border: 1px solid #22C55E;
+    color: #22C55E;
+    text-decoration: none;
+}
+
+.btn--purchased:hover {
+    background: #F0FDF4;
+}
+
+.btn--purchased i {
+    width: 14px;
+    height: 14px;
+}
