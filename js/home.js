@@ -192,9 +192,14 @@ function renderCatalog(items) {
         </div>
         <div class="product-card__price-row">
           <span class="product-card__price">$${parseFloat(product.price).toFixed(2)}</span>
-          <button class="btn btn--sm btn--primary btn-add-cart" data-id="${parseInt(product.id)}">
-             Agregar
-          </button>
+          <div class="product-card__btns">
+            <button class="btn btn--sm btn--outline btn-add-cart" data-id="${parseInt(product.id)}">
+               <i data-lucide="shopping-cart"></i>
+            </button>
+            <button class="btn btn--sm btn--primary btn-buy-now" data-id="${parseInt(product.id)}">
+               Comprar
+            </button>
+          </div>
         </div>
       </div>
     </div>
@@ -213,14 +218,28 @@ function renderCatalog(items) {
             const product = products.find(p => p.id === id);
             if (product) {
                 addToCart(product);
-                // Optional: Show toast
-                const originalText = btn.textContent;
-                btn.textContent = '¡Agregado!';
+                const originalHTML = btn.innerHTML;
+                btn.innerHTML = '<i data-lucide="check"></i>';
                 btn.classList.add('text-green');
+                if (window.lucide) window.lucide.createIcons();
                 setTimeout(() => {
-                    btn.textContent = originalText;
+                    btn.innerHTML = originalHTML;
                     btn.classList.remove('text-green');
+                    if (window.lucide) window.lucide.createIcons();
                 }, 1000);
+            }
+        });
+    });
+
+    // Buy Now
+    grid.querySelectorAll('.btn-buy-now').forEach(btn => {
+        btn.addEventListener('click', async (e) => {
+            e.stopPropagation();
+            const id = parseInt(btn.dataset.id);
+            const product = products.find(p => p.id === id);
+            if (product) {
+                await addToCart(product);
+                window.location.href = 'checkout.html';
             }
         });
     });
@@ -237,7 +256,7 @@ function renderCatalog(items) {
     // Navigate to Detail
     grid.querySelectorAll('.product-card').forEach(card => {
         card.addEventListener('click', (e) => {
-            if (!e.target.closest('.btn-add-cart') && !e.target.closest('.product-card__heart')) {
+            if (!e.target.closest('.btn-add-cart') && !e.target.closest('.btn-buy-now') && !e.target.closest('.product-card__heart')) {
                 const id = card.dataset.id;
                 window.location.href = `product.html?id=${id}`;
             }

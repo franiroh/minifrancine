@@ -172,3 +172,13 @@
     font-size: 15px;
     font-weight: 600;
 }
+
+/* --- Action Buttons Row --- */
+.detail__actions {
+    display: flex;
+    gap: 12px;
+}
+
+.detail__actions .btn {
+    flex: 1;
+}

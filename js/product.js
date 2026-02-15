@@ -85,10 +85,15 @@ function renderProduct() {
     setText('detail-stitches', p.stitches);
     setText('detail-formats', p.formats);
 
-    // Button
+    // Buttons
     const btn = document.getElementById('detail-add-btn');
     if (btn) {
-        btn.innerHTML = `<i class="icon lucide-shopping-cart"></i> Agregar al Carrito — $${p.price}`;
+        btn.innerHTML = `<i class="icon lucide-shopping-cart"></i> Agregar al Carrito`;
+    }
+
+    const buyBtn = document.getElementById('detail-buy-btn');
+    if (buyBtn) {
+        buyBtn.innerHTML = `<i class="icon lucide-zap"></i> Comprar Ahora — $${p.price}`;
     }
 
     updateFavoriteButton();
@@ -120,6 +125,16 @@ function setupListeners() {
                     addBtn.innerHTML = originalText;
                     addBtn.classList.remove('text-green');
                 }, 1000);
+            }
+        });
+    }
+
+    const buyBtn = document.getElementById('detail-buy-btn');
+    if (buyBtn) {
+        buyBtn.addEventListener('click', async () => {
+            if (currentProduct) {
+                await addToCart(currentProduct);
+                window.location.href = 'checkout.html';
             }
         });
     }

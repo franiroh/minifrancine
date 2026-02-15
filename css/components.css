@@ -154,6 +154,17 @@
     background: #F6F7F8;
 }
 
+.btn--outline-light {
+    border: 1px solid #E5E7EB;
+    color: #6B7280;
+    background: transparent;
+}
+
+.btn--outline-light:hover {
+    background: #F6F7F8;
+    color: #1A1A1A;
+}
+
 .btn--dark {
     background: #1A1A1A;
     color: #FFF;
