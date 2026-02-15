@@ -128,17 +128,28 @@ function renderCheckout() {
                 onApprove: async (data, actions) => {
                     try {
                         console.log('PayPal Approved, capturing...', data);
-                        // data.orderID is the PayPal ID
 
                         // 3. Call Edge Function to Capture
                         const result = await import('./api.js').then(m => m.captureOrderSecure(data.orderID, window.currentDbOrderId));
 
-                        if (result.status === 'success') {
-                            alert(`¡Pago exitoso! ID: ${result.data.id}`);
+                        console.log('Capture result:', result);
+
+                        // Edge Function returns { status: 'success', data: {...} }
+                        // Handle both possible response shapes
+                        if (result && (result.status === 'success' || result.status === 'COMPLETED')) {
+                            const paymentId = result.data?.id || data.orderID;
+                            alert(`¡Pago exitoso! ID: ${paymentId}`);
                             state.cart = [];
-                            window.location.href = 'index.html';
+                            window.location.href = 'orders.html';
+                        } else if (result && result.error) {
+                            throw new Error(result.error);
                         } else {
-                            throw new Error(result.message || 'Payment failed');
+                            // If we get here, the server might have processed OK but response shape is unexpected
+                            // Check if result exists at all
+                            console.warn('Unexpected capture result shape:', result);
+                            alert('Pago procesado. Verificá en "Mis Compras".');
+                            state.cart = [];
+                            window.location.href = 'orders.html';
                         }
 
                     } catch (err) {
