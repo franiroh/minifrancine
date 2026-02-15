@@ -13,8 +13,8 @@ export const loadComponents = async () => {
       <div class="navbar__links">
         <a href="index.html" class="navbar__link ${window.location.pathname.includes('index.html') || window.location.pathname === '/' ? 'navbar__link--active' : ''}">Catálogo</a>
         <a href="categories.html" class="navbar__link ${window.location.pathname.includes('categories.html') ? 'navbar__link--active' : ''}">Categorías</a>
-        <a href="#" class="navbar__link">Novedades</a>
-        <a href="#" class="navbar__link">Ayuda</a>
+        <a href="help.html" class="navbar__link">Novedades</a>
+        <a href="help.html" class="navbar__link">Ayuda</a>
       </div>
       <div class="navbar__right">
         <i data-lucide="search" class="navbar__icon"></i>
@@ -58,21 +58,14 @@ export const loadComponents = async () => {
           <p class="footer__brand-desc">Archivos digitales de bordado premium para máquinas industriales y domésticas.</p>
         </div>
         <div class="footer__col">
-          <h4>Productos</h4><a href="index.html">Catálogo</a><a href="#">Novedades</a><a href="#">Más vendidos</a><a href="#">Ofertas</a>
-        </div>
-        <div class="footer__col">
-          <h4>Soporte</h4><a href="#">Centro de ayuda</a><a href="#">Formatos compatibles</a><a href="#">Guía de uso</a><a href="#">Contacto</a>
-        </div>
-        <div class="footer__col">
-          <h4>Mi Cuenta</h4><a href="mis-disenos.html">Mis Diseños</a><a href="orders.html">Mis Compras</a>
-        </div>
-        <div class="footer__col">
-          <h4>Legal</h4><a href="#">Términos de uso</a><a href="#">Política de privacidad</a><a href="#">Licencias</a>
+          <h4>Menú</h4><a href="index.html">Catálogo</a><a href="categories.html">Categorías</a><a href="help.html">Novedades</a><a href="help.html">Ayuda</a>
         </div>
       </div>
       <div class="footer__bottom">
-        <span>&copy; 2026 PatchFiles. Todos los derechos reservados.</span>
-        <div class="footer__social"><i data-lucide="instagram"></i><i data-lucide="facebook"></i><i data-lucide="youtube"></i></div>
+        <span>
+          &copy; 2026 PatchFiles. Todos los derechos reservados.
+          <a href="help.html" style="margin-left: 10px; color: inherit; text-decoration: none;">Términos y Condiciones</a>
+        </span>
       </div>
     </footer>
         `;

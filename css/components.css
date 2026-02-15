@@ -349,18 +349,5 @@
     color: #6B7280;
 }
 
-.footer__social {
-    display: flex;
-    gap: 16px;
-}
 
-.footer__social i {
-    font-size: 18px;
-    color: #9CA3AF;
-    cursor: pointer;
-    transition: color 0.2s;
-}
-
-.footer__social i:hover {
-    color: #FFF;
-}
+/* End of footer styles */

@@ -1,27 +1,31 @@
 
 import { loadComponents, updateNavbarAuth, updateNavbarCartCount } from './components.js';
-import { getUser, onAuthStateChange, fetchMyOrders, downloadProductFile } from './api.js';
+import { getUser, onAuthStateChange, fetchMyOrders, downloadProductFile, fetchAllUserReviews, fetchUserReview, addReview, updateReview, deleteReview } from './api.js';
 import { state, loadCart, getCartCount } from './state.js';
 import { escapeHtml, sanitizeCssValue } from './utils.js';
+
+let currentUser = null;
 
 async function init() {
     await loadComponents();
 
-    const user = await getUser();
-    updateNavbarAuth(user);
+    currentUser = await getUser();
+    updateNavbarAuth(currentUser);
 
-    if (!user) {
+    if (!currentUser) {
         window.location.href = 'login.html';
         return;
     }
 
-    await loadCart(user);
+    await loadCart(currentUser);
     updateNavbarCartCount(getCartCount());
 
     onAuthStateChange((event, session) => {
         updateNavbarAuth(session ? session.user : null);
         if (!session) {
             window.location.href = 'login.html';
+        } else {
+            currentUser = session.user;
         }
     });
 
@@ -31,14 +35,25 @@ async function init() {
 
     if (window.lucide) window.lucide.createIcons();
 
-    loadOrders(user.id);
+    loadOrders(currentUser.id);
+    setupRatingModal();
 }
 
 async function loadOrders(userId) {
     const listContainer = document.getElementById('orders-list');
 
     try {
-        const orders = await fetchMyOrders(userId);
+        const [orders, reviews] = await Promise.all([
+            fetchMyOrders(userId),
+            fetchAllUserReviews(userId)
+        ]);
+
+        const reviewsMap = {};
+        if (reviews) {
+            reviews.forEach(r => {
+                reviewsMap[r.product_id] = r;
+            });
+        }
 
         if (!orders || orders.length === 0) {
             listContainer.innerHTML = `
@@ -52,9 +67,10 @@ async function loadOrders(userId) {
             return;
         }
 
-        listContainer.innerHTML = orders.map(order => renderOrderCard(order)).join('');
+        listContainer.innerHTML = orders.map(order => renderOrderCard(order, reviewsMap)).join('');
         if (window.lucide) window.lucide.createIcons();
         attachDownloadListeners();
+        attachRatingListeners();
 
     } catch (error) {
         console.error("Error loading orders:", error);
@@ -66,7 +82,7 @@ async function loadOrders(userId) {
     }
 }
 
-function renderOrderCard(order) {
+function renderOrderCard(order, reviewsMap = {}) {
     const date = new Date(order.created_at).toLocaleDateString('es-ES', {
         year: 'numeric', month: 'short', day: 'numeric'
     });
@@ -82,16 +98,49 @@ function renderOrderCard(order) {
             const title = product.title || 'Producto';
             const mainImage = product.main_image || '';
             const imageColor = product.image_color || '#F3F4F6';
+            const productId = parseInt(item.product_id);
 
             const thumbContent = mainImage
                 ? `<img src="${escapeHtml(mainImage)}" alt="${escapeHtml(title)}" loading="lazy">`
                 : `<i data-lucide="image" style="width:24px; height:24px; color:#D1D5DB;"></i>`;
 
             const downloadBtn = isPaid
-                ? `<button class="order-item__download" data-id="${parseInt(item.product_id)}" data-title="${escapeHtml(title)}">
+                ? `<button class="order-item__download btn btn--sm btn--outline" data-id="${productId}" data-title="${escapeHtml(title)}" style="margin-right: 8px;">
                      <i data-lucide="download"></i> Descargar
                    </button>`
                 : '';
+
+            const userReview = reviewsMap[productId];
+            let rateUi = '';
+
+            if (isPaid) {
+                if (userReview) {
+                    // Show stars + Edit button
+                    let starsHtml = '';
+                    for (let i = 1; i <= 5; i++) {
+                        if (i <= userReview.rating) {
+                            starsHtml += `<i data-lucide="star" style="width: 14px; height: 14px; fill: #F59E0B; color: #F59E0B;"></i>`;
+                        } else {
+                            starsHtml += `<i data-lucide="star" style="width: 14px; height: 14px; color: #D1D5DB;"></i>`;
+                        }
+                    }
+                    rateUi = `
+                        <div style="display: flex; align-items: center; gap: 8px;">
+                            <div style="display: flex; gap: 2px;">${starsHtml}</div>
+                            <button class="order-item__rate btn btn--sm btn--link" data-id="${productId}" data-title="${escapeHtml(title)}">
+                                Editar
+                            </button>
+                        </div>
+                    `;
+                } else {
+                    // Show Rate button
+                    rateUi = `
+                        <button class="order-item__rate btn btn--sm btn--ghost" data-id="${productId}" data-title="${escapeHtml(title)}">
+                             <i data-lucide="star"></i> Calificar
+                        </button>
+                    `;
+                }
+            }
 
             return `
             <div class="order-item">
@@ -102,8 +151,18 @@ function renderOrderCard(order) {
                     <div class="order-item__title">${escapeHtml(title)}</div>
                     <div class="order-item__qty">Cant: ${parseInt(item.quantity)}</div>
                 </div>
-                ${downloadBtn}
-                <span class="order-item__price">$${parseFloat(item.price).toFixed(2)}</span>
+                
+                <div class="order-item__col-download">
+                    ${downloadBtn}
+                </div>
+                
+                <div class="order-item__col-rating">
+                    ${rateUi}
+                </div>
+                
+                <div class="order-item__col-price">
+                    $${parseFloat(item.price).toFixed(2)}
+                </div>
             </div>
             `;
         }).join('');
@@ -140,7 +199,7 @@ function attachDownloadListeners() {
             const productTitle = btn.dataset.title;
 
             const originalHTML = btn.innerHTML;
-            btn.innerHTML = '<i data-lucide="loader"></i> Descargando...';
+            btn.innerHTML = '<i data-lucide="loader"></i> ...';
             btn.disabled = true;
             if (window.lucide) window.lucide.createIcons();
 
@@ -154,7 +213,7 @@ function attachDownloadListeners() {
                     link.click();
                     document.body.removeChild(link);
 
-                    btn.innerHTML = '<i data-lucide="check"></i> Descargado';
+                    btn.innerHTML = '<i data-lucide="check"></i> Listo';
                     if (window.lucide) window.lucide.createIcons();
                     setTimeout(() => {
                         btn.innerHTML = originalHTML;
@@ -176,6 +235,168 @@ function attachDownloadListeners() {
             }
         });
     });
+}
+
+// --- Rating Logic ---
+
+function attachRatingListeners() {
+    document.querySelectorAll('.order-item__rate').forEach(btn => {
+        btn.addEventListener('click', async () => {
+            const productId = parseInt(btn.dataset.id);
+            const productTitle = btn.dataset.title;
+            openRatingModal(productId, productTitle);
+        });
+    });
+}
+
+const modal = document.getElementById('rating-modal');
+const closeModal = document.querySelector('.close-modal');
+const ratingForm = document.getElementById('rating-form');
+const ratingContainer = document.querySelector('.star-rating');
+const ratingValueInput = document.getElementById('rating-value');
+const deleteBtn = document.getElementById('delete-review-btn');
+
+function setupRatingModal() {
+    // Close modal
+    closeModal.onclick = () => {
+        modal.style.display = 'none';
+    };
+    window.onclick = (event) => {
+        if (event.target == modal) {
+            modal.style.display = 'none';
+        }
+    };
+
+    // Star clicking & Hover via Delegation
+    ratingContainer.addEventListener('click', (e) => {
+        const star = e.target.closest('[data-value]');
+        if (star) {
+            const value = parseInt(star.dataset.value);
+            setRating(value);
+        }
+    });
+
+    ratingContainer.addEventListener('mouseover', (e) => {
+        const star = e.target.closest('[data-value]');
+        if (star) {
+            const value = parseInt(star.dataset.value);
+            highlightStars(value);
+        }
+    });
+
+    ratingContainer.addEventListener('mouseout', () => {
+        const value = parseInt(ratingValueInput.value) || 0;
+        highlightStars(value);
+    });
+
+    // Submit
+    ratingForm.addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const productId = parseInt(document.getElementById('rating-product-id').value);
+        const reviewId = document.getElementById('rating-review-id').value;
+        const rating = parseInt(ratingValueInput.value);
+        const comment = document.getElementById('rating-comment').value;
+
+        if (!rating) {
+            alert('Por favor selecciona una puntuación.');
+            return;
+        }
+
+        const submitBtn = ratingForm.querySelector('button[type="submit"]');
+        submitBtn.disabled = true;
+        submitBtn.textContent = 'Guardando...';
+
+        let result;
+        if (reviewId) {
+            result = await updateReview(reviewId, rating, comment);
+        } else {
+            result = await addReview(currentUser.id, productId, rating, comment);
+        }
+
+        if (result.error) {
+            alert('Error al guardar la calificación.');
+            console.error(result.error);
+        } else {
+            modal.style.display = 'none';
+            // Ideally toast notification
+            alert('Calificación guardada correctamente.');
+            // Reload orders to update buttons potentially (though state is ok)
+            loadOrders(currentUser.id);
+        }
+        submitBtn.disabled = false;
+        submitBtn.textContent = 'Guardar Calificación';
+    });
+
+    // Delete
+    deleteBtn.addEventListener('click', async () => {
+        if (!confirm('¿Estás seguro de que quieres eliminar tu reseña?')) return;
+
+        const reviewId = document.getElementById('rating-review-id').value;
+        const submitBtn = deleteBtn;
+        submitBtn.disabled = true;
+        submitBtn.textContent = 'Eliminando...';
+
+        const result = await deleteReview(reviewId);
+
+        if (result.error) {
+            alert('Error al eliminar la reseña.');
+            console.error(result.error);
+        } else {
+            modal.style.display = 'none';
+            alert('Reseña eliminada.');
+            loadOrders(currentUser.id);
+        }
+        submitBtn.disabled = false;
+        submitBtn.textContent = 'Eliminar';
+        submitBtn.style.display = 'none'; // Hide again
+    });
+}
+
+function setRating(value) {
+    ratingValueInput.value = value;
+    highlightStars(value);
+}
+
+function highlightStars(value) {
+    // Re-query stars every time because Lucide replaces DOM elements
+    const stars = ratingContainer.querySelectorAll('[data-value]');
+    stars.forEach(star => {
+        const starValue = parseInt(star.dataset.value);
+        if (starValue <= value) {
+            star.style.color = '#F59E0B'; // Gold/Yellow
+            star.style.fill = '#F59E0B';
+            star.setAttribute('fill', '#F59E0B'); // For SVG
+        } else {
+            star.style.color = '#ddd';
+            star.style.fill = 'none';
+            star.setAttribute('fill', 'none'); // For SVG
+        }
+    });
+}
+
+async function openRatingModal(productId, productTitle) {
+    document.getElementById('rating-modal-title').textContent = `Calificar: ${productTitle}`;
+    document.getElementById('rating-product-id').value = productId;
+    document.getElementById('rating-review-id').value = '';
+    document.getElementById('rating-comment').value = '';
+
+    // Ensure icons are rendered if modal was hidden initially
+    if (window.lucide) window.lucide.createIcons();
+
+    setRating(0);
+    deleteBtn.style.display = 'none';
+
+    // Fetch existing review
+    const review = await fetchUserReview(currentUser.id, productId);
+
+    if (review) {
+        document.getElementById('rating-review-id').value = review.id;
+        document.getElementById('rating-comment').value = review.comment || '';
+        setRating(review.rating);
+        deleteBtn.style.display = 'inline-block';
+    }
+
+    modal.style.display = 'block';
 }
 
 document.addEventListener('DOMContentLoaded', init);

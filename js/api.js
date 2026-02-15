@@ -752,3 +752,92 @@ export async function deleteCategory(id) {
     return { error }
 }
 
+
+// --- Reviews ---
+
+export async function fetchProductReviews(productId) {
+    const { data, error } = await supabase
+        .from('reviews')
+        .select(`
+            id,
+            rating,
+            comment,
+            created_at,
+            user_id,
+            profiles (full_name)
+        `)
+        .eq('product_id', productId)
+        .order('created_at', { ascending: false });
+
+    if (error) {
+        console.error('Error fetching reviews:', error);
+        return [];
+    }
+    return data;
+}
+
+export async function fetchUserReview(userId, productId) {
+    const { data, error } = await supabase
+        .from('reviews')
+        .select('*')
+        .eq('user_id', userId)
+        .eq('product_id', productId)
+        .maybeSingle();
+
+    if (error && error.code !== 'PGRST116') { // PGRST116 is just "no rows returned" for single(), maybeSingle handles it better but just in case
+        console.error('Error fetching user review:', error);
+        return null;
+    }
+    return data;
+}
+
+export async function fetchAllUserReviews(userId) {
+    const { data, error } = await supabase
+        .from('reviews')
+        .select('*')
+        .eq('user_id', userId);
+
+    if (error) {
+        console.error('Error fetching all user reviews:', error);
+        return [];
+    }
+    return data;
+}
+
+export async function addReview(userId, productId, rating, comment) {
+    const { data, error } = await supabase
+        .from('reviews')
+        .insert({
+            user_id: userId,
+            product_id: productId,
+            rating,
+            comment
+        })
+        .select()
+        .single();
+
+    return { data, error };
+}
+
+export async function updateReview(reviewId, rating, comment) {
+    const { data, error } = await supabase
+        .from('reviews')
+        .update({
+            rating,
+            comment
+        })
+        .eq('id', reviewId)
+        .select()
+        .single();
+
+    return { data, error };
+}
+
+export async function deleteReview(reviewId) {
+    const { error } = await supabase
+        .from('reviews')
+        .delete()
+        .eq('id', reviewId);
+
+    return { error };
+}
