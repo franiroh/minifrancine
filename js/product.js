@@ -1,6 +1,6 @@
 
 import { loadComponents, updateNavbarAuth, updateNavbarCartCount } from './components.js';
-import { fetchProducts, getUser, onAuthStateChange, downloadProductFile } from './api.js';
+import { fetchProductById, getUser, onAuthStateChange, downloadProductFile } from './api.js';
 import { state, loadCart, getCartCount, addToCart, loadFavorites, isFavorite, toggleFavorite, loadPurchases, isPurchased } from './state.js';
 import { getUrlParam, renderBreadcrumbs } from './utils.js';
 
@@ -24,8 +24,7 @@ async function init() {
         return;
     }
 
-    const products = await fetchProducts();
-    currentProduct = products.find(p => p.id == productId);
+    currentProduct = await fetchProductById(productId);
 
     if (!currentProduct) {
         document.querySelector('.detail').innerHTML = '<h1>Producto no encontrado</h1>';
@@ -71,8 +70,18 @@ function renderProduct() {
     const img = document.getElementById('detail-img');
     const thumb = document.getElementById('detail-thumb');
 
-    if (img) img.style.background = p.imageColor; // Using color as placeholder for now
-    if (thumb) thumb.style.background = p.imageColor;
+    if (img) {
+        img.style.background = p.imageColor;
+        if (p.mainImage) {
+            img.innerHTML = `<img src="${p.mainImage}" alt="${p.title}" class="detail__main-img-el">`;
+        }
+    }
+    if (thumb) {
+        thumb.style.background = p.imageColor;
+        if (p.mainImage) {
+            thumb.innerHTML = `<img src="${p.mainImage}" alt="${p.title}" class="detail__thumb-img-el">`;
+        }
+    }
 
     // Info
     document.title = `${p.title} — PatchFiles`;

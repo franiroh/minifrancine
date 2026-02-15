@@ -31,7 +31,8 @@ export async function fetchProducts() {
         formats: p.formats,
         rating: p.rating,
         reviews: p.reviews,
-        description: p.description
+        description: p.description,
+        mainImage: p.main_image
     }));
 }
 

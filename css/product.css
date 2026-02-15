@@ -43,6 +43,21 @@
     border-radius: 20px;
     background-size: cover;
     background-position: center;
+    overflow: hidden;
+}
+
+.detail__main-img-el {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    border-radius: 20px;
+}
+
+.detail__thumb-img-el {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    border-radius: 12px;
 }
 
 .detail__thumbs {
@@ -55,6 +70,7 @@
     height: 80px;
     border-radius: 12px;
     cursor: pointer;
+    overflow: hidden;
 }
 
 .detail__thumb--active {
