@@ -1,5 +1,5 @@
 
-import { loadComponents, updateNavbarAuth, updateNavbarCartCount } from './components.js';
+import { loadComponents, updateNavbarAuth, updateNavbarCartCount, createProductCard } from './components.js';
 import { fetchProducts, fetchCategories, getUser, onAuthStateChange } from './api.js';
 import { state, loadCart, getCartCount, addToCart, loadFavorites, isFavorite, toggleFavorite, loadPurchases, isPurchased } from './state.js';
 import { renderBreadcrumbs, escapeHtml, sanitizeCssValue } from './utils.js';
@@ -183,44 +183,7 @@ function renderCatalog(items) {
         return;
     }
 
-    grid.innerHTML = items.map(product => {
-        const purchased = isPurchased(product.id);
-        return `
-    <div class="product-card ${purchased ? 'product-card--purchased' : ''}" data-id="${parseInt(product.id)}">
-      <div class="product-card__image" style="background: ${sanitizeCssValue(product.imageColor)};">
-        ${product.mainImage ? `<img src="${escapeHtml(product.mainImage)}" alt="${escapeHtml(product.title)}" class="product-card__img" loading="lazy">` : ''}
-        ${purchased
-            ? `<span class="product-card__badge product-card__badge--purchased"><i data-lucide="check-circle"></i> Comprado</span>`
-            : (product.badge ? `<span class="product-card__badge ${product.badgeColor === 'green' ? 'product-card__badge--green' : ''}">${escapeHtml(product.badge)}</span>` : '')}
-        <div class="product-card__heart ${isFavorite(product.id) ? 'product-card__heart--active' : ''}" data-id="${parseInt(product.id)}">
-            <i data-lucide="heart"></i>
-        </div>
-      </div>
-      <div class="product-card__info">
-        <span class="product-card__category">${escapeHtml(product.category)}</span>
-        <h3 class="product-card__title">${escapeHtml(product.title)}</h3>
-        <div class="product-card__tags">
-          ${product.tags ? product.tags.map(tag => `<span class="tag">${escapeHtml(tag)}</span>`).join('') : ''}
-        </div>
-        <div class="product-card__price-row">
-          <span class="product-card__price">$${parseFloat(product.price).toFixed(2)}</span>
-          <div class="product-card__btns">
-            ${purchased
-              ? `<a href="mis-disenos.html#product-${parseInt(product.id)}" class="btn btn--sm btn--purchased">
-                   <i data-lucide="download"></i> Mis diseños
-                 </a>`
-              : `<button class="btn btn--sm btn--outline btn-add-cart" data-id="${parseInt(product.id)}">
-                   <i data-lucide="shopping-cart"></i>
-                 </button>
-                 <button class="btn btn--sm btn--primary btn-buy-now" data-id="${parseInt(product.id)}">
-                    Comprar
-                 </button>`}
-          </div>
-        </div>
-      </div>
-    </div>
-  `;
-    }).join('');
+    grid.innerHTML = items.map(product => createProductCard(product)).join('');
 
     // Re-init icons
     if (window.lucide) window.lucide.createIcons();

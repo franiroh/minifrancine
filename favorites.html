@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PatchFiles — Mis Favoritos</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:wght@700;800&family=DM+Sans:wght@400;500;600;700&display=swap"
+        rel="stylesheet">
+    <script src="https://unpkg.com/lucide@latest"></script>
+
+    <link rel="stylesheet" href="css/main.css">
+    <link rel="stylesheet" href="css/components.css">
+    <link rel="stylesheet" href="css/home.css"> <!-- Reusing product grid styles -->
+    <style>
+        .page-header {
+            padding: 48px 80px 24px;
+        }
+
+        .page-title {
+            font-family: 'Bricolage Grotesque', serif;
+            font-size: 32px;
+            font-weight: 800;
+            margin-bottom: 8px;
+        }
+
+        .page-subtitle {
+            color: #6B7280;
+            font-size: 16px;
+        }
+
+        .favorites-content {
+            padding: 24px 80px 64px;
+        }
+
+        /* reuse product-grid from home.css */
+
+        #empty-state {
+            display: none;
+            text-align: center;
+            padding: 64px 0;
+            color: #9CA3AF;
+        }
+
+        #empty-state i {
+            font-size: 48px;
+            margin-bottom: 16px;
+            color: #E5E7EB;
+        }
+
+        @media (max-width: 900px) {
+
+            .page-header,
+            .favorites-content {
+                padding-left: 24px;
+                padding-right: 24px;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="page">
+        <div id="navbar-placeholder"></div>
+
+        <section class="page-header">
+            <h1 class="page-title">Mis Favoritos</h1>
+            <p class="page-subtitle">Los diseños que más te gustan, guardados para ti.</p>
+        </section>
+
+        <section class="favorites-content">
+            <div id="loading" style="text-align: center; padding: 40px;">
+                <div class="spinner"></div>
+            </div>
+
+            <div id="empty-state">
+                <i data-lucide="heart"></i>
+                <p>Aún no tienes favoritos guardados.</p>
+                <a href="index.html" class="btn btn--primary btn--sm"
+                    style="margin-top: 16px; display: inline-flex;">Explorar Catálogo</a>
+            </div>
+
+            <div class="product-grid" id="favorites-grid" style="display: none;">
+                <!-- Products Rendered Here -->
+            </div>
+        </section>
+
+        <div id="footer-placeholder"></div>
+    </div>
+
+    <script type="module" src="js/favorites.js"></script>
+</body>
+
+</html>

@@ -29,6 +29,9 @@ export const loadComponents = async () => {
             <i data-lucide="chevron-down" id="navbar-user-arrow" style="width: 16px; height: 16px; margin-left: -2px; display: none;"></i>
           </button>
           <div class="navbar__dropdown" id="navbar-dropdown">
+            <a href="favorites.html" class="navbar__dropdown-item">
+              <i data-lucide="heart"></i> Mis Favoritos
+            </a>
             <a href="mis-disenos.html" class="navbar__dropdown-item">
               <i data-lucide="palette"></i> Mis Diseños
             </a>
@@ -159,4 +162,48 @@ export const updateNavbarAuth = async (user) => {
 export const updateNavbarCartCount = (count) => {
   const badges = document.querySelectorAll('.navbar__cart-badge');
   badges.forEach(b => b.textContent = count);
+};
+
+import { isFavorite, isPurchased } from './state.js';
+import { sanitizeCssValue } from './utils.js';
+
+export const createProductCard = (product) => {
+  const purchased = isPurchased(product.id);
+  const favorite = isFavorite(product.id);
+
+  return `
+    <div class="product-card ${purchased ? 'product-card--purchased' : ''}" data-id="${parseInt(product.id)}">
+      <div class="product-card__image" style="background: ${sanitizeCssValue(product.imageColor)};">
+        ${product.mainImage ? `<img src="${escapeHtml(product.mainImage)}" alt="${escapeHtml(product.title)}" class="product-card__img" loading="lazy">` : ''}
+        ${purchased
+      ? `<span class="product-card__badge product-card__badge--purchased"><i data-lucide="check-circle"></i> Comprado</span>`
+      : (product.badge ? `<span class="product-card__badge ${product.badgeColor === 'green' ? 'product-card__badge--green' : ''}">${escapeHtml(product.badge)}</span>` : '')}
+        <div class="product-card__heart ${favorite ? 'product-card__heart--active' : ''}" data-id="${parseInt(product.id)}">
+            <i data-lucide="heart"></i>
+        </div>
+      </div>
+      <div class="product-card__info">
+        <span class="product-card__category">${escapeHtml(product.category)}</span>
+        <h3 class="product-card__title">${escapeHtml(product.title)}</h3>
+        <div class="product-card__tags">
+          ${product.tags ? product.tags.map(tag => `<span class="tag">${escapeHtml(tag)}</span>`).join('') : ''}
+        </div>
+        <div class="product-card__price-row">
+          <span class="product-card__price">$${parseFloat(product.price).toFixed(2)}</span>
+          <div class="product-card__btns">
+            ${purchased
+      ? `<a href="mis-disenos.html#product-${parseInt(product.id)}" class="btn btn--sm btn--purchased">
+                   <i data-lucide="download"></i> Mis diseños
+                 </a>`
+      : `<button class="btn btn--sm btn--outline btn-add-cart" data-id="${parseInt(product.id)}">
+                   <i data-lucide="shopping-cart"></i>
+                 </button>
+                 <button class="btn btn--sm btn--primary btn-buy-now" data-id="${parseInt(product.id)}">
+                    Comprar
+                 </button>`}
+          </div>
+        </div>
+      </div>
+    </div>
+  `;
 };
