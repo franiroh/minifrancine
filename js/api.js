@@ -8,7 +8,7 @@ export const supabase = createClient(supabaseUrl, supabaseKey)
 export async function fetchProducts({ publishedOnly = false } = {}) {
     let query = supabase
         .from('products')
-        .select('*')
+        .select('*, categories(name)')
         .order('id', { ascending: true })
 
     if (publishedOnly) {
@@ -26,7 +26,8 @@ export async function fetchProducts({ publishedOnly = false } = {}) {
     return data.map(p => ({
         id: p.id,
         title: p.title,
-        category: p.category,
+        category: p.categories?.name || 'Sin categoría',
+        categoryId: p.category_id,
         price: p.price,
         oldPrice: p.old_price,
         imageColor: p.image_color,
@@ -46,7 +47,7 @@ export async function fetchProducts({ publishedOnly = false } = {}) {
 export async function fetchProductById(id) {
     const { data, error } = await supabase
         .from('products')
-        .select('*')
+        .select('*, categories(name)')
         .eq('id', id)
         .single()
 
@@ -58,7 +59,8 @@ export async function fetchProductById(id) {
     return {
         id: data.id,
         title: data.title,
-        category: data.category,
+        category: data.categories?.name || 'Sin categoría',
+        categoryId: data.category_id,
         price: data.price,
         oldPrice: data.old_price,
         imageColor: data.image_color,
@@ -171,7 +173,7 @@ export async function fetchCart(userId) {
             id,
             product_id,
             quantity,
-            product:products (*)
+            product:products (*, categories(name))
         `)
         .eq('user_id', userId)
 
@@ -182,9 +184,9 @@ export async function fetchCart(userId) {
 
     // Transform to flat structure expected by state
     return data.map(item => ({
-        ...item.product, // Spread product details
-        // Override potential name conflicts or just use product data
-        cart_item_id: item.id, // Store cart_item_id for deletion
+        ...item.product,
+        category: item.product.categories?.name || 'Sin categoría',
+        cart_item_id: item.id,
         quantity: item.quantity
     }))
 }

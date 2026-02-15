@@ -110,7 +110,7 @@ async function renderProduct() {
     setText('detail-price', `$${p.price}`);
 
     setText('detail-size', p.size);
-    setText('detail-stitches', p.stitches);
+    setText('detail-stitches', p.stitches ? Number(p.stitches).toLocaleString('en-US') : '');
     setText('detail-formats', p.formats);
 
     // Buttons — conditional rendering based on purchased state

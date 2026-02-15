@@ -50,7 +50,7 @@ async function init() {
     const categories = await fetchCategories();
     const catSelect = document.getElementById('prod-category');
     catSelect.innerHTML = categories.map(c =>
-        `<option value="${escapeHtml(c.name)}">${escapeHtml(c.name)}</option>`
+        `<option value="${c.id}">${escapeHtml(c.name)}</option>`
     ).join('');
 
     if (productId) {
@@ -95,12 +95,12 @@ async function loadProductData(id) {
     document.getElementById('prod-description').value = product.description || '';
     document.getElementById('prod-price').value = product.price || '';
     document.getElementById('prod-old-price').value = product.oldPrice || '';
-    document.getElementById('prod-category').value = product.category || '';
+    document.getElementById('prod-category').value = product.categoryId || '';
     document.getElementById('prod-badge').value = product.badge || '';
     document.getElementById('prod-badge-color').value = product.badgeColor || 'red';
     document.getElementById('prod-image-color').value = product.imageColor || '';
     document.getElementById('prod-size').value = product.size || '';
-    document.getElementById('prod-stitches').value = product.stitches || '';
+    document.getElementById('prod-stitches').value = product.stitches ? Number(product.stitches).toLocaleString('en-US') : '';
     document.getElementById('prod-formats').value = product.formats || '';
 
     // Published state
@@ -191,6 +191,13 @@ function setupEventListeners() {
 
     // Delete File
     document.getElementById('btn-delete-file').onclick = handleDeleteFile;
+
+    // Stitches: auto-format with commas as user types
+    const stitchesInput = document.getElementById('prod-stitches');
+    stitchesInput.addEventListener('input', () => {
+        const raw = stitchesInput.value.replace(/,/g, '').replace(/\D/g, '');
+        stitchesInput.value = raw ? Number(raw).toLocaleString('en-US') : '';
+    });
 }
 
 let pendingImages = [];
@@ -303,12 +310,12 @@ async function handleSave(e) {
             description: document.getElementById('prod-description').value,
             price: parseFloat(document.getElementById('prod-price').value),
             old_price: parseFloat(document.getElementById('prod-old-price').value) || null,
-            category: document.getElementById('prod-category').value,
+            category_id: parseInt(document.getElementById('prod-category').value, 10),
             badge: document.getElementById('prod-badge').value,
             badge_color: document.getElementById('prod-badge-color').value,
             image_color: document.getElementById('prod-image-color').value,
             size: document.getElementById('prod-size').value,
-            stitches: document.getElementById('prod-stitches').value || '',
+            stitches: parseInt(document.getElementById('prod-stitches').value.replace(/,/g, ''), 10) || 0,
             formats: document.getElementById('prod-formats').value,
             published: document.getElementById('prod-published').checked,
         };
