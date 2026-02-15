@@ -1,6 +1,6 @@
 
 import { loadComponents, updateNavbarAuth, updateNavbarCartCount } from './components.js';
-import { fetchProductById, getUser, onAuthStateChange, downloadProductFile } from './api.js';
+import { fetchProductById, fetchProductImages, getUser, onAuthStateChange, downloadProductFile } from './api.js';
 import { state, loadCart, getCartCount, addToCart, loadFavorites, isFavorite, toggleFavorite, loadPurchases, isPurchased } from './state.js';
 import { getUrlParam, renderBreadcrumbs } from './utils.js';
 
@@ -31,7 +31,7 @@ async function init() {
         return;
     }
 
-    renderProduct();
+    await renderProduct();
     renderProductBreadcrumbs();
     setupListeners();
     setupAuthListener();
@@ -63,24 +63,41 @@ function setupAuthListener() {
     });
 }
 
-function renderProduct() {
+async function renderProduct() {
     const p = currentProduct;
 
-    // Images
+    // Images — fetch gallery from product_images table
     const img = document.getElementById('detail-img');
-    const thumb = document.getElementById('detail-thumb');
+    const thumbsContainer = document.getElementById('detail-thumbs');
+    const galleryImages = await fetchProductImages(p.id);
+
+    // Build image list: use gallery if available, fall back to mainImage
+    const images = galleryImages.length > 0
+        ? galleryImages.map(gi => gi.public_url)
+        : (p.mainImage ? [p.mainImage] : []);
 
     if (img) {
         img.style.background = p.imageColor;
-        if (p.mainImage) {
-            img.innerHTML = `<img src="${p.mainImage}" alt="${p.title}" class="detail__main-img-el">`;
+        if (images.length > 0) {
+            img.innerHTML = `<img src="${images[0]}" alt="${p.title}" class="detail__main-img-el">`;
         }
     }
-    if (thumb) {
-        thumb.style.background = p.imageColor;
-        if (p.mainImage) {
-            thumb.innerHTML = `<img src="${p.mainImage}" alt="${p.title}" class="detail__thumb-img-el">`;
-        }
+
+    if (thumbsContainer && images.length > 1) {
+        thumbsContainer.innerHTML = images.map((url, i) =>
+            `<div class="detail__thumb ${i === 0 ? 'detail__thumb--active' : ''}" data-index="${i}">
+                <img src="${url}" alt="${p.title}" class="detail__thumb-img-el">
+            </div>`
+        ).join('');
+
+        thumbsContainer.addEventListener('click', (e) => {
+            const thumb = e.target.closest('.detail__thumb');
+            if (!thumb) return;
+            const index = Number(thumb.dataset.index);
+            img.innerHTML = `<img src="${images[index]}" alt="${p.title}" class="detail__main-img-el">`;
+            thumbsContainer.querySelectorAll('.detail__thumb').forEach(t => t.classList.remove('detail__thumb--active'));
+            thumb.classList.add('detail__thumb--active');
+        });
     }
 
     // Info

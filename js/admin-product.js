@@ -69,7 +69,7 @@ async function loadProductData(id) {
     const product = await fetchProductById(id);
     if (!product) {
         alert('Producto no encontrado');
-        window.location.href = 'admin.html';
+        window.location.href = 'admin.html#products';
         return;
     }
     currentProduct = product;
@@ -335,7 +335,7 @@ async function handleSave(e) {
         }
 
         alert('Producto guardado correctamente');
-        window.location.href = 'admin.html';
+        window.location.href = 'admin.html#products';
 
     } catch (err) {
         console.error(err);
