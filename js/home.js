@@ -50,7 +50,9 @@ async function init() {
     });
 
     window.addEventListener('favorites-updated', () => {
-        const activeCategory = document.querySelector('.filter-chip--active').textContent;
+        const activeChip = document.querySelector('.filter-chip--active');
+        const activeCategory = activeChip ? activeChip.textContent : 'Todos';
+
         // Re-render keeping current filter
         if (activeCategory === 'Todos') {
             renderCatalog(products);
