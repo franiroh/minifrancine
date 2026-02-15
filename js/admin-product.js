@@ -13,6 +13,7 @@ import {
     saveProductFileRecord,
     fetchProductFile,
     deleteProductFile,
+    fetchCategories,
     supabase
 } from './api.js';
 import { escapeHtml } from './utils.js';
@@ -45,6 +46,13 @@ async function init() {
 
     if (window.lucide) window.lucide.createIcons();
 
+    // Populate category select from DB
+    const categories = await fetchCategories();
+    const catSelect = document.getElementById('prod-category');
+    catSelect.innerHTML = categories.map(c =>
+        `<option value="${escapeHtml(c.name)}">${escapeHtml(c.name)}</option>`
+    ).join('');
+
     if (productId) {
         document.getElementById('page-title').textContent = 'Editar Producto';
         document.getElementById('prod-id').value = productId;
@@ -52,6 +60,14 @@ async function init() {
     } else {
         document.getElementById('page-title').textContent = 'Nuevo Producto';
     }
+
+    // Published toggle label sync
+    const pubCheckbox = document.getElementById('prod-published');
+    const pubLabel = document.getElementById('prod-published-label');
+    pubCheckbox.addEventListener('change', () => {
+        pubLabel.textContent = pubCheckbox.checked ? 'Publicado' : 'No publicado';
+        pubLabel.style.color = pubCheckbox.checked ? '#22C55E' : '#9CA3AF';
+    });
 
     setupEventListeners();
     fadeOutPreloader();
@@ -79,13 +95,20 @@ async function loadProductData(id) {
     document.getElementById('prod-description').value = product.description || '';
     document.getElementById('prod-price').value = product.price || '';
     document.getElementById('prod-old-price').value = product.oldPrice || '';
-    document.getElementById('prod-category').value = product.category || 'Anime';
+    document.getElementById('prod-category').value = product.category || '';
     document.getElementById('prod-badge').value = product.badge || '';
     document.getElementById('prod-badge-color').value = product.badgeColor || 'red';
     document.getElementById('prod-image-color').value = product.imageColor || '';
     document.getElementById('prod-size').value = product.size || '';
     document.getElementById('prod-stitches').value = product.stitches || '';
     document.getElementById('prod-formats').value = product.formats || '';
+
+    // Published state
+    const pubCheckbox = document.getElementById('prod-published');
+    const pubLabel = document.getElementById('prod-published-label');
+    pubCheckbox.checked = product.published !== false;
+    pubLabel.textContent = pubCheckbox.checked ? 'Publicado' : 'No publicado';
+    pubLabel.style.color = pubCheckbox.checked ? '#22C55E' : '#9CA3AF';
 
     // Load Images
     const images = await fetchProductImages(id);
@@ -287,6 +310,7 @@ async function handleSave(e) {
             size: document.getElementById('prod-size').value,
             stitches: document.getElementById('prod-stitches').value || '',
             formats: document.getElementById('prod-formats').value,
+            published: document.getElementById('prod-published').checked,
         };
 
         let savedProductId = productId; // Existing or new

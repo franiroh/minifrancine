@@ -1,7 +1,7 @@
 
 import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js/+esm'
-import { getUser, signOut, fetchProducts } from './api.js';
-import { fetchAllOrders, fetchAdminStats, deleteProduct } from './api.js';
+import { getUser, signOut, fetchProducts, updateProduct } from './api.js';
+import { fetchAllOrders, fetchAdminStats, deleteProduct, fetchCategories, createCategory, updateCategory, deleteCategory } from './api.js';
 import { escapeHtml, sanitizeCssValue } from './utils.js';
 
 let currentView = 'dashboard';
@@ -29,7 +29,7 @@ async function init() {
 
     // 3. Load Initial View (Hash Routing)
     const hash = window.location.hash.replace('#', '');
-    if (hash && ['dashboard', 'products', 'orders'].includes(hash)) {
+    if (hash && ['dashboard', 'products', 'orders', 'categories'].includes(hash)) {
         const navItem = document.querySelector(`.nav-item[data-tab="${hash}"]`);
         if (navItem) navItem.click();
     } else {
@@ -92,6 +92,7 @@ function setupNavigation() {
             if (viewId === 'dashboard') loadDashboard();
             if (viewId === 'products') loadProducts();
             if (viewId === 'orders') loadOrders();
+            if (viewId === 'categories') loadCategories();
         };
     });
 }
@@ -111,27 +112,64 @@ async function loadDashboard() {
 
 async function loadProducts() {
     const products = await fetchProducts();
-    const tbody = document.querySelector('#products-table tbody');
+    const container = document.getElementById('products-by-category');
 
-    tbody.innerHTML = products.map(p => `
-        <tr>
-            <td>
-                ${(p.mainImage)
-            ? `<img src="${escapeHtml(p.mainImage)}" alt="${escapeHtml(p.title)}" class="img-preview" style="object-fit: cover;">`
-            : (p.imageColor && p.imageColor.includes('gradient'))
-                ? `<div class="img-preview" style="background: ${sanitizeCssValue(p.imageColor)}; width: 48px; height: 48px; border-radius: 12px;"></div>`
-                : `<img src="${escapeHtml(p.imageColor || 'https://placehold.co/48')}" alt="${escapeHtml(p.title)}" class="img-preview" style="object-fit: cover;">`
-        }
-            </td>
-            <td><strong>${escapeHtml(p.title)}</strong></td>
-            <td>$${parseFloat(p.price).toFixed(2)}</td>
-            <td><span class="tag">${escapeHtml(p.category)}</span></td>
-            <td>
-                <button class="btn-icon" onclick="window.location.href='admin-product.html?id=${parseInt(p.id)}'"><i data-lucide="edit-3"></i></button>
-                <button class="btn-icon" onclick="deleteProductHandler('${parseInt(p.id)}')"><i data-lucide="trash-2"></i></button>
-            </td>
-        </tr>
-    `).join('');
+    // Group by category
+    const grouped = {};
+    products.forEach(p => {
+        const cat = p.category || 'Sin categoría';
+        if (!grouped[cat]) grouped[cat] = [];
+        grouped[cat].push(p);
+    });
+
+    const categoryNames = Object.keys(grouped).sort();
+
+    container.innerHTML = categoryNames.map(cat => {
+        const rows = grouped[cat].map(p => `
+            <tr class="${p.published === false ? 'product-row--unpublished' : ''}">
+                <td>
+                    ${(p.mainImage)
+                ? `<img src="${escapeHtml(p.mainImage)}" alt="${escapeHtml(p.title)}" class="img-preview" style="object-fit: cover;">`
+                : (p.imageColor && p.imageColor.includes('gradient'))
+                    ? `<div class="img-preview" style="background: ${sanitizeCssValue(p.imageColor)}; width: 48px; height: 48px; border-radius: 12px;"></div>`
+                    : `<img src="${escapeHtml(p.imageColor || 'https://placehold.co/48')}" alt="${escapeHtml(p.title)}" class="img-preview" style="object-fit: cover;">`
+            }
+                </td>
+                <td><strong>${escapeHtml(p.title)}</strong></td>
+                <td>$${parseFloat(p.price).toFixed(2)}</td>
+                <td>
+                    <label class="toggle-switch">
+                        <input type="checkbox" ${p.published !== false ? 'checked' : ''} onchange="togglePublishHandler(${parseInt(p.id)}, this.checked)">
+                        <span class="slider"></span>
+                    </label>
+                </td>
+                <td>
+                    <button class="btn-icon" onclick="window.location.href='admin-product.html?id=${parseInt(p.id)}'"><i data-lucide="edit-3"></i></button>
+                    <button class="btn-icon" onclick="deleteProductHandler('${parseInt(p.id)}')"><i data-lucide="trash-2"></i></button>
+                </td>
+            </tr>
+        `).join('');
+
+        return `
+            <div class="category-group">
+                <h3 class="category-group__title">${escapeHtml(cat)} <span class="category-group__count">${grouped[cat].length}</span></h3>
+                <div class="table-container">
+                    <table class="data-table">
+                        <thead>
+                            <tr>
+                                <th>Imagen</th>
+                                <th>Título</th>
+                                <th>Precio</th>
+                                <th>Estado</th>
+                                <th>Acciones</th>
+                            </tr>
+                        </thead>
+                        <tbody>${rows}</tbody>
+                    </table>
+                </div>
+            </div>
+        `;
+    }).join('');
 
     if (window.lucide) window.lucide.createIcons();
 }
@@ -162,6 +200,67 @@ async function loadOrders() {
 
     if (window.lucide) window.lucide.createIcons();
 }
+
+async function loadCategories() {
+    const categories = await fetchCategories();
+    const tbody = document.querySelector('#categories-table tbody');
+
+    tbody.innerHTML = categories.map(c => `
+        <tr>
+            <td><strong>${escapeHtml(c.name)}</strong></td>
+            <td>
+                <button class="btn-icon" onclick="editCategoryHandler(${parseInt(c.id)}, '${escapeHtml(c.name).replace(/'/g, "\\'")}')"><i data-lucide="edit-3"></i></button>
+                <button class="btn-icon" onclick="deleteCategoryHandler(${parseInt(c.id)})"><i data-lucide="trash-2"></i></button>
+            </td>
+        </tr>
+    `).join('');
+
+    if (window.lucide) window.lucide.createIcons();
+
+    // Wire up "Nueva Categoría" button
+    document.getElementById('btn-add-category').onclick = async () => {
+        const name = prompt('Nombre de la nueva categoría:');
+        if (!name || !name.trim()) return;
+        const { error } = await createCategory({ name: name.trim() });
+        if (error) {
+            alert('Error al crear categoría: ' + error.message);
+        } else {
+            loadCategories();
+        }
+    };
+}
+
+window.editCategoryHandler = async (id, currentName) => {
+    const name = prompt('Editar nombre de categoría:', currentName);
+    if (!name || !name.trim() || name.trim() === currentName) return;
+    const { error } = await updateCategory(id, { name: name.trim() });
+    if (error) {
+        alert('Error al actualizar categoría: ' + error.message);
+    } else {
+        loadCategories();
+    }
+};
+
+window.deleteCategoryHandler = async (id) => {
+    if (confirm('¿Seguro que quieres eliminar esta categoría?')) {
+        const { error } = await deleteCategory(id);
+        if (error) {
+            alert('Error al eliminar: ' + error.message);
+        } else {
+            loadCategories();
+        }
+    }
+};
+
+window.togglePublishHandler = async (id, published) => {
+    const { error } = await updateProduct(id, { published });
+    if (error) {
+        alert('Error al cambiar estado: ' + error.message);
+        loadProducts(); // Revert UI
+    } else {
+        loadProducts();
+    }
+};
 
 window.deleteProductHandler = async (id) => {
     if (confirm('¿Seguro que quieres eliminar este producto?')) {

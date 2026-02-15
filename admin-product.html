@@ -35,6 +35,9 @@
                 <a href="admin.html#orders" class="nav-item">
                     <i data-lucide="shopping-bag"></i> Ventas
                 </a>
+                <a href="admin.html#categories" class="nav-item">
+                    <i data-lucide="tag"></i> Categorías
+                </a>
                 <a href="index.html" class="nav-item">
                     <i data-lucide="external-link"></i> Ver Tienda
                 </a>
@@ -59,7 +62,12 @@
                         <h2 style="font-size: 24px; font-weight: 700; margin-bottom: 8px;">Detalles del Producto</h2>
                         <p class="text-gray">Completa la información para publicar el diseño.</p>
                     </div>
-                    <div class="actions">
+                    <div class="actions" style="display:flex;align-items:center;gap:16px;">
+                        <label class="toggle-switch" title="Publicado" style="flex-shrink:0;">
+                            <input type="checkbox" id="prod-published" checked>
+                            <span class="slider"></span>
+                        </label>
+                        <span id="prod-published-label" style="font-size:13px;font-weight:600;color:#22C55E;">Publicado</span>
                         <button type="button" class="btn btn--secondary"
                             onclick="window.location.href='admin.html#products'">Cancelar</button>
                         <button type="button" class="btn btn--primary" id="btn-save">Guardar Producto</button>
@@ -94,10 +102,7 @@
                             <div class="form-group">
                                 <label>Categoría</label>
                                 <select id="prod-category">
-                                    <option value="Anime">Anime</option>
-                                    <option value="Animales">Animales</option>
-                                    <option value="Flores">Flores</option>
-                                    <option value="Logos">Logos</option>
+                                    <!-- Populated dynamically from categories table -->
                                 </select>
                             </div>
                         </div>
@@ -158,7 +163,7 @@
                             </div>
                             <div class="form-group">
                                 <label>Puntadas</label>
-                                <input type="number" id="prod-stitches" placeholder="5400">
+                                <input type="text" id="prod-stitches" placeholder="5,400">
                             </div>
                         </div>
                     </div>

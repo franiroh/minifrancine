@@ -34,6 +34,9 @@
                 <button class="nav-item" data-tab="orders">
                     <i data-lucide="shopping-bag"></i> Ventas
                 </button>
+                <button class="nav-item" data-tab="categories">
+                    <i data-lucide="tag"></i> Categorías
+                </button>
                 <button class="nav-item" id="exit-admin-btn">
                     <i data-lucide="external-link"></i> Volver a Tienda
                 </button>
@@ -89,19 +92,8 @@
                             <i data-lucide="plus"></i> Nuevo Producto
                         </button>
                     </div>
-                    <div class="table-container">
-                        <table class="data-table" id="products-table">
-                            <thead>
-                                <tr>
-                                    <th>Imagen</th>
-                                    <th>Título</th>
-                                    <th>Precio</th>
-                                    <th>Categoría</th>
-                                    <th>Acciones</th>
-                                </tr>
-                            </thead>
-                            <tbody><!-- Dynamic --></tbody>
-                        </table>
+                    <div id="products-by-category">
+                        <!-- Dynamic: one table per category -->
                     </div>
                 </div>
 
@@ -119,6 +111,27 @@
                                     <th>Fecha</th>
                                     <th>Total</th>
                                     <th>Estado</th>
+                                </tr>
+                            </thead>
+                            <tbody><!-- Dynamic --></tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <!-- Categories View -->
+                <div id="view-categories" class="view">
+                    <div class="view-header">
+                        <h2>Gestionar Categorías</h2>
+                        <button class="btn btn--primary" id="btn-add-category">
+                            <i data-lucide="plus"></i> Nueva Categoría
+                        </button>
+                    </div>
+                    <div class="table-container">
+                        <table class="data-table" id="categories-table">
+                            <thead>
+                                <tr>
+                                    <th>Nombre</th>
+                                    <th>Acciones</th>
                                 </tr>
                             </thead>
                             <tbody><!-- Dynamic --></tbody>

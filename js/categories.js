@@ -17,7 +17,7 @@ async function init() {
     });
 
     // Load Data
-    const products = await fetchProducts();
+    const products = await fetchProducts({ publishedOnly: true });
     renderCategories(products);
 }
 

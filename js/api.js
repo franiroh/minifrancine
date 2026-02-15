@@ -5,11 +5,17 @@ const supabaseUrl = 'https://dxqsdzktytehycpnrbtn.supabase.co'
 const supabaseKey = 'sb_publishable_crjG8THHPXfnLrtQityLWg_7pLdQPhG'
 export const supabase = createClient(supabaseUrl, supabaseKey)
 
-export async function fetchProducts() {
-    const { data, error } = await supabase
+export async function fetchProducts({ publishedOnly = false } = {}) {
+    let query = supabase
         .from('products')
         .select('*')
         .order('id', { ascending: true })
+
+    if (publishedOnly) {
+        query = query.eq('published', true)
+    }
+
+    const { data, error } = await query
 
     if (error) {
         console.error('Error fetching products:', error)
@@ -32,7 +38,8 @@ export async function fetchProducts() {
         rating: p.rating,
         reviews: p.reviews,
         description: p.description,
-        mainImage: p.main_image
+        mainImage: p.main_image,
+        published: p.published
     }));
 }
 
@@ -63,7 +70,8 @@ export async function fetchProductById(id) {
         formats: data.formats,
         rating: data.rating,
         reviews: data.reviews,
-        description: data.description
+        description: data.description,
+        published: data.published
     };
 }
 
@@ -618,5 +626,47 @@ export async function fetchOrderItems(orderId) {
         return []
     }
     return data
+}
+
+// --- Categories ---
+
+export async function fetchCategories() {
+    const { data, error } = await supabase
+        .from('categories')
+        .select('*')
+        .order('name', { ascending: true })
+
+    if (error) {
+        console.error('Error fetching categories:', error)
+        return []
+    }
+    return data
+}
+
+export async function createCategory(categoryData) {
+    const { data, error } = await supabase
+        .from('categories')
+        .insert(categoryData)
+        .select()
+        .single()
+    return { data, error }
+}
+
+export async function updateCategory(id, categoryData) {
+    const { data, error } = await supabase
+        .from('categories')
+        .update(categoryData)
+        .eq('id', id)
+        .select()
+        .single()
+    return { data, error }
+}
+
+export async function deleteCategory(id) {
+    const { error } = await supabase
+        .from('categories')
+        .delete()
+        .eq('id', id)
+    return { error }
 }
 

@@ -1,6 +1,6 @@
 
 import { loadComponents, updateNavbarAuth, updateNavbarCartCount } from './components.js';
-import { fetchProducts, getUser, onAuthStateChange } from './api.js';
+import { fetchProducts, fetchCategories, getUser, onAuthStateChange } from './api.js';
 import { state, loadCart, getCartCount, addToCart, loadFavorites, isFavorite, toggleFavorite, loadPurchases, isPurchased } from './state.js';
 import { renderBreadcrumbs, escapeHtml, sanitizeCssValue } from './utils.js';
 
@@ -31,8 +31,18 @@ async function init() {
         showHomeView(); // Default view
     }
 
-    // 3. Fetch & Render Products
-    products = await fetchProducts();
+    // 3. Fetch categories & render filter chips
+    const categories = await fetchCategories();
+    const filtersContainer = document.getElementById('catalog-filters');
+    if (filtersContainer && categories.length > 0) {
+        const chipsHTML = categories.map(c =>
+            `<button class="filter-chip">${escapeHtml(c.name)}</button>`
+        ).join('');
+        filtersContainer.innerHTML = `<button class="filter-chip filter-chip--active">Todos</button>${chipsHTML}`;
+    }
+
+    // 4. Fetch & Render Products (only published)
+    products = await fetchProducts({ publishedOnly: true });
 
     if (initialCategory) {
         // Just filter, view is already correctly set
@@ -42,7 +52,7 @@ async function init() {
         renderCatalog(products); // Render all
     }
 
-    // 4. Setup Listeners
+    // 5. Setup Listeners
     setupAuthListener();
     setupFilterListeners();
 
