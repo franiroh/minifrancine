@@ -2,6 +2,7 @@
 import { loadComponents, updateNavbarAuth, updateNavbarCartCount } from './components.js';
 import { getUser, onAuthStateChange } from './api.js';
 import { state, loadCart, getCartCount, getCartTotal } from './state.js';
+import { escapeHtml } from './utils.js';
 import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js/+esm'
 
 // Initialize Supabase Client for direct function invocation if needed, 
@@ -66,7 +67,7 @@ function renderCheckout() {
 
     if (itemsContainer) {
         itemsContainer.innerHTML = cart.map(item => `
-            <div class="checkout-summary__row"><span>${item.title}</span><span>$${item.price}</span></div>
+            <div class="checkout-summary__row"><span>${escapeHtml(item.title)}</span><span>$${parseFloat(item.price).toFixed(2)}</span></div>
         `).join('');
     }
 

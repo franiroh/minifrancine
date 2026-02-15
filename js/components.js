@@ -64,6 +64,7 @@ export const loadComponents = async () => {
 };
 
 import { getProfile } from './api.js';
+import { escapeHtml } from './utils.js';
 
 export const updateNavbarAuth = async (user) => {
   const userBtn = document.getElementById('navbar-user-btn');
@@ -74,7 +75,7 @@ export const updateNavbarAuth = async (user) => {
     if (user) {
       userText.textContent = user.email;
       userBtn.onclick = () => window.location.href = 'orders.html';
-      userText.innerHTML = `${user.email} <br> <span style="font-size:0.8em; opacity:0.8;">Mis Compras</span>`;
+      userText.innerHTML = `${escapeHtml(user.email)} <br> <span style="font-size:0.8em; opacity:0.8;">Mis Compras</span>`;
 
       // Check for Admin role
       const { data: profile } = await getProfile(user.id);

@@ -2,7 +2,7 @@
 import { loadComponents, updateNavbarAuth, updateNavbarCartCount } from './components.js';
 import { getUser, onAuthStateChange } from './api.js';
 import { state, loadCart, getCartCount, removeFromCart, clearCart, getCartTotal } from './state.js';
-import { formatPrice } from './utils.js';
+import { formatPrice, escapeHtml, sanitizeCssValue } from './utils.js';
 
 async function init() {
     await loadComponents();
@@ -47,11 +47,11 @@ function renderCart() {
     } else {
         container.innerHTML = cart.map((item, index) => `
         <div class="cart-item">
-          <div class="cart-item__img" style="background: ${item.imageColor};"></div>
+          <div class="cart-item__img" style="background: ${sanitizeCssValue(item.imageColor)};"></div>
           <div class="cart-item__info">
-            <span class="cart-item__name">${item.title}</span>
-            <span class="cart-item__meta">${item.category} · ${item.size || 'Standard'}</span>
-            <span class="cart-item__price">$${item.price}</span>
+            <span class="cart-item__name">${escapeHtml(item.title)}</span>
+            <span class="cart-item__meta">${escapeHtml(item.category)} · ${escapeHtml(item.size || 'Standard')}</span>
+            <span class="cart-item__price">$${parseFloat(item.price).toFixed(2)}</span>
           </div>
           <button class="cart-item__delete" data-index="${index}"><i data-lucide="trash-2"></i></button>
         </div>

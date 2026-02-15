@@ -2,6 +2,7 @@
 import { loadComponents, updateNavbarAuth, updateNavbarCartCount } from './components.js';
 import { getUser, onAuthStateChange, fetchMyOrders, downloadProductFile } from './api.js';
 import { state, loadCart, getCartCount } from './state.js';
+import { escapeHtml } from './utils.js';
 
 async function init() {
     await loadComponents();
@@ -72,23 +73,21 @@ function renderOrderCard(order) {
     if (order.order_items && order.order_items.length > 0) {
         itemsHtml = order.order_items.map(item => {
             const productTitle = item.products ? item.products.title : 'Producto';
-            // Simple escape for single quotes in title
-            const safeTitle = productTitle.replace(/'/g, "\\'");
+            const safeTitle = escapeHtml(productTitle);
+            // For the onclick attribute, encode for safe use in JS string
+            const jsTitle = productTitle.replace(/\\/g, '\\\\').replace(/'/g, "\\'").replace(/"/g, '\\"');
 
             const downloadBtn = order.status === 'paid'
-                ? `<button onclick="handleDownload(${item.product_id}, '${safeTitle}')" class="btn-download" style="margin-left: auto; font-size: 0.8rem; padding: 4px 12px; border: 1px solid var(--color-border); border-radius: 4px; background: white; cursor: pointer;">
+                ? `<button onclick="handleDownload(${parseInt(item.product_id)}, '${jsTitle}')" class="btn-download" style="margin-left: auto; font-size: 0.8rem; padding: 4px 12px; border: 1px solid var(--color-border); border-radius: 4px; background: white; cursor: pointer;">
                      <i data-lucide="download" style="width: 14px; height: 14px; vertical-align: middle; margin-right: 4px;"></i> Descargar
                    </button>`
-                // Note: item.product_id might be missing in some join scenarios, but fetchMyOrders selects it via order_items(product_id). Wait, fetchMyOrders selects products(title) nested. 
-                // We need to make sure we have product_id. The order_items table has product_id.
-                // fetchMyOrders select: order_items (quantity, price, products(title)) -> we need product_id here too!
                 : '';
 
             return `
             <div class="order-item" style="align-items: center;">
-                <span>${item.quantity}x ${productTitle}</span>
+                <span>${parseInt(item.quantity)}x ${safeTitle}</span>
                 ${downloadBtn}
-                <span style="font-weight: 600; margin-left: 12px;">$${item.price}</span>
+                <span style="font-weight: 600; margin-left: 12px;">$${parseFloat(item.price).toFixed(2)}</span>
             </div>
             `;
         }).join('');

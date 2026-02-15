@@ -2,7 +2,7 @@
 import { loadComponents, updateNavbarAuth, updateNavbarCartCount } from './components.js';
 import { fetchProducts, getUser, onAuthStateChange } from './api.js';
 import { state, loadCart, getCartCount, addToCart, loadFavorites, isFavorite, toggleFavorite } from './state.js';
-import { renderBreadcrumbs } from './utils.js';
+import { renderBreadcrumbs, escapeHtml, sanitizeCssValue } from './utils.js';
 
 let products = [];
 let currentCategory = 'Todos';
@@ -177,22 +177,22 @@ function renderCatalog(items) {
     }
 
     grid.innerHTML = items.map(product => `
-    <div class="product-card" data-id="${product.id}">
-      <div class="product-card__image" style="background: ${product.imageColor};">
-        ${product.badge ? `<span class="product-card__badge ${product.badgeColor === 'green' ? 'product-card__badge--green' : ''}">${product.badge}</span>` : ''}
-        <div class="product-card__heart ${isFavorite(product.id) ? 'product-card__heart--active' : ''}" data-id="${product.id}">
+    <div class="product-card" data-id="${parseInt(product.id)}">
+      <div class="product-card__image" style="background: ${sanitizeCssValue(product.imageColor)};">
+        ${product.badge ? `<span class="product-card__badge ${product.badgeColor === 'green' ? 'product-card__badge--green' : ''}">${escapeHtml(product.badge)}</span>` : ''}
+        <div class="product-card__heart ${isFavorite(product.id) ? 'product-card__heart--active' : ''}" data-id="${parseInt(product.id)}">
             <i data-lucide="heart"></i>
         </div>
       </div>
       <div class="product-card__info">
-        <span class="product-card__category">${product.category}</span>
-        <h3 class="product-card__title">${product.title}</h3>
+        <span class="product-card__category">${escapeHtml(product.category)}</span>
+        <h3 class="product-card__title">${escapeHtml(product.title)}</h3>
         <div class="product-card__tags">
-          ${product.tags ? product.tags.map(tag => `<span class="tag">${tag}</span>`).join('') : ''}
+          ${product.tags ? product.tags.map(tag => `<span class="tag">${escapeHtml(tag)}</span>`).join('') : ''}
         </div>
         <div class="product-card__price-row">
-          <span class="product-card__price">$${product.price}</span>
-          <button class="btn btn--sm btn--primary btn-add-cart" data-id="${product.id}">
+          <span class="product-card__price">$${parseFloat(product.price).toFixed(2)}</span>
+          <button class="btn btn--sm btn--primary btn-add-cart" data-id="${parseInt(product.id)}">
              Agregar
           </button>
         </div>

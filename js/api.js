@@ -409,11 +409,36 @@ export async function deleteProduct(id) {
     return { error }
 }
 
+// Sanitize filename to prevent path traversal and special character issues
+function sanitizeFileName(name) {
+    // Remove path separators and special chars, keep only safe characters
+    return name.replace(/[^a-zA-Z0-9._-]/g, '_').replace(/\.{2,}/g, '.');
+}
+
+const ALLOWED_IMAGE_MIMES = ['image/jpeg', 'image/png', 'image/webp', 'image/gif'];
+const MAX_IMAGE_BYTES = 5 * 1024 * 1024; // 5MB
+const ALLOWED_FILE_MIMES = ['application/zip', 'application/x-zip-compressed', 'application/x-rar-compressed', 'application/x-7z-compressed'];
+const MAX_FILE_BYTES = 50 * 1024 * 1024; // 50MB
+
 export async function uploadProductImage(file) {
-    const fileName = `${Date.now()}-${file.name}`;
+    // Server-side validation
+    if (!ALLOWED_IMAGE_MIMES.includes(file.type)) {
+        console.error('Invalid image type:', file.type);
+        return null;
+    }
+    if (file.size > MAX_IMAGE_BYTES) {
+        console.error('Image too large:', file.size);
+        return null;
+    }
+
+    const safeName = sanitizeFileName(file.name);
+    const fileName = `${Date.now()}-${safeName}`;
     const { data, error } = await supabase.storage
         .from('product-images')
-        .upload(fileName, file);
+        .upload(fileName, file, {
+            contentType: file.type,
+            upsert: false
+        });
 
     if (error) {
         console.error('Upload Error', error);
@@ -474,10 +499,24 @@ export async function deleteProductImage(imageId) {
 }
 
 export async function uploadProductFile(file) {
-    const fileName = `${Date.now()}-${file.name}`;
+    // Server-side validation
+    if (!ALLOWED_FILE_MIMES.includes(file.type)) {
+        console.error('Invalid file type:', file.type);
+        return null;
+    }
+    if (file.size > MAX_FILE_BYTES) {
+        console.error('File too large:', file.size);
+        return null;
+    }
+
+    const safeName = sanitizeFileName(file.name);
+    const fileName = `${Date.now()}-${safeName}`;
     const { data, error } = await supabase.storage
         .from('product-files')
-        .upload(fileName, file);
+        .upload(fileName, file, {
+            contentType: file.type,
+            upsert: false
+        });
 
     if (error) {
         console.error('File Upload Error', error);

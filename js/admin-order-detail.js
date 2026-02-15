@@ -1,6 +1,7 @@
 import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js/+esm'
 import { getUser, fetchOrderById, fetchOrderItems } from './api.js';
 import { supabase } from './api.js';
+import { escapeHtml, sanitizeCssValue } from './utils.js';
 
 async function init() {
     // Auth Check
@@ -58,7 +59,7 @@ async function loadOrderDetails(orderId) {
 
     // Status Badge
     const statusEl = document.getElementById('order-status');
-    statusEl.innerHTML = `<span class="status-badge status-${order.status}">${order.status}</span>`;
+    statusEl.innerHTML = `<span class="status-badge status-${escapeHtml(order.status)}">${escapeHtml(order.status)}</span>`;
 
     // Render Items
     const tbody = document.querySelector('#order-items-table tbody');
@@ -78,20 +79,20 @@ async function loadOrderDetails(orderId) {
         }
 
         const imgHtml = img
-            ? `<img src="${img}" class="img-preview" style="width:40px;height:40px;">`
-            : `<div class="img-preview" style="background:${p?.image_color || '#ccc'};width:40px;height:40px;border-radius:8px;"></div>`;
+            ? `<img src="${escapeHtml(img)}" class="img-preview" style="width:40px;height:40px;">`
+            : `<div class="img-preview" style="background:${sanitizeCssValue(p?.image_color || '#ccc')};width:40px;height:40px;border-radius:8px;"></div>`;
 
         return `
             <tr>
                 <td style="display:flex;align-items:center;gap:12px;">
                     ${imgHtml}
                     <div>
-                        <strong>${p ? p.title : 'Producto Eliminado'}</strong>
+                        <strong>${p ? escapeHtml(p.title) : 'Producto Eliminado'}</strong>
                     </div>
                 </td>
-                <td>$${item.price}</td>
-                <td>${item.quantity}</td>
-                <td><strong>$${(item.price * item.quantity).toFixed(2)}</strong></td>
+                <td>$${parseFloat(item.price).toFixed(2)}</td>
+                <td>${parseInt(item.quantity)}</td>
+                <td><strong>$${(parseFloat(item.price) * parseInt(item.quantity)).toFixed(2)}</strong></td>
             </tr>
         `;
     }).join('');

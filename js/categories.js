@@ -1,6 +1,7 @@
 import { loadComponents, updateNavbarAuth, updateNavbarCartCount } from './components.js';
 import { fetchProducts, getUser, onAuthStateChange } from './api.js';
 import { getCartCount, loadCart } from './state.js';
+import { escapeHtml, sanitizeCssValue } from './utils.js';
 
 async function init() {
     await loadComponents();
@@ -54,7 +55,7 @@ function renderCategories(products) {
         // Determine background (Image or Gradient)
         let bgContent = '';
         if (cat.image) {
-            bgContent = `<img src="${cat.image}" alt="${cat.name}" class="category-card__bg">`;
+            bgContent = `<img src="${escapeHtml(cat.image)}" alt="${escapeHtml(cat.name)}" class="category-card__bg">`;
         } else {
             // Fallback gradients based on index
             const gradients = [
@@ -65,15 +66,15 @@ function renderCategories(products) {
                 'linear-gradient(120deg, #e0c3fc 0%, #8ec5fc 100%)'
             ];
             const gradient = cat.bg && cat.bg.includes('gradient') ? cat.bg : gradients[index % gradients.length];
-            bgContent = `<div class="category-card__bg" style="background: ${gradient};"></div>`;
+            bgContent = `<div class="category-card__bg" style="background: ${sanitizeCssValue(gradient)};"></div>`;
         }
 
         return `
             <a href="index.html?category=${encodeURIComponent(cat.name)}" class="category-card">
                 ${bgContent}
                 <div class="category-card__overlay">
-                    <h3 class="category-card__name">${cat.name}</h3>
-                    <span class="category-card__count">${cat.count} diseño${cat.count !== 1 ? 's' : ''}</span>
+                    <h3 class="category-card__name">${escapeHtml(cat.name)}</h3>
+                    <span class="category-card__count">${parseInt(cat.count)} diseño${cat.count !== 1 ? 's' : ''}</span>
                 </div>
             </a>
         `;

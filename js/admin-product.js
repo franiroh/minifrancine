@@ -15,6 +15,7 @@ import {
     deleteProductFile,
     supabase
 } from './api.js';
+import { escapeHtml } from './utils.js';
 
 const urlParams = new URLSearchParams(window.location.search);
 const productId = urlParams.get('id');
@@ -101,8 +102,8 @@ async function loadProductData(id) {
         const item = document.createElement('div');
         item.className = 'gallery-item';
         item.innerHTML = `
-            <img src="${img.public_url}" loading="lazy">
-            <div class="remove-btn" onclick="removeImage('${img.id}')">
+            <img src="${escapeHtml(img.public_url)}" loading="lazy">
+            <div class="remove-btn" onclick="removeImage('${escapeHtml(img.id)}')">
                 <i data-lucide="x" style="width: 16px; height: 16px;"></i>
             </div>
         `;
@@ -122,9 +123,9 @@ async function loadProductData(id) {
 function createGalleryItemHTML(id, url, canDelete) {
     return `
         <div class="gallery-item">
-            <img src="${url}" loading="lazy">
+            <img src="${escapeHtml(url)}" loading="lazy">
             ${canDelete ? `
-            <div class="remove-btn" onclick="removeImage('${id}')">
+            <div class="remove-btn" onclick="removeImage('${escapeHtml(id)}')">
                 <i data-lucide="x" style="width: 16px; height: 16px;"></i>
             </div>` : ''}
         </div>
@@ -172,11 +173,27 @@ function setupEventListeners() {
 let pendingImages = [];
 let pendingFile = null;
 
+// Allowed types and limits for security
+const ALLOWED_IMAGE_TYPES = ['image/jpeg', 'image/png', 'image/webp', 'image/gif'];
+const MAX_IMAGE_SIZE = 5 * 1024 * 1024; // 5MB
+const ALLOWED_FILE_TYPES = ['application/zip', 'application/x-zip-compressed', 'application/x-rar-compressed', 'application/x-7z-compressed'];
+const MAX_FILE_SIZE = 50 * 1024 * 1024; // 50MB
+
 function handleImageSelect(e) {
     const files = Array.from(e.target.files);
     if (files.length === 0) return;
 
     files.forEach(file => {
+        // Validate image type
+        if (!ALLOWED_IMAGE_TYPES.includes(file.type)) {
+            alert(`Tipo de archivo no permitido: ${file.name}. Solo se aceptan: JPG, PNG, WebP, GIF.`);
+            return;
+        }
+        // Validate image size
+        if (file.size > MAX_IMAGE_SIZE) {
+            alert(`Archivo demasiado grande: ${file.name} (${(file.size / 1024 / 1024).toFixed(1)}MB). Máximo: 5MB.`);
+            return;
+        }
         pendingImages.push(file);
 
         // Preview
@@ -202,6 +219,20 @@ function handleImageSelect(e) {
 function handleFileSelect(e) {
     const file = e.target.files[0];
     if (!file) return;
+
+    // Validate file type
+    if (!ALLOWED_FILE_TYPES.includes(file.type)) {
+        alert(`Tipo de archivo no permitido: ${file.name}. Solo se aceptan: ZIP, RAR, 7z.`);
+        e.target.value = '';
+        return;
+    }
+    // Validate file size
+    if (file.size > MAX_FILE_SIZE) {
+        alert(`Archivo demasiado grande: ${file.name} (${(file.size / 1024 / 1024).toFixed(1)}MB). Máximo: 50MB.`);
+        e.target.value = '';
+        return;
+    }
+
     pendingFile = file;
     showFileStatus(file.name + ' (Pendiente de guardar)');
 }

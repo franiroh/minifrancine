@@ -1,8 +1,8 @@
 
 import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js/+esm'
 import { getUser, signOut, fetchProducts } from './api.js';
-
 import { fetchAllOrders, fetchAdminStats, deleteProduct } from './api.js';
+import { escapeHtml, sanitizeCssValue } from './utils.js';
 
 let currentView = 'dashboard';
 
@@ -117,18 +117,18 @@ async function loadProducts() {
         <tr>
             <td>
                 ${(p.mainImage)
-            ? `<img src="${p.mainImage}" alt="${p.title}" class="img-preview" style="object-fit: cover;">`
+            ? `<img src="${escapeHtml(p.mainImage)}" alt="${escapeHtml(p.title)}" class="img-preview" style="object-fit: cover;">`
             : (p.imageColor && p.imageColor.includes('gradient'))
-                ? `<div class="img-preview" style="background: ${p.imageColor}; width: 48px; height: 48px; border-radius: 12px;"></div>`
-                : `<img src="${p.imageColor || 'https://placehold.co/48'}" alt="${p.title}" class="img-preview" style="object-fit: cover;">`
+                ? `<div class="img-preview" style="background: ${sanitizeCssValue(p.imageColor)}; width: 48px; height: 48px; border-radius: 12px;"></div>`
+                : `<img src="${escapeHtml(p.imageColor || 'https://placehold.co/48')}" alt="${escapeHtml(p.title)}" class="img-preview" style="object-fit: cover;">`
         }
             </td>
-            <td><strong>${p.title}</strong></td>
-            <td>$${p.price}</td>
-            <td><span class="tag">${p.category}</span></td>
+            <td><strong>${escapeHtml(p.title)}</strong></td>
+            <td>$${parseFloat(p.price).toFixed(2)}</td>
+            <td><span class="tag">${escapeHtml(p.category)}</span></td>
             <td>
-                <button class="btn-icon" onclick="window.location.href='admin-product.html?id=${p.id}'"><i data-lucide="edit-3"></i></button>
-                <button class="btn-icon" onclick="deleteProductHandler('${p.id}')"><i data-lucide="trash-2"></i></button>
+                <button class="btn-icon" onclick="window.location.href='admin-product.html?id=${parseInt(p.id)}'"><i data-lucide="edit-3"></i></button>
+                <button class="btn-icon" onclick="deleteProductHandler('${parseInt(p.id)}')"><i data-lucide="trash-2"></i></button>
             </td>
         </tr>
     `).join('');
@@ -143,17 +143,17 @@ async function loadOrders() {
 
     tbody.innerHTML = orders.map(o => `
         <tr>
-            <td><strong>#${o.id.slice(0, 8).toUpperCase()}</strong></td>
+            <td><strong>#${escapeHtml(String(o.id).slice(0, 8).toUpperCase())}</strong></td>
             <td>
-                <div style="font-weight: 600; color: var(--admin-text);">${o.email || 'N/A'}</div>
-                <div style="font-size: 11px; color: var(--admin-text-light);">${o.user_id}</div>
+                <div style="font-weight: 600; color: var(--admin-text);">${escapeHtml(o.email || 'N/A')}</div>
+                <div style="font-size: 11px; color: var(--admin-text-light);">${escapeHtml(o.user_id)}</div>
                 <small class="text-gray">${o.created_at ? new Date(o.created_at).toLocaleDateString() : '-'}</small>
             </td>
             <td>${o.created_at ? new Date(o.created_at).toLocaleTimeString() : '-'}</td>
-            <td><strong>$${o.total}</strong></td>
+            <td><strong>$${parseFloat(o.total).toFixed(2)}</strong></td>
             <td>
-                <span class="status-badge status-${o.status}">${o.status}</span>
-                <button class="btn-icon" style="margin-left:8px;" onclick="window.location.href='admin-order-detail.html?id=${o.id}'">
+                <span class="status-badge status-${escapeHtml(o.status)}">${escapeHtml(o.status)}</span>
+                <button class="btn-icon" style="margin-left:8px;" onclick="window.location.href='admin-order-detail.html?id=${escapeHtml(o.id)}'">
                     <i data-lucide="eye"></i>
                 </button>
             </td>
