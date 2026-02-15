@@ -26,7 +26,8 @@
 .detail {
     display: flex;
     gap: 48px;
-    padding: 48px 80px;
+    padding: 0 80px 48px;
+    /* Remove top padding as Breadcrumbs provide spacing */
 }
 
 .detail__images {

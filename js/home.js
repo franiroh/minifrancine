@@ -19,18 +19,25 @@ async function init() {
 
     await loadFavorites(user);
 
-    // 3. Fetch & Render Products
-    products = await fetchProducts();
-
-    // Check URL for category filter
+    // Check URL for category filter immediately to prevent flash
     const urlParams = new URLSearchParams(window.location.search);
     const initialCategory = urlParams.get('category');
 
     if (initialCategory) {
-        filterProducts(initialCategory);
+        showCategoryView(initialCategory); // Show header immediately
     } else {
         showHomeView(); // Default view
-        renderCatalog(products);
+    }
+
+    // 3. Fetch & Render Products
+    products = await fetchProducts();
+
+    if (initialCategory) {
+        // Just filter, view is already correctly set
+        const filtered = products.filter(p => p.category === initialCategory);
+        filterProducts(initialCategory); // This also sets active chip
+    } else {
+        renderCatalog(products); // Render all
     }
 
     // 4. Setup Listeners
