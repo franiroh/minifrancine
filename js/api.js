@@ -203,11 +203,11 @@ export async function createOrderSecure(items) {
     if (!user) throw new Error("User must be logged in");
 
     // items: [{ id: 1, quantity: 1 }, ...]
+    // user_id is extracted from JWT on the server, NOT sent from client
     const { data, error } = await supabase.functions.invoke('paypal-order', {
         body: {
             action: 'create',
-            items: items,
-            user_id: user.id
+            items: items
         }
     });
 
@@ -253,21 +253,6 @@ export async function getPayPalClientId() {
 }
 
 
-export async function confirmOrderPayment(orderId, paymentId) {
-    const { error } = await supabase
-        .rpc('confirm_order_payment', {
-            p_order_id: orderId,
-            p_payment_id: paymentId
-        })
-    return { error }
-}
-
-export async function verifyPayment(orderId, paymentId) {
-    const { data, error } = await supabase.functions.invoke('verify-payment', {
-        body: { order_id: orderId, payment_id: paymentId }
-    })
-    return { data, error }
-}
 
 
 
