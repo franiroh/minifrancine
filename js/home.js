@@ -5,6 +5,7 @@ import { state, loadCart, getCartCount, addToCart, loadFavorites, isFavorite, to
 import { renderBreadcrumbs } from './utils.js';
 
 let products = [];
+let currentCategory = 'Todos';
 
 async function init() {
     // 1. Load Navbar/Footer
@@ -125,10 +126,12 @@ function setupFilterListeners() {
 }
 
 function filterProducts(category) {
+    currentCategory = category || 'Todos';
+
     // Update UI active state if function called manually (e.g. from URL)
     const chips = document.querySelectorAll('.filter-chip');
     chips.forEach(c => {
-        if (c.textContent === category) {
+        if (c.textContent === currentCategory) {
             c.classList.add('filter-chip--active');
         } else {
             c.classList.remove('filter-chip--active');
@@ -136,7 +139,7 @@ function filterProducts(category) {
     });
 
     // Special case for "Todos"
-    if (category === 'Todos' || !category) {
+    if (currentCategory === 'Todos') {
         // Reset UI to 'Todos' if necessary
         const allChip = Array.from(chips).find(c => c.textContent === 'Todos');
         if (allChip) {
@@ -148,8 +151,8 @@ function filterProducts(category) {
         return;
     }
 
-    showCategoryView(category);
-    const filtered = products.filter(p => p.category === category);
+    showCategoryView(currentCategory);
+    const filtered = products.filter(p => p.category === currentCategory);
     renderCatalog(filtered);
 }
 
@@ -160,8 +163,6 @@ function setupAuthListener() {
         await loadFavorites(user);
 
         // Re-render with current filter
-        const activeChip = document.querySelector('.filter-chip--active');
-        const currentCategory = activeChip ? activeChip.textContent : 'Todos';
         filterProducts(currentCategory);
     });
 }
