@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PatchFiles — Mis Diseños</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:wght@700;800&family=DM+Sans:wght@400;500;600;700&display=swap"
+        rel="stylesheet">
+    <script src="https://unpkg.com/lucide@latest"></script>
+
+    <link rel="stylesheet" href="css/main.css">
+    <link rel="stylesheet" href="css/components.css">
+    <link rel="stylesheet" href="css/home.css">
+    <link rel="stylesheet" href="css/mis-disenos.css">
+</head>
+
+<body>
+
+    <div class="page">
+        <div id="navbar-placeholder"></div>
+
+        <section class="designs-header">
+            <h1 class="designs-title">Mis Diseños</h1>
+            <p class="designs-subtitle">Todos tus diseños de bordado descargables en un solo lugar</p>
+        </section>
+
+        <section class="designs-catalog">
+            <div class="product-grid" id="designs-grid">
+                <div class="empty-state">
+                    <i data-lucide="loader-2" class="animate-spin" style="font-size: 2rem;"></i>
+                    <p style="margin-top: 16px;">Cargando tus diseños...</p>
+                </div>
+            </div>
+        </section>
+
+        <div id="footer-placeholder"></div>
+    </div>
+
+    <script type="module" src="js/mis-disenos.js"></script>
+</body>
+
+</html>

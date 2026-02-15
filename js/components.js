@@ -74,8 +74,8 @@ export const updateNavbarAuth = async (user) => {
   if (userBtn && userText) {
     if (user) {
       userText.textContent = user.email;
-      userBtn.onclick = () => window.location.href = 'orders.html';
-      userText.innerHTML = `${escapeHtml(user.email)} <br> <span style="font-size:0.8em; opacity:0.8;">Mis Compras</span>`;
+      userBtn.onclick = () => window.location.href = 'mis-disenos.html';
+      userText.innerHTML = `${escapeHtml(user.email)} <br> <span style="font-size:0.8em; opacity:0.8;">Mis Diseños</span>`;
 
       // Check for Admin role
       const { data: profile } = await getProfile(user.id);

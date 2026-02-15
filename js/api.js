@@ -164,6 +164,42 @@ export async function fetchPurchasedProductIds() {
     return data || []
 }
 
+export async function fetchPurchasedProducts() {
+    const purchasedIds = await fetchPurchasedProductIds()
+    if (!purchasedIds || purchasedIds.length === 0) return []
+
+    const { data, error } = await supabase
+        .from('products')
+        .select('*, categories(name)')
+        .in('id', purchasedIds)
+        .order('id', { ascending: true })
+
+    if (error) {
+        console.error('Error fetching purchased products:', error)
+        return []
+    }
+
+    return data.map(p => ({
+        id: p.id,
+        title: p.title,
+        category: p.categories?.name || 'Sin categoría',
+        categoryId: p.category_id,
+        price: p.price,
+        oldPrice: p.old_price,
+        imageColor: p.image_color,
+        badge: p.badge,
+        badgeColor: p.badge_color,
+        size: p.size,
+        stitches: p.stitches,
+        formats: p.formats,
+        rating: p.rating,
+        reviews: p.reviews,
+        description: p.description,
+        mainImage: p.main_image,
+        published: p.published
+    }))
+}
+
 // --- Cart ---
 
 export async function fetchCart(userId) {

@@ -206,8 +206,8 @@ function renderCatalog(items) {
           <span class="product-card__price">$${parseFloat(product.price).toFixed(2)}</span>
           <div class="product-card__btns">
             ${purchased
-              ? `<a href="orders.html" class="btn btn--sm btn--purchased">
-                   <i data-lucide="download"></i> Descargar
+              ? `<a href="mis-disenos.html#product-${parseInt(product.id)}" class="btn btn--sm btn--purchased">
+                   <i data-lucide="download"></i> Mis diseños
                  </a>`
               : `<button class="btn btn--sm btn--outline btn-add-cart" data-id="${parseInt(product.id)}">
                    <i data-lucide="shopping-cart"></i>

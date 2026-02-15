@@ -205,9 +205,11 @@
 /* --- Toggle Switch --- */
 .toggle-switch {
     position: relative;
+    display: inline-block;
     width: 40px;
     height: 22px;
     cursor: pointer;
+    flex-shrink: 0;
 }
 
 .toggle-switch input {
@@ -219,7 +221,7 @@
 .toggle-switch .slider {
     position: absolute;
     inset: 0;
-    background: #D1D5DB;
+    background: #EF4444;
     border-radius: 999px;
     transition: background 0.2s;
 }
