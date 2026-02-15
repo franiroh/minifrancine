@@ -251,7 +251,7 @@ export async function getPayPalClientId() {
     }
     return { data };
 }
-}
+
 
 export async function confirmOrderPayment(orderId, paymentId) {
     const { error } = await supabase
@@ -269,12 +269,6 @@ export async function verifyPayment(orderId, paymentId) {
     return { data, error }
 }
 
-export async function getPayPalClientId() {
-    const { data, error } = await supabase.functions.invoke('get-paypal-config', {
-        method: 'GET'
-    })
-    return { data, error }
-}
 
 
 
