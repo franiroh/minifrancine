@@ -51,3 +51,47 @@ export const renderBreadcrumbs = (items) => {
         </nav>
     `;
 };
+
+export const showToast = (message, type = 'info') => {
+    let container = document.querySelector('.toast-container');
+    if (!container) {
+        container = document.createElement('div');
+        container.className = 'toast-container';
+        document.body.appendChild(container);
+    }
+
+    const toast = document.createElement('div');
+    toast.className = `toast toast--${type}`;
+
+    let iconName = 'info';
+    if (type === 'success') iconName = 'check-circle';
+    if (type === 'error') iconName = 'alert-circle';
+
+    toast.innerHTML = `
+        <i data-lucide="${iconName}"></i>
+        <span>${escapeHtml(message)}</span>
+    `;
+
+    container.appendChild(toast);
+
+    if (window.lucide) {
+        window.lucide.createIcons({
+            attrs: {
+                class: `lucide lucide-${iconName}`
+            },
+            nameAttr: 'data-lucide',
+            root: toast
+        });
+    }
+
+    // Auto remove
+    setTimeout(() => {
+        toast.style.animation = 'toast-out 0.3s forwards';
+        toast.addEventListener('animationend', () => {
+            toast.remove();
+            if (container.children.length === 0) {
+                container.remove();
+            }
+        });
+    }, 3000);
+};

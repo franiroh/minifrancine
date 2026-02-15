@@ -47,22 +47,29 @@ async function renderFavorites(user) {
 
     if (!grid) return;
 
-    // Show loading
-    grid.style.display = 'none';
-    if (loading) loading.style.display = 'block';
+    // Show loading only if grid is empty (initial load)
+    if (grid.children.length === 0) {
+        grid.style.display = 'none';
+        if (loading) loading.style.display = 'block';
+    }
     if (emptyState) emptyState.style.display = 'none';
 
     try {
-        const products = await fetchFavoriteProducts(user.id);
+        // Use local state IDs for immediate consistency (optimistic updates)
+        const currentFavIds = Array.from(state.favorites);
+        const products = await fetchFavoriteProducts(user.id, currentFavIds);
 
         if (loading) loading.style.display = 'none';
 
         if (products.length === 0) {
+            grid.style.display = 'none'; // Ensure grid is hidden if empty
             if (emptyState) emptyState.style.display = 'block';
             return;
         }
 
         grid.style.display = 'flex';
+        // Note: Replacing innerHTML causes image reload. For a perfect experience we'd diff, 
+        // but removing the loading flicker is the big win here.
         grid.innerHTML = products.map(product => createProductCard(product)).join('');
 
         // Re-init lucide icons for new cards
@@ -74,9 +81,6 @@ async function renderFavorites(user) {
             btn.addEventListener('click', (e) => {
                 e.stopPropagation();
                 const id = parseInt(btn.dataset.id);
-                // We need the full product object here. 
-                // Since we don't have a global 'products' array like home.js easily accessible in this scope without re-fetching or passing it,
-                // let's rely on the fact that we just rendered 'products' variable.
                 const product = products.find(p => p.id === id);
                 if (product) {
                     import('./state.js').then(({ addToCart }) => {
@@ -114,9 +118,20 @@ async function renderFavorites(user) {
             btn.addEventListener('click', async (e) => {
                 e.stopPropagation();
                 const id = parseInt(btn.dataset.id);
+
+                // Optimistic UI Removal
+                const card = btn.closest('.product-card');
+                if (card) {
+                    card.style.transition = 'opacity 0.2s, transform 0.2s';
+                    card.style.opacity = '0';
+                    card.style.transform = 'scale(0.9)';
+                    setTimeout(() => card.remove(), 200);
+                }
+
                 const { toggleFavorite } = await import('./state.js');
                 await toggleFavorite(id);
-                // logic in init() listens for 'favorites-updated' and re-renders
+                // The favorites-updated listener will eventually fire and ensure consistency,
+                // but visually the item is already gone.
             });
         });
 

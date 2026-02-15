@@ -139,8 +139,14 @@ export async function fetchFavorites(userId) {
     return data.map(f => f.product_id)
 }
 
-export async function fetchFavoriteProducts(userId) {
-    const favIds = await fetchFavorites(userId)
+export async function fetchFavoriteProducts(userId, specificIds = null) {
+    let favIds;
+    if (specificIds) {
+        favIds = specificIds;
+    } else {
+        favIds = await fetchFavorites(userId)
+    }
+
     if (!favIds || favIds.length === 0) return []
 
     const { data, error } = await supabase

@@ -1,5 +1,6 @@
 
 import { loadComponents, updateNavbarAuth, updateNavbarCartCount } from './components.js';
+import { showToast } from './utils.js';
 import { getUser, onAuthStateChange } from './api.js';
 import { loadCart, getCartCount } from './state.js';
 
@@ -54,13 +55,13 @@ async function handleSubmit(e) {
 
     // 1. Basic Validation
     if (!email || !message) {
-        alert('Por favor completa todos los campos.');
+        showToast('Por favor completa todos los campos.', 'error');
         return;
     }
 
     // 2. Length Validation (Double check)
     if (message.length > 500) {
-        alert('El mensaje es demasiado largo. Por favor redúcelo a 500 caracteres.');
+        showToast('El mensaje es demasiado largo. Por favor redúcelo a 500 caracteres.', 'error');
         return;
     }
 
@@ -83,13 +84,13 @@ async function handleSubmit(e) {
 
         if (error) throw error;
 
-        alert('¡Mensaje enviado correctamente! Nos pondremos en contacto contigo pronto.');
+        showToast('¡Mensaje enviado correctamente! Nos pondremos en contacto contigo pronto.', 'success');
         document.getElementById('contact-form').reset();
         document.getElementById('char-count').textContent = '0 / 500';
 
     } catch (err) {
         console.error('Error sending email:', err);
-        alert('Hubo un error al enviar el mensaje. Por favor intenta nuevamente o escríbenos directamente a minifrancine@gmail.com.');
+        showToast('Hubo un error al enviar el mensaje. Por favor escríbenos a minifrancine@gmail.com.', 'error');
     } finally {
         submitBtn.disabled = false;
         submitBtn.innerHTML = originalBtnText;

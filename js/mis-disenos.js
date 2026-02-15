@@ -2,7 +2,7 @@
 import { loadComponents, updateNavbarAuth, updateNavbarCartCount } from './components.js';
 import { getUser, onAuthStateChange, fetchPurchasedProducts, downloadProductFile } from './api.js';
 import { loadCart, getCartCount } from './state.js';
-import { escapeHtml, sanitizeCssValue } from './utils.js';
+import { escapeHtml, sanitizeCssValue, showToast } from './utils.js';
 
 async function init() {
     await loadComponents();
@@ -64,12 +64,12 @@ function renderDesigns(products) {
 
     grid.innerHTML = products.map(product => `
         <div class="product-card product-card--purchased" id="product-${parseInt(product.id)}" data-id="${parseInt(product.id)}">
-            <div class="product-card__image" style="background: ${sanitizeCssValue(product.imageColor)};">
+            <a href="product.html?id=${product.id}" class="product-card__image" style="background: ${sanitizeCssValue(product.imageColor)}; display: block;">
                 ${product.mainImage ? `<img src="${escapeHtml(product.mainImage)}" alt="${escapeHtml(product.title)}" class="product-card__img" loading="lazy">` : ''}
                 <span class="product-card__badge product-card__badge--purchased">
                     <i data-lucide="check-circle"></i> Comprado
                 </span>
-            </div>
+            </a>
             <div class="product-card__info">
                 <span class="product-card__category">${escapeHtml(product.category)}</span>
                 <h3 class="product-card__title">${escapeHtml(product.title)}</h3>
@@ -119,14 +119,14 @@ function attachDownloadListeners() {
                         if (window.lucide) window.lucide.createIcons();
                     }, 2000);
                 } else {
-                    alert('El archivo digital para este producto no está disponible todavía.');
+                    showToast('El archivo digital para este producto no está disponible todavía.', 'error');
                     btn.innerHTML = originalHTML;
                     btn.disabled = false;
                     if (window.lucide) window.lucide.createIcons();
                 }
             } catch (err) {
                 console.error('Download error:', err);
-                alert('Error al generar el enlace de descarga.');
+                showToast('Error al generar el enlace de descarga.', 'error');
                 btn.innerHTML = originalHTML;
                 btn.disabled = false;
                 if (window.lucide) window.lucide.createIcons();

@@ -1,5 +1,6 @@
 
 import { fetchFavorites, addToFavorites, removeFromFavorites, fetchCart, addToCartDB, removeFromCartDB, clearCartDB, fetchPurchasedProductIds } from './api.js';
+import { showToast } from './utils.js';
 
 export const state = {
     cart: [],
@@ -44,7 +45,7 @@ export const loadCart = async (user = null) => {
 export const addToCart = async (product) => {
     // Block adding already-purchased products
     if (isPurchased(product.id)) {
-        alert('Ya compraste este producto. Puedes descargarlo desde "Mis Compras".');
+        showToast('Ya compraste este producto. Puedes descargarlo desde "Mis Compras".', 'info');
         return;
     }
 
@@ -55,7 +56,7 @@ export const addToCart = async (product) => {
             // Reload cart to get the new ID and structure
             await loadCart(state.user);
         } else {
-            alert('Error adding to cart');
+            showToast('Error al agregar al carrito', 'error');
         }
     } else {
         // Local Add
@@ -112,49 +113,50 @@ export const loadFavorites = async (user) => {
     }
     state.user = user;
     const favIds = await fetchFavorites(user.id);
-    state.favorites = new Set(favIds);
+    state.favorites = new Set(favIds.map(id => parseInt(id)));
     window.dispatchEvent(new CustomEvent('favorites-updated'));
 };
 
 export const toggleFavorite = async (productId) => {
     if (!state.user) {
-        alert('Debes iniciar sesión para agregar favoritos.');
+        showToast('Debes iniciar sesión para agregar favoritos.', 'info');
         return;
     }
 
-    const isFav = state.favorites.has(productId);
+    const id = parseInt(productId);
+    const isFav = state.favorites.has(id);
 
     // Optimistic Update
     if (isFav) {
-        state.favorites.delete(productId);
+        state.favorites.delete(id);
     } else {
-        state.favorites.add(productId);
+        state.favorites.add(id);
     }
     window.dispatchEvent(new CustomEvent('favorites-updated'));
 
     // API Call
     let result;
     if (isFav) {
-        result = await removeFromFavorites(state.user.id, productId);
+        result = await removeFromFavorites(state.user.id, id);
     } else {
-        result = await addToFavorites(state.user.id, productId);
+        result = await addToFavorites(state.user.id, id);
     }
 
     if (result.error) {
         console.error('Error toggling favorite:', result.error);
-        alert('Hubo un error al actualizar favoritos.');
+        showToast('Hubo un error al actualizar favoritos.', 'error');
         // Revert
         if (isFav) {
-            state.favorites.add(productId);
+            state.favorites.add(id);
         } else {
-            state.favorites.delete(productId);
+            state.favorites.delete(id);
         }
         window.dispatchEvent(new CustomEvent('favorites-updated'));
     }
 };
 
 export const isFavorite = (productId) => {
-    return state.favorites.has(productId);
+    return state.favorites.has(parseInt(productId));
 };
 
 // --- Purchased Products Logic ---
@@ -166,10 +168,10 @@ export const loadPurchases = async (user) => {
     }
     state.user = user;
     const purchasedIds = await fetchPurchasedProductIds();
-    state.purchases = new Set(purchasedIds);
+    state.purchases = new Set(purchasedIds.map(id => parseInt(id)));
     window.dispatchEvent(new CustomEvent('purchases-updated'));
 };
 
 export const isPurchased = (productId) => {
-    return state.purchases.has(productId);
+    return state.purchases.has(parseInt(productId));
 };

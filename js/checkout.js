@@ -2,7 +2,7 @@
 import { loadComponents, updateNavbarAuth, updateNavbarCartCount } from './components.js';
 import { getUser, onAuthStateChange } from './api.js';
 import { state, loadCart, getCartCount, getCartTotal, removeFromCart, loadPurchases, isPurchased } from './state.js';
-import { escapeHtml } from './utils.js';
+import { escapeHtml, showToast } from './utils.js';
 import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js/+esm'
 
 // Initialize Supabase Client for direct function invocation if needed, 
@@ -38,7 +38,7 @@ async function init() {
     await loadPurchases(user);
     const purchasedInCart = state.cart.filter(item => isPurchased(item.id));
     if (purchasedInCart.length > 0) {
-        alert(`${purchasedInCart.length} producto(s) en tu carrito ya fueron comprados. Se han removido.`);
+        showToast(`${purchasedInCart.length} producto(s) en tu carrito ya fueron comprados. Se han removido.`, 'info');
         for (let i = state.cart.length - 1; i >= 0; i--) {
             if (isPurchased(state.cart[i].id)) {
                 await removeFromCart(i);
@@ -97,7 +97,7 @@ function renderCheckout() {
             window.paypal.Buttons({
                 createOrder: async (data, actions) => {
                     if (!state.user) {
-                        alert('Debes iniciar sesión');
+                        showToast('Debes iniciar sesión', 'error');
                         return Promise.reject(new Error('User not logged in'));
                     }
 
@@ -135,7 +135,7 @@ function renderCheckout() {
                         return result.orderID;
 
                     } catch (err) {
-                        alert('Error al crear la orden: ' + err.message);
+                        showToast('Error al crear la orden: ' + err.message, 'error');
                         return Promise.reject(err);
                     }
                 },
@@ -152,28 +152,28 @@ function renderCheckout() {
                         // Handle both possible response shapes
                         if (result && (result.status === 'success' || result.status === 'COMPLETED')) {
                             const paymentId = result.data?.id || data.orderID;
-                            alert(`¡Pago exitoso! ID: ${paymentId}`);
+                            showToast(`¡Pago exitoso! ID: ${paymentId}`, 'success');
                             state.cart = [];
-                            window.location.href = 'orders.html';
+                            setTimeout(() => window.location.href = 'orders.html', 2000);
                         } else if (result && result.error) {
                             throw new Error(result.error);
                         } else {
                             // If we get here, the server might have processed OK but response shape is unexpected
                             // Check if result exists at all
                             console.warn('Unexpected capture result shape:', result);
-                            alert('Pago procesado. Verificá en "Mis Compras".');
+                            showToast('Pago procesado. Verificá en "Mis Compras".', 'info');
                             state.cart = [];
-                            window.location.href = 'orders.html';
+                            setTimeout(() => window.location.href = 'orders.html', 2000);
                         }
 
                     } catch (err) {
                         console.error('Capture error:', err);
-                        alert('Hubo un error al procesar el pago: ' + err.message);
+                        showToast('Hubo un error al procesar el pago: ' + err.message, 'error');
                     }
                 },
                 onError: (err) => {
                     console.error('PayPal Error:', err);
-                    alert('Hubo un error con el pago de PayPal.');
+                    showToast('Hubo un error con el pago de PayPal.', 'error');
                 }
             }).render('#paypal-button-container');
         }

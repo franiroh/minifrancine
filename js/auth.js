@@ -2,6 +2,7 @@
 import { loadComponents, updateNavbarAuth, updateNavbarCartCount } from './components.js';
 import { signIn, signUp, onAuthStateChange, getUser, signOut } from './api.js';
 import { loadCart, getCartCount, loadFavorites } from './state.js';
+import { showToast } from './utils.js';
 
 async function init() {
     await loadComponents();
@@ -84,7 +85,10 @@ function setupForms() {
         loginBtn.addEventListener('click', async () => {
             const email = document.getElementById('login-email').value;
             const password = document.getElementById('login-password').value;
-            if (!email || !password) return alert('Completa todos los campos');
+            if (!email || !password) {
+                showToast('Completa todos los campos', 'error');
+                return;
+            }
 
             loginBtn.textContent = 'Cargando...';
             loginBtn.disabled = true;
@@ -92,10 +96,11 @@ function setupForms() {
             const { error } = await signIn(email, password);
 
             if (error) {
-                alert('Error: ' + error.message);
+                showToast('Error: ' + error.message, 'error');
                 loginBtn.textContent = 'Iniciar Sesión';
                 loginBtn.disabled = false;
             } else {
+                showToast('Inicio de sesión exitoso', 'success');
                 // Redirect handled by onAuthStateChange
             }
         });
@@ -105,7 +110,10 @@ function setupForms() {
         registerBtn.addEventListener('click', async () => {
             const email = document.getElementById('register-email').value;
             const password = document.getElementById('register-password').value;
-            if (!email || !password) return alert('Completa todos los campos');
+            if (!email || !password) {
+                showToast('Completa todos los campos', 'error');
+                return;
+            }
 
             registerBtn.textContent = 'Cargando...';
             registerBtn.disabled = true;
@@ -113,11 +121,11 @@ function setupForms() {
             const { error } = await signUp(email, password);
 
             if (error) {
-                alert('Error: ' + error.message);
+                showToast('Error: ' + error.message, 'error');
                 registerBtn.textContent = 'Registrarse';
                 registerBtn.disabled = false;
             } else {
-                alert('¡Registro exitoso! Por favor verifica tu email.');
+                showToast('¡Registro exitoso! Por favor verifica tu email.', 'success');
                 // Depending on settings, might auto login
             }
         });

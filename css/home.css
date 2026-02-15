@@ -220,11 +220,14 @@
     background: #fff;
 }
 
-.product-card__heart--active i {
+.product-card__heart--active i,
+.product-card__heart--active svg {
     fill: #FF6B6B;
+    color: #FF6B6B;
 }
 
-.product-card__heart i {
+.product-card__heart i,
+.product-card__heart svg {
     font-size: 16px;
     color: #FF6B6B;
 }

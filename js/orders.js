@@ -2,7 +2,9 @@
 import { loadComponents, updateNavbarAuth, updateNavbarCartCount } from './components.js';
 import { getUser, onAuthStateChange, fetchMyOrders, downloadProductFile, fetchAllUserReviews, fetchUserReview, addReview, updateReview, deleteReview } from './api.js';
 import { state, loadCart, getCartCount } from './state.js';
-import { escapeHtml, sanitizeCssValue } from './utils.js';
+import { escapeHtml, sanitizeCssValue, showToast } from './utils.js';
+
+// ... (rest of imports)
 
 let currentUser = null;
 
@@ -214,6 +216,7 @@ function attachDownloadListeners() {
                     document.body.removeChild(link);
 
                     btn.innerHTML = '<i data-lucide="check"></i> Listo';
+                    showToast('Descarga iniciada correctamente.', 'success');
                     if (window.lucide) window.lucide.createIcons();
                     setTimeout(() => {
                         btn.innerHTML = originalHTML;
@@ -221,14 +224,14 @@ function attachDownloadListeners() {
                         if (window.lucide) window.lucide.createIcons();
                     }, 2000);
                 } else {
-                    alert('El archivo digital para este producto no está disponible todavía.');
+                    showToast('El archivo digital para este producto no está disponible todavía.', 'error');
                     btn.innerHTML = originalHTML;
                     btn.disabled = false;
                     if (window.lucide) window.lucide.createIcons();
                 }
             } catch (err) {
                 console.error('Download error:', err);
-                alert('Error al generar el enlace de descarga.');
+                showToast('Error al generar el enlace de descarga.', 'error');
                 btn.innerHTML = originalHTML;
                 btn.disabled = false;
                 if (window.lucide) window.lucide.createIcons();
@@ -298,7 +301,7 @@ function setupRatingModal() {
         const comment = document.getElementById('rating-comment').value;
 
         if (!rating) {
-            alert('Por favor selecciona una puntuación.');
+            showToast('Por favor selecciona una puntuación.', 'error');
             return;
         }
 
@@ -314,12 +317,11 @@ function setupRatingModal() {
         }
 
         if (result.error) {
-            alert('Error al guardar la calificación.');
+            showToast('Error al guardar la calificación.', 'error');
             console.error(result.error);
         } else {
             modal.style.display = 'none';
-            // Ideally toast notification
-            alert('Calificación guardada correctamente.');
+            showToast('Calificación guardada correctamente.', 'success');
             // Reload orders to update buttons potentially (though state is ok)
             loadOrders(currentUser.id);
         }
@@ -339,11 +341,11 @@ function setupRatingModal() {
         const result = await deleteReview(reviewId);
 
         if (result.error) {
-            alert('Error al eliminar la reseña.');
+            showToast('Error al eliminar la reseña.', 'error');
             console.error(result.error);
         } else {
             modal.style.display = 'none';
-            alert('Reseña eliminada.');
+            showToast('Reseña eliminada.', 'success');
             loadOrders(currentUser.id);
         }
         submitBtn.disabled = false;

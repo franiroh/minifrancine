@@ -2,7 +2,7 @@
 import { loadComponents, updateNavbarAuth, updateNavbarCartCount } from './components.js';
 import { fetchProductById, fetchProductImages, getUser, onAuthStateChange, downloadProductFile, fetchProductReviews, fetchUserReview } from './api.js';
 import { state, loadCart, getCartCount, addToCart, loadFavorites, isFavorite, toggleFavorite, loadPurchases, isPurchased } from './state.js';
-import { getUrlParam, renderBreadcrumbs, escapeHtml } from './utils.js';
+import { getUrlParam, renderBreadcrumbs, escapeHtml, showToast } from './utils.js';
 
 let currentProduct = null;
 let currentUser = null;
@@ -188,6 +188,7 @@ async function handleDownload() {
     const originalHTML = btn.innerHTML;
     btn.innerHTML = `<i data-lucide="loader"></i> Preparando descarga...`;
     btn.disabled = true;
+    showToast('Preparando descarga...', 'info');
     if (window.lucide) window.lucide.createIcons();
     try {
         const result = await downloadProductFile(currentProduct.id);
@@ -198,12 +199,13 @@ async function handleDownload() {
             document.body.appendChild(link);
             link.click();
             document.body.removeChild(link);
+            showToast('Descarga iniciada.', 'success');
         } else {
-            alert('El archivo digital para este producto no está disponible todavía.');
+            showToast('El archivo digital para este producto no está disponible todavía.', 'error');
         }
     } catch (err) {
         console.error('Download error:', err);
-        alert('Error al generar el enlace de descarga.');
+        showToast('Error al generar el enlace de descarga.', 'error');
     } finally {
         btn.innerHTML = originalHTML;
         btn.disabled = false;
