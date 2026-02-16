@@ -26,8 +26,9 @@
         <section class="cart-body">
             <div class="cart-body__left">
                 <div class="cart-body__header">
-                    <h2 class="cart-body__title">Tu Carrito (<span id="cart-count">0</span>)</h2>
-                    <a href="#" id="clear-cart-btn" class="cart-body__clear">Vaciar carrito</a>
+                    <h2 class="cart-body__title"><span data-i18n="cart.title">Tu Carrito</span> (<span
+                            id="cart-count">0</span>)</h2>
+                    <a href="#" id="clear-cart-btn" class="cart-body__clear" data-i18n="cart.clear">Vaciar carrito</a>
                 </div>
 
                 <div class="cart-items" id="cart-items-container">
@@ -36,23 +37,26 @@
             </div>
 
             <aside class="cart-summary">
-                <h3 class="cart-summary__title">Resumen del Pedido</h3>
+                <h3 class="cart-summary__title" data-i18n="cart.summary">Resumen del Pedido</h3>
                 <hr class="cart-summary__divider">
-                <div class="cart-summary__row"><span>Subtotal</span><span id="cart-subtotal">$0.00</span></div>
-                <div class="cart-summary__row"><span>Descuento</span><span
+                <div class="cart-summary__row"><span data-i18n="cart.subtotal">Subtotal</span><span
+                        id="cart-subtotal">$0.00</span></div>
+                <div class="cart-summary__row"><span data-i18n="cart.discount">Descuento</span><span
                         class="cart-summary__val cart-summary__val--green">-$0.00</span></div>
-                <div class="cart-summary__row"><span>Impuestos</span><span class="cart-summary__val">$0.00</span></div>
+                <div class="cart-summary__row"><span data-i18n="cart.tax">Impuestos</span><span
+                        class="cart-summary__val">$0.00</span></div>
                 <hr class="cart-summary__divider">
                 <div class="cart-summary__total">
-                    <span>Total</span>
+                    <span data-i18n="cart.total">Total</span>
                     <span class="cart-summary__total-val" id="cart-total">$0.00</span>
                 </div>
                 <div class="cart-summary__coupon">
-                    <input type="text" placeholder="Código de descuento" class="input">
-                    <button class="btn btn--dark btn--sm">Aplicar</button>
+                    <input type="text" placeholder="Código de descuento" class="input"
+                        data-i18n="cart.coupon_placeholder">
+                    <button class="btn btn--dark btn--sm" data-i18n="cart.apply">Aplicar</button>
                 </div>
                 <button class="btn btn--primary btn--block btn--lg" onclick="window.location.href='checkout.html'">
-                    <i data-lucide="credit-card"></i> Proceder al Pago
+                    <i data-lucide="credit-card"></i> <span data-i18n="cart.checkout">Proceder al Pago</span>
                 </button>
             </aside>
         </section>

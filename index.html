@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="es">
+<html lang="en">
 
 <head>
   <meta charset="UTF-8">
@@ -28,21 +28,24 @@
     <section id="category-header"
       style="display: none; padding: 40px 80px; background: linear-gradient(135deg, #FFF5F5 0%, #FFFFFF 100%); text-align: center;">
       <h1 id="category-title"
-        style="font-family: 'Bricolage Grotesque', serif; font-size: 36px; font-weight: 800; margin-bottom: 8px;">
+        style="font-family: 'Bricolage Grotesque', serif; font-size: 36px; font-weight: 800; margin-bottom: 8px;"
+        data-i18n="category.title">
         Categoría</h1>
-      <p style="color: #6B7280;">Explora nuestra colección seleccionada.</p>
+      <p style="color: #6B7280;" data-i18n="category.subtitle">Explore our curated collection.</p>
     </section>
 
     <!-- Hero -->
     <section class="hero" id="home-hero">
       <div class="hero__left">
-        <span class="hero__badge"><i data-lucide="sparkles"></i> Más de 5,000 diseños disponibles</span>
-        <h1 class="hero__title">Diseños de Bordado Profesionales</h1>
-        <p class="hero__sub">Archivos digitales listos para tu máquina bordadora. Formatos DST, PES, JEF, VP3 y más.
-          Descarga instantánea.</p>
+        <span class="hero__badge"><i data-lucide="sparkles"></i> <span data-i18n="hero.badge">Over 5,000 designs
+            available</span></span>
+        <h1 class="hero__title" data-i18n="hero.title_default">Professional Embroidery Designs</h1>
+        <p class="hero__sub" data-i18n="hero.sub_default">Digital files ready for your embroidery machine. DST, PES,
+          JEF, VP3 formats and more. Instant download.</p>
         <div class="hero__ctas">
-          <a href="#catalog" class="btn btn--primary btn--lg">Explorar Catálogo <i data-lucide="arrow-right"></i></a>
-          <a href="#" class="btn btn--outline btn--lg">Ver Novedades</a>
+          <a href="#catalog" class="btn btn--primary btn--lg"><span data-i18n="hero.cta.catalog">Browse Catalog</span>
+            <i data-lucide="arrow-right"></i></a>
+          <a href="#" class="btn btn--outline btn--lg" data-i18n="hero.cta.new">View New Arrivals</a>
         </div>
       </div>
       <div class="hero__right">
@@ -52,27 +55,30 @@
 
     <!-- Trust bar -->
     <section class="trust-bar">
-      <div class="trust-bar__item"><i data-lucide="download"></i> Descarga instantánea</div>
-      <div class="trust-bar__item"><i data-lucide="file-check"></i> Todos los formatos</div>
-      <div class="trust-bar__item"><i data-lucide="shield-check"></i> Pago seguro</div>
+      <div class="trust-bar__item"><i data-lucide="download"></i> <span data-i18n="trust.download">Descarga
+          instantánea</span></div>
+      <div class="trust-bar__item"><i data-lucide="file-check"></i> <span data-i18n="trust.formats">Todos los
+          formatos</span></div>
+      <div class="trust-bar__item"><i data-lucide="shield-check"></i> <span data-i18n="trust.secure">Pago seguro</span>
+      </div>
     </section>
 
     <!-- Catalog -->
     <section class="catalog" id="catalog">
       <div class="catalog__header">
-        <h2 class="catalog__title">Catálogo de Diseños</h2>
-        <span class="catalog__count">Mostrando diseños recientes</span>
+        <h2 class="catalog__title" data-i18n="catalog.title">Catálogo de Diseños</h2>
+        <span class="catalog__count" data-i18n="catalog.recent">Mostrando diseños recientes</span>
       </div>
 
       <div class="catalog__filters" id="catalog-filters">
-        <button class="filter-chip filter-chip--active">Todos</button>
+        <button class="filter-chip filter-chip--active" data-i18n="filter.all">Todos</button>
         <!-- Category chips populated dynamically -->
       </div>
 
       <!-- Product Grid (Dynamic) -->
       <div class="product-grid" id="catalog-grid">
         <!-- Products rendered by js/home.js -->
-        <p style="width:100%; text-align:center;">Cargando productos...</p>
+        <p style="width:100%; text-align:center;" data-i18n="catalog.loading">Cargando productos...</p>
       </div>
     </section>
 

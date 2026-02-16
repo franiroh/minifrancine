@@ -64,8 +64,11 @@ input {
     background: #FFFFFF;
     min-height: 100vh;
     display: flex;
-    display: flex;
     flex-direction: column;
+}
+
+#navbar-placeholder {
+    min-height: 72px;
 }
 
 /* --- Preloader --- */

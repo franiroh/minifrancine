@@ -4,6 +4,7 @@ import { getUser, signOut, fetchProducts, updateProduct } from './api.js';
 import { fetchAllOrders, fetchAdminStats, deleteProduct, fetchCategories, createCategory, updateCategory, deleteCategory } from './api.js';
 import { loadAdminMessages } from './admin-messages.js';
 import { initContent } from './admin-content.js';
+import { initI18nEditor } from './admin-i18n.js';
 import { escapeHtml, sanitizeCssValue } from './utils.js';
 
 let currentView = 'dashboard';

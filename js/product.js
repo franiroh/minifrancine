@@ -3,6 +3,7 @@ import { loadComponents, updateNavbarAuth, updateNavbarCartCount } from './compo
 import { fetchProductById, fetchProductImages, getUser, onAuthStateChange, downloadProductFile, fetchProductReviews, fetchUserReview } from './api.js';
 import { state, loadCart, getCartCount, addToCart, loadFavorites, isFavorite, toggleFavorite, loadPurchases, isPurchased } from './state.js';
 import { getUrlParam, renderBreadcrumbs, escapeHtml, showToast } from './utils.js';
+import i18n from './i18n.js';
 
 let currentProduct = null;
 let currentUser = null;
@@ -28,7 +29,7 @@ async function init() {
     currentProduct = await fetchProductById(productId);
 
     if (!currentProduct) {
-        document.querySelector('.detail').innerHTML = '<h1>Producto no encontrado</h1>';
+        document.querySelector('.detail').innerHTML = `<h1>${i18n.t('product.not_found')}</h1>`;
         return;
     }
 
@@ -47,8 +48,8 @@ function renderProductBreadcrumbs() {
     const placeholder = document.getElementById('breadcrumbs-placeholder');
     if (placeholder && currentProduct) {
         placeholder.innerHTML = renderBreadcrumbs([
-            { label: 'Inicio', href: 'index.html' },
-            { label: 'Categorías', href: 'categories.html' },
+            { label: i18n.t('nav.home'), href: 'index.html' },
+            { label: i18n.t('nav.catalog'), href: 'categories.html' },
             { label: currentProduct.category, href: `catalog.html?category=${encodeURIComponent(currentProduct.category)}` },
             { label: currentProduct.title, href: null }
         ]);
@@ -65,7 +66,7 @@ function setupAuthListener() {
         updateFavoriteButton();
         // Refresh buttons and reviews mainly to check 'purchased' state
         if (currentProduct) {
-            renderProduct(); // re-render buttons
+            await renderProduct(); // re-render buttons
             loadAndRenderReviews(currentProduct.id); // re-render reviews (maybe user added one)
         }
     });
@@ -119,9 +120,16 @@ async function renderProduct() {
         catEl.querySelector('a').onmouseout = e => e.target.style.opacity = '1';
     }
 
-    setText('detail-category-crumb', p.category);
+    // setText('detail-category-crumb', p.category); // Removed as we use Breadcrumb component
+    // setText('detail-title-crumb', p.title); // Removed as we use Breadcrumb component
+
+    // Set text logic for simple IDs
+    const setText = (id, text) => {
+        const el = document.getElementById(id);
+        if (el) el.textContent = text;
+    };
+
     setText('detail-title', p.title);
-    setText('detail-title-crumb', p.title);
 
     // Badge logic
     const titleEl = document.getElementById('detail-title');
@@ -181,9 +189,10 @@ async function renderProduct() {
                 starsHtml += `<i data-lucide="star" class="detail__star" style="color: #D1D5DB;"></i>`;
             }
         }
+        const reviewText = reviewCount === 1 ? i18n.t('product.review') : i18n.t('product.reviews');
         ratingContainer.innerHTML = `
             ${starsHtml}
-            <span class="detail__rating-text">${rating.toFixed(1)} (${reviewCount} ${reviewCount === 1 ? 'reseña' : 'reseñas'})</span>
+            <span class="detail__rating-text">${rating.toFixed(1)} (${reviewCount} ${reviewText})</span>
         `;
     }
 
@@ -194,9 +203,10 @@ async function renderProduct() {
 
     if (purchased) {
         if (addBtn) {
-            addBtn.innerHTML = `<i data-lucide="download"></i> Descargar Archivos`;
+            addBtn.innerHTML = `<i data-lucide="download"></i> ${i18n.t('product.download')}`;
             addBtn.className = 'btn btn--purchased-download btn--block btn--lg';
             addBtn.id = 'detail-download-btn';
+            addBtn.removeAttribute('data-i18n'); // Remove static i18n if present
 
             // Re-attach download listener if replaced
             addBtn.replaceWith(addBtn.cloneNode(true)); // Clear old listeners
@@ -204,21 +214,24 @@ async function renderProduct() {
             newDlBtn.addEventListener('click', handleDownload);
         }
         if (buyBtn) {
-            buyBtn.innerHTML = `<i data-lucide="check-circle"></i> Ya Comprado`;
+            buyBtn.innerHTML = `<i data-lucide="check-circle"></i> ${i18n.t('btn.purchased')}`;
             buyBtn.disabled = true;
             buyBtn.className = 'btn btn--purchased-indicator btn--block btn--lg';
+            buyBtn.removeAttribute('data-i18n');
         }
     } else {
         if (addBtn) {
             // Reset class if it was changed
             addBtn.className = 'btn btn--outline btn--block btn--lg';
             addBtn.id = 'detail-add-btn'; // restore ID
-            addBtn.innerHTML = `<i data-lucide="shopping-cart"></i> Agregar al Carrito`;
+            addBtn.innerHTML = `<i data-lucide="shopping-cart"></i> ${i18n.t('btn.add_cart')}`;
+            addBtn.setAttribute('data-i18n', 'btn.add_cart');
         }
         if (buyBtn) {
             buyBtn.className = 'btn btn--primary btn--block btn--lg';
             buyBtn.disabled = false;
-            buyBtn.innerHTML = `<i data-lucide="zap"></i> Comprar Ahora`;
+            buyBtn.innerHTML = `<i data-lucide="zap"></i> ${i18n.t('btn.buy_now')}`;
+            buyBtn.setAttribute('data-i18n', 'btn.buy_now');
         }
     }
 
@@ -229,9 +242,9 @@ async function renderProduct() {
 async function handleDownload() {
     const btn = document.getElementById('detail-download-btn');
     const originalHTML = btn.innerHTML;
-    btn.innerHTML = `<i data-lucide="loader"></i> Preparando descarga...`;
+    btn.innerHTML = `<i data-lucide="loader"></i> ${i18n.t('product.preparing_download')}`;
     btn.disabled = true;
-    showToast('Preparando descarga...', 'info');
+    showToast(i18n.t('product.preparing_download'), 'info');
     if (window.lucide) window.lucide.createIcons();
     try {
         const result = await downloadProductFile(currentProduct.id);
@@ -242,13 +255,13 @@ async function handleDownload() {
             document.body.appendChild(link);
             link.click();
             document.body.removeChild(link);
-            showToast('Descarga iniciada.', 'success');
+            showToast(i18n.t('product.download_started'), 'success');
         } else {
-            showToast('El archivo digital para este producto no está disponible todavía.', 'error');
+            showToast(i18n.t('product.download_unavailable'), 'error');
         }
     } catch (err) {
         console.error('Download error:', err);
-        showToast('Error al generar el enlace de descarga.', 'error');
+        showToast(i18n.t('product.download_error'), 'error');
     } finally {
         btn.innerHTML = originalHTML;
         btn.disabled = false;
@@ -340,18 +353,18 @@ async function loadAndRenderReviews(productId) {
             if (!myReview) {
                 ctaHtml = `
                     <div style="background: #F9FAFB; padding: 20px; border-radius: 8px; margin-bottom: 24px; text-align: center;">
-                        <p style="margin-bottom: 12px; font-weight: 500;">¿Compraste este producto?</p>
+                        <p style="margin-bottom: 12px; font-weight: 500;">${i18n.t('product.reviews.purchased_question') || '¿Compraste este producto?'}</p>
                         <a href="orders.html" class="btn btn--white btn--sm">
-                           <i data-lucide="star"></i> Escribir una reseña
+                           <i data-lucide="star"></i> ${i18n.t('product.reviews.write')}
                         </a>
                     </div>
                  `;
             } else {
                 ctaHtml = `
                     <div style="background: #F9FAFB; padding: 20px; border-radius: 8px; margin-bottom: 24px; text-align: center;">
-                        <p style="margin-bottom: 12px; font-weight: 500;">Ya calificaste este producto.</p>
+                        <p style="margin-bottom: 12px; font-weight: 500;">${i18n.t('product.reviews.already_rated') || 'Ya calificaste este producto.'}</p>
                         <a href="orders.html" class="btn btn--white btn--sm">
-                           Ver mi reseña en Mis Compras
+                           ${i18n.t('product.reviews.view_my_review') || 'Ver mi reseña en Mis Compras'}
                         </a>
                     </div>
                  `;
@@ -361,11 +374,11 @@ async function loadAndRenderReviews(productId) {
         if (reviews.length === 0) {
             container.innerHTML = `
                 ${ctaHtml}
-                <p style="color: #6B7280; font-style: italic;">No hay reseñas todavía. ¡Sé el primero en opinar!</p>
+                <p style="color: #6B7280; font-style: italic;">${i18n.t('product.reviews.empty')}</p>
             `;
         } else {
             const reviewsList = reviews.map(review => {
-                const date = new Date(review.created_at).toLocaleDateString('es-ES');
+                const date = new Date(review.created_at).toLocaleDateString(i18n.currentLang === 'es' ? 'es-ES' : 'en-US');
                 const author = review.profiles?.full_name || 'Usuario';
                 let startHtml = '';
                 for (let i = 1; i <= 5; i++) {

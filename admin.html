@@ -47,6 +47,9 @@
                 <button class="nav-item" data-tab="content">
                     <i data-lucide="layout-template"></i> Contenido Home
                 </button>
+                <button class="nav-item" data-tab="translations">
+                    <i data-lucide="languages"></i> Traducciones
+                </button>
             </nav>
         </aside>
 
@@ -208,6 +211,35 @@
                                 </button>
                             </div>
                         </form>
+                    </div>
+                </div>
+                <!-- Translations View -->
+                <div id="view-translations" class="view">
+                    <div class="view-header">
+                        <h2>Editor de Traducciones</h2>
+                        <button class="btn btn--outline" onclick="window.location.reload()">
+                            <i data-lucide="refresh-cw"></i> Recargar
+                        </button>
+                    </div>
+
+                    <div class="card" style="overflow-x: auto;">
+                        <table class="data-table" style="width: 100%; border-collapse: collapse;">
+                            <thead>
+                                <tr>
+                                    <th style="width: 15%;">Clave (Key)</th>
+                                    <th style="width: 25%;">Español (ES)</th>
+                                    <th style="width: 25%;">Inglés (EN)</th>
+                                    <th style="width: 25%;">Portugués (PT)</th>
+                                    <th style="width: 10%;">Acciones</th>
+                                </tr>
+                            </thead>
+                            <tbody id="i18n-table-body">
+                                <tr>
+                                    <td colspan="5" style="text-align: center; padding: 20px;">Cargando traducciones...
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
                     </div>
                 </div>
             </div>

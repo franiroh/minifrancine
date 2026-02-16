@@ -3,6 +3,7 @@ import { loadComponents, updateNavbarAuth, updateNavbarCartCount } from './compo
 import { getUser, onAuthStateChange } from './api.js';
 import { state, loadCart, getCartCount, removeFromCart, clearCart, getCartTotal } from './state.js';
 import { formatPrice, escapeHtml, sanitizeCssValue } from './utils.js';
+import i18n from './i18n.js';
 
 async function init() {
     await loadComponents();
@@ -41,7 +42,7 @@ function renderCart() {
     countEl.textContent = cart.length;
 
     if (cart.length === 0) {
-        container.innerHTML = '<p style="text-align:center; padding: 20px; color: #9CA3AF;">Tu carrito está vacío.</p>';
+        container.innerHTML = `<p style="text-align:center; padding: 20px; color: #9CA3AF;">${i18n.t('cart.empty')}</p>`;
         subtotalEl.textContent = 'USD 0.00';
         totalEl.textContent = 'USD 0.00';
     } else {
@@ -78,7 +79,7 @@ function renderCart() {
 
         newBtn.addEventListener('click', (e) => {
             e.preventDefault();
-            if (confirm('¿Estás seguro de vaciar el carrito?')) {
+            if (confirm(i18n.t('cart.confirm_clear'))) {
                 clearCart();
             }
         });

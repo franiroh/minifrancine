@@ -73,6 +73,28 @@
     gap: 20px;
 }
 
+.navbar__lang-switch {
+    margin-right: 4px;
+}
+
+.lang-select {
+    border: 1px solid #E5E7EB;
+    border-radius: 6px;
+    padding: 6px 8px;
+    font-size: 13px;
+    font-weight: 500;
+    color: #374151;
+    cursor: pointer;
+    outline: none;
+    background-color: transparent;
+    transition: all 0.2s;
+}
+
+.lang-select:hover {
+    border-color: #9CA3AF;
+    background-color: #F9FAFB;
+}
+
 .navbar__icon {
     font-size: 22px;
     color: #6B7280;
@@ -531,4 +553,12 @@
 
 .product-card--skeleton .product-card__heart {
     display: none;
+}
+
+/* --- Breadcrumbs --- */
+#breadcrumbs-placeholder {
+    min-height: 42px;
+    /* Validated height of breadcrumbs */
+    display: flex;
+    align-items: center;
 }

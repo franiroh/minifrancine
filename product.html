@@ -39,7 +39,7 @@
             </div>
 
             <div class="detail__info">
-                <span id="detail-category" class="detail__cat-badge">Categoría</span>
+                <span id="detail-category" class="detail__cat-badge" data-i18n="product.category_label">Categoría</span>
                 <h1 id="detail-title" class="detail__title">Título Producto</h1>
 
                 <div class="detail__rating">
@@ -61,26 +61,27 @@
                 <hr class="detail__divider">
 
                 <div class="detail__specs">
-                    <h3 class="detail__specs-title">Especificaciones</h3>
+                    <h3 class="detail__specs-title" data-i18n="product.specs.title">Especificaciones</h3>
                     <div class="detail__specs-grid">
                         <div class="detail__spec-item detail__spec-item--full">
-                            <span class="detail__spec-label">Formatos incluidos</span>
+                            <span class="detail__spec-label" data-i18n="product.specs.formats">Formatos incluidos</span>
                             <span id="detail-formats" class="detail__spec-value">-</span>
                         </div>
                         <div class="detail__spec-item">
-                            <span class="detail__spec-label">Tamaño (pulgadas)</span>
+                            <span class="detail__spec-label" data-i18n="product.specs.size">Tamaño (pulgadas)</span>
                             <span id="detail-size" class="detail__spec-value">-</span>
                         </div>
                         <div class="detail__spec-item">
-                            <span class="detail__spec-label">Puntadas Totales</span>
+                            <span class="detail__spec-label" data-i18n="product.specs.stitches">Puntadas Totales</span>
                             <span id="detail-stitches" class="detail__spec-value">-</span>
                         </div>
                         <div class="detail__spec-item">
-                            <span class="detail__spec-label">Cambios de color</span>
+                            <span class="detail__spec-label" data-i18n="product.specs.color_changes">Cambios de
+                                color</span>
                             <span id="detail-color-change-count" class="detail__spec-value">-</span>
                         </div>
                         <div class="detail__spec-item">
-                            <span class="detail__spec-label">Cantidad de Colores</span>
+                            <span class="detail__spec-label" data-i18n="product.specs.colors">Cantidad de Colores</span>
                             <span id="detail-color-count" class="detail__spec-value">-</span>
                         </div>
                     </div>
@@ -90,10 +91,10 @@
 
                 <div class="detail__actions">
                     <button id="detail-add-btn" class="btn btn--outline btn--block btn--lg">
-                        <i data-lucide="shopping-cart"></i> Agregar al Carrito
+                        <i data-lucide="shopping-cart"></i> <span data-i18n="btn.add_cart">Agregar al Carrito</span>
                     </button>
                     <button id="detail-buy-btn" class="btn btn--primary btn--block btn--lg">
-                        <i data-lucide="zap"></i> Comprar Ahora
+                        <i data-lucide="zap"></i> <span data-i18n="btn.buy_now">Comprar Ahora</span>
                     </button>
                 </div>
             </div>
@@ -101,9 +102,10 @@
 
         <!-- Reviews Section -->
         <section class="reviews" style="max-width: 1200px; margin: 0 auto; padding: 40px 20px;">
-            <h2 style="font-size: 24px; font-weight: 700; margin-bottom: 20px;">Reseñas de Clientes</h2>
+            <h2 style="font-size: 24px; font-weight: 700; margin-bottom: 20px;" data-i18n="product.reviews.title">
+                Reseñas de Clientes</h2>
             <div id="reviews-container">
-                <p style="color: #6B7280;">Cargando reseñas...</p>
+                <p style="color: #6B7280;" data-i18n="product.reviews.loading">Cargando reseñas...</p>
             </div>
         </section>
 

@@ -1,15 +1,20 @@
 
 import { fetchCategories } from './api.js';
+import i18n from './i18n.js';
 
 export const loadComponents = async () => {
   const navbarPlaceholder = document.getElementById('navbar-placeholder');
   const footerPlaceholder = document.getElementById('footer-placeholder');
 
+  // Initialize i18n first
+  await i18n.init();
+
   if (navbarPlaceholder) {
     // Fetch categories for dropdown
     const categories = await fetchCategories();
+    // Categories names are dynamic, we might translate them later via a different mechanism or JSON column
     const categoriesList = categories.map(c =>
-      `<a href="catalog.html?category=${encodeURIComponent(c.name)}" class="navbar__dropdown-item">${escapeHtml(c.name)}</a>`
+      `<a href="catalog.html?category=${encodeURIComponent(c.name)}" class="navbar__dropdown-item" data-i18n="category.${c.id}">${i18n.t(`category.${c.id}`) || escapeHtml(c.name)}</a>`
     ).join('');
 
     navbarPlaceholder.innerHTML = `
@@ -18,27 +23,36 @@ export const loadComponents = async () => {
         <i data-lucide="scissors" class="navbar__logo-icon"></i>
         <div class="navbar__brand-wrap">
             <a href="index.html" class="navbar__logo-text">MiniFrancine</a>
-            <span class="navbar__subtitle">Embroidery Patterns</span>
+            <span class="navbar__subtitle" data-i18n="nav.subtitle">Embroidery Patterns</span>
         </div>
       </div>
       <div class="navbar__links">
-        <a href="index.html" class="navbar__link ${window.location.pathname.includes('index.html') || window.location.pathname === '/' ? 'navbar__link--active' : ''}">Inicio</a>
+        <a href="index.html" class="navbar__link ${window.location.pathname.includes('index.html') || window.location.pathname === '/' ? 'navbar__link--active' : ''}" data-i18n="nav.home">Inicio</a>
         
         <div class="navbar__menu-item">
             <a href="categories.html" class="navbar__link ${window.location.pathname.includes('categories.html') ? 'navbar__link--active' : ''}" style="display:flex;align-items:center;gap:4px;">
-                Categorías <i data-lucide="chevron-down" style="width:14px;height:14px;"></i>
+                <span data-i18n="nav.catalog">Categorías</span> <i data-lucide="chevron-down" style="width:14px;height:14px;"></i>
             </a>
             <div class="navbar__dropdown">
-                <a href="categories.html" class="navbar__dropdown-item" style="font-weight:700; color:var(--primary-color);">Ver todas</a>
+                <a href="categories.html" class="navbar__dropdown-item" style="font-weight:700; color:var(--primary-color);" data-i18n="nav.all_categories">Ver todas</a>
                 <div class="navbar__dropdown-divider"></div>
                 ${categoriesList}
             </div>
         </div>
 
-        <a href="help.html" class="navbar__link">Novedades</a>
-        <a href="help.html" class="navbar__link">Ayuda</a>
+        <a href="catalog.html?sort=newest" class="navbar__link" data-i18n="nav.new">Novedades</a>
+        <a href="help.html" class="navbar__link" data-i18n="nav.help">Ayuda</a>
       </div>
       <div class="navbar__right">
+        <!-- Language Switcher -->
+        <div class="navbar__lang-switch">
+            <select id="lang-select" class="lang-select">
+                <option value="es" ${i18n.lang === 'es' ? 'selected' : ''}>ES</option>
+                <option value="en" ${i18n.lang === 'en' ? 'selected' : ''}>EN</option>
+                <option value="pt" ${i18n.lang === 'pt' ? 'selected' : ''}>PT</option>
+            </select>
+        </div>
+
         <i data-lucide="search" class="navbar__icon"></i>
         <div class="navbar__cart-wrap" onclick="window.location.href='cart.html'">
           <i data-lucide="shopping-cart" class="navbar__icon"></i>
@@ -47,25 +61,25 @@ export const loadComponents = async () => {
         <div class="navbar__account" id="navbar-account">
           <button class="navbar__user-btn" id="navbar-user-btn" onclick="window.location.href='login.html'">
             <i data-lucide="user"></i>
-            <span id="navbar-user-text">Login</span>
+            <span id="navbar-user-text" data-i18n="nav.login">Login</span>
             <i data-lucide="chevron-down" id="navbar-user-arrow" style="width: 16px; height: 16px; margin-left: -2px; display: none;"></i>
           </button>
           <div class="navbar__dropdown" id="navbar-dropdown">
             <a href="favorites.html" class="navbar__dropdown-item">
-              <i data-lucide="heart"></i> Mis Favoritos
+              <i data-lucide="heart"></i> <span data-i18n="nav.favorites">Mis Favoritos</span>
             </a>
             <a href="mis-disenos.html" class="navbar__dropdown-item">
-              <i data-lucide="palette"></i> Mis Diseños
+              <i data-lucide="palette"></i> <span data-i18n="nav.my_designs">Mis Diseños</span>
             </a>
             <a href="orders.html" class="navbar__dropdown-item">
-              <i data-lucide="receipt"></i> Mis Compras
+              <i data-lucide="receipt"></i> <span data-i18n="nav.my_orders">Mis Compras</span>
             </a>
             <a href="messages.html" class="navbar__dropdown-item">
-              <i data-lucide="message-circle"></i> Mensajes
+              <i data-lucide="message-circle"></i> <span data-i18n="nav.messages">Mensajes</span>
             </a>
             <div class="navbar__dropdown-divider"></div>
             <button class="navbar__dropdown-item navbar__dropdown-item--danger" id="navbar-logout-btn">
-              <i data-lucide="log-out"></i> Cerrar sesión
+              <i data-lucide="log-out"></i> <span data-i18n="nav.logout">Cerrar sesión</span>
             </button>
           </div>
         </div>
@@ -80,21 +94,35 @@ export const loadComponents = async () => {
       <div class="footer__top">
         <div class="footer__brand">
           <div class="footer__brand-logo"><i data-lucide="scissors"></i><span>MiniFrancine</span></div>
-          <p class="footer__brand-desc">Archivos digitales de bordado premium para máquinas bordadoras domésticas.</p>
+          <p class="footer__brand-desc" data-i18n="footer.description">Archivos digitales de bordado premium para máquinas bordadoras domésticas.</p>
         </div>
         <div class="footer__col">
-          <a href="index.html">Inicio</a><a href="categories.html">Categorías</a><a href="help.html">Novedades</a><a href="help.html">Ayuda</a>
+          <a href="index.html" data-i18n="nav.home">Inicio</a>
+          <a href="categories.html" data-i18n="nav.catalog">Categorías</a>
+          <a href="catalog.html?sort=newest" data-i18n="nav.new">Novedades</a>
+          <a href="help.html" data-i18n="nav.help">Ayuda</a>
         </div>
       </div>
       <div class="footer__bottom">
         <span>
-          &copy; 2026 MiniFrancine. Todos los derechos reservados.
-          <a href="help.html" style="margin-left: 10px; color: inherit; text-decoration: none;">Términos y Condiciones</a>
+          &copy; 2026 MiniFrancine. <span data-i18n="footer.rights">Todos los derechos reservados.</span>
+          <a href="help.html" style="margin-left: 10px; color: inherit; text-decoration: none;" data-i18n="footer.terms">Términos y Condiciones</a>
         </span>
       </div>
     </footer>
         `;
+
+    // Add language switcher listener
+    const langSelect = document.getElementById('lang-select');
+    if (langSelect) {
+      langSelect.addEventListener('change', (e) => {
+        i18n.setLanguage(e.target.value);
+      });
+    }
   }
+
+  // Ensure translations are applied to the newly injected HTML
+  await i18n.updatePage();
 
   // Initialize Lucide icons for injected content
   if (window.lucide) {
@@ -116,6 +144,7 @@ export const updateNavbarAuth = async (user) => {
   if (userBtn && userText) {
     if (user) {
       userText.textContent = escapeHtml(user.email);
+      userText.removeAttribute('data-i18n'); // Prevent i18n from overwriting email
 
       // Show arrow
       const arrow = document.getElementById('navbar-user-arrow');
@@ -161,8 +190,10 @@ export const updateNavbarAuth = async (user) => {
           navLinks.appendChild(adminLink);
         }
       }
+
     } else {
-      userText.textContent = 'Login';
+      userText.setAttribute('data-i18n', 'nav.login');
+      userText.textContent = i18n.t('nav.login');
       // Hide arrow
       const arrow = document.getElementById('navbar-user-arrow');
       if (arrow) arrow.style.display = 'none';

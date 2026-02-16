@@ -3,6 +3,7 @@ import { fetchProducts, fetchCategories, getUser, onAuthStateChange, addToFavori
 import { state, loadCart, getCartCount, addToCart, loadFavorites, isFavorite, toggleFavorite, loadPurchases, isPurchased } from './state.js';
 import { renderBreadcrumbs, escapeHtml, sanitizeCssValue } from './utils.js';
 import { supabase } from './api.js';
+import i18n from './i18n.js';
 
 let products = [];
 let currentCategory = 'Todos';
@@ -50,9 +51,9 @@ async function init() {
     const filtersContainer = document.getElementById('catalog-filters');
     if (filtersContainer && categories.length > 0) {
         const chipsHTML = categories.map(c =>
-            `<button class="filter-chip">${escapeHtml(c.name)}</button>`
+            `<button class="filter-chip" data-category="${escapeHtml(c.name)}" data-i18n="category.${c.id}">${i18n.t(`category.${c.id}`) || escapeHtml(c.name)}</button>`
         ).join('');
-        filtersContainer.innerHTML = `<button class="filter-chip filter-chip--active">Todos</button>${chipsHTML}`;
+        filtersContainer.innerHTML = `<button class="filter-chip filter-chip--active" data-category="Todos" data-i18n="category.all">Todos</button>${chipsHTML}`;
     }
 
     // 4. Fetch & Render Products (only published)
@@ -68,6 +69,33 @@ async function init() {
 
     // 5. Setup Listeners
     setupAuthListener();
+
+    // Filter Chips Listener
+    if (filtersContainer) {
+        filtersContainer.addEventListener('click', (e) => {
+            if (e.target.closest('.filter-chip')) {
+                const btn = e.target.closest('.filter-chip');
+                // Use data-category (original name) for filtering
+                const selectedCategory = btn.dataset.category || btn.textContent;
+
+                // Update UI
+                filtersContainer.querySelectorAll('.filter-chip').forEach(c => c.classList.remove('filter-chip--active'));
+                btn.classList.add('filter-chip--active');
+
+                // Filter
+                if (selectedCategory === 'Todos') {
+                    currentCategory = 'Todos';
+                    showHomeView();
+                    renderCatalog(products);
+                } else {
+                    currentCategory = selectedCategory;
+                    // showCategoryView(selectedCategory); // Keeping simple view
+                    const filtered = products.filter(p => p.category === selectedCategory);
+                    renderCatalog(filtered);
+                }
+            }
+        });
+    }
     setupFilterListeners();
 
     // Listen for state updates from other components
@@ -140,17 +168,23 @@ async function loadContentConfig() {
             if (data.hero_badge) {
                 const badge = document.querySelector('.hero__badge');
                 if (badge) {
-                    badge.innerHTML = `<i data-lucide="sparkles"></i> ${escapeHtml(data.hero_badge)}`;
+                    // Start of i18n fix: Do not overwrite if we want to use translations
+                    // badge.innerHTML = `<i data-lucide="sparkles"></i> ${escapeHtml(data.hero_badge)}`;
+                    // Instead, just ensure the icon exists. The text is handled by data-i18n="hero.badge" in HTML.
+                    // If we want to allow admin override via site_config, that system needs to be multi-language aware.
+                    // For now, disabling this overwrite to fix the "not changing language" bug.
                     if (window.lucide) window.lucide.createIcons();
                 }
             }
             if (data.hero_title) {
                 const title = document.querySelector('.hero__title');
-                if (title) title.textContent = data.hero_title;
+                // if (title) title.textContent = data.hero_title;
+                // Disabling overwrite to allow i18n
             }
             if (data.hero_description) {
                 const sub = document.querySelector('.hero__sub');
-                if (sub) sub.textContent = data.hero_description;
+                // if (sub) sub.textContent = data.hero_description;
+                // Disabling overwrite to allow i18n
             }
             if (data.hero_image_url) {
                 const heroImg = document.querySelector('.hero__image');

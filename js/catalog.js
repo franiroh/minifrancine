@@ -2,6 +2,7 @@ import { fetchProducts, getUser, fetchCategories } from './api.js';
 import { loadComponents, createProductCard, createSkeletonCard } from './components.js';
 import { loadFavorites, loadPurchases, addToCart, toggleFavorite } from './state.js';
 import { renderBreadcrumbs, escapeHtml } from './utils.js';
+import i18n from './i18n.js';
 
 document.addEventListener('DOMContentLoaded', async () => {
     // 1. Immediate UI Updates (Prevent Flash)
@@ -16,25 +17,52 @@ document.addEventListener('DOMContentLoaded', async () => {
     const resultCount = document.getElementById('result-count');
 
     // Apply visibility/text changes immediately
+    // Apply visibility/text changes
     if (category) {
         // Category View
         if (catalogHeader) catalogHeader.style.display = 'none';
-        if (categoryHeader) {
-            categoryHeader.style.display = 'block';
-            categoryTitle.textContent = category;
-        }
+        categoryHeader.style.display = 'block';
+        // Wait for translation to load before setting text
+        // categoryTitle.textContent = category; 
+        categoryTitle.innerHTML = '<span class="skeleton-text" style="width: 200px; display: inline-block;"></span>';
+        categoryTitle.removeAttribute('data-i18n');
         document.title = `Categoría: ${category} — MiniFrancine`;
     } else if (tag) {
         // Tag View
-        if (pageTitle) pageTitle.textContent = `Etiqueta: "${tag}"`;
+        if (pageTitle) {
+            pageTitle.textContent = `Etiqueta: "${tag}"`;
+            pageTitle.removeAttribute('data-i18n');
+        }
+        document.title = `Etiqueta: ${tag} — MiniFrancine`;
+    }
+
+    // 2. Load Components (Navbar/Footer) - This initializes i18n
+    await loadComponents();
+
+    // Import i18n dynamically or from module if possible, but loadComponents initializes it. 
+    // We can import it at top level.
+
+    if (category) {
+        // Category View
+        if (catalogHeader) catalogHeader.style.display = 'none';
+        categoryHeader.style.display = 'block';
+        // Wait for translation to load before setting text
+        // categoryTitle.textContent = category; 
+        categoryTitle.innerHTML = '<span class="skeleton-text" style="width: 200px; display: inline-block;"></span>';
+        categoryTitle.removeAttribute('data-i18n');
+        document.title = `Categoría: ${category} — MiniFrancine`;
+    } else if (tag) {
+        // Tag View
+        if (pageTitle) {
+            pageTitle.textContent = `Etiqueta: "${tag}"`;
+            pageTitle.removeAttribute('data-i18n');
+        }
         document.title = `Etiqueta: ${tag} — MiniFrancine`;
     } else {
         // Default All View
-        if (pageTitle) pageTitle.textContent = 'Catálogo Completo';
+        // Do nothing, let data-i18n="catalog.full_title" in HTML handle it via i18n.updatePage()
+        // Or ensure it is set if we are switching views dynamically (not the case here, it's page load)
     }
-
-    // 2. Load Components (Navbar/Footer)
-    await loadComponents();
 
     const grid = document.getElementById('catalog-grid');
     if (grid) {
@@ -54,25 +82,38 @@ document.addEventListener('DOMContentLoaded', async () => {
     const categories = await fetchCategories();
     renderFilters(categories, category);
 
+    // Update Title with Translation if category is present
+    if (category) {
+        const catObj = categories.find(c => c.name === category);
+        if (catObj) {
+            const translatedName = i18n.t(`category.${catObj.id}`);
+            if (categoryTitle) categoryTitle.textContent = translatedName;
+            document.title = `Categoría: ${translatedName} — MiniFrancine`;
+        }
+    }
+
     // 5. Render Breadcrumbs
     const breadcrumbsContainer = document.getElementById('breadcrumbs-placeholder');
     if (breadcrumbsContainer) {
         if (category) {
+            const catObj = categories.find(c => c.name === category);
+            const label = catObj ? i18n.t(`category.${catObj.id}`) : category;
+
             breadcrumbsContainer.innerHTML = renderBreadcrumbs([
-                { label: 'Inicio', href: 'index.html' },
-                { label: 'Categorías', href: 'categories.html' },
-                { label: category, href: null }
+                { label: i18n.t('nav.home'), href: 'index.html' },
+                { label: i18n.t('nav.catalog'), href: 'categories.html' },
+                { label: label, href: null }
             ]);
         } else if (tag) {
             breadcrumbsContainer.innerHTML = renderBreadcrumbs([
-                { label: 'Inicio', href: 'index.html' },
-                { label: 'Catálogo', href: 'catalog.html' },
+                { label: i18n.t('nav.home'), href: 'index.html' },
+                { label: i18n.t('nav.catalog'), href: 'catalog.html' }, // "Catálogo"
                 { label: tag, href: null }
             ]);
         } else {
             breadcrumbsContainer.innerHTML = renderBreadcrumbs([
-                { label: 'Inicio', href: 'index.html' },
-                { label: 'Catálogo', href: null }
+                { label: i18n.t('nav.home'), href: 'index.html' },
+                { label: i18n.t('nav.catalog'), href: null }
             ]);
         }
     }
@@ -103,15 +144,16 @@ function renderFilters(categories, activeCategory) {
 
     // 'Todos' button
     let html = `
-        <a href="catalog.html" class="filter-chip ${!activeCategory ? 'filter-chip--active' : ''}" style="text-decoration: none;">Todos</a>
+        <a href="catalog.html" class="filter-chip ${!activeCategory ? 'filter-chip--active' : ''}" style="text-decoration: none;" data-i18n="category.all">Todos</a>
     `;
 
     // Categories
     html += categories.map(c => `
         <a href="catalog.html?category=${encodeURIComponent(c.name)}" 
            class="filter-chip ${activeCategory === c.name ? 'filter-chip--active' : ''}" 
-           style="text-decoration: none;">
-           ${escapeHtml(c.name)}
+           style="text-decoration: none;"
+           data-i18n="category.${c.id}">
+           ${i18n.t(`category.${c.id}`) || escapeHtml(c.name)}
         </a>
     `).join('');
 
