@@ -109,7 +109,7 @@ async function renderProduct() {
     }
 
     // Info
-    document.title = `${p.title} — PatchFiles`;
+    document.title = `${p.title} — MiniFrancine`;
 
     // Make category clickable
     const catEl = document.getElementById('detail-category');

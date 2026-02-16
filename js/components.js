@@ -16,7 +16,10 @@ export const loadComponents = async () => {
     <header class="navbar">
       <div class="navbar__left">
         <i data-lucide="scissors" class="navbar__logo-icon"></i>
-        <a href="index.html" class="navbar__logo-text">PatchFiles</a>
+        <div class="navbar__brand-wrap">
+            <a href="index.html" class="navbar__logo-text">MiniFrancine</a>
+            <span class="navbar__subtitle">Embroidery Patterns</span>
+        </div>
       </div>
       <div class="navbar__links">
         <a href="index.html" class="navbar__link ${window.location.pathname.includes('index.html') || window.location.pathname === '/' ? 'navbar__link--active' : ''}">Inicio</a>
@@ -76,8 +79,8 @@ export const loadComponents = async () => {
     <footer class="footer">
       <div class="footer__top">
         <div class="footer__brand">
-          <div class="footer__brand-logo"><i data-lucide="scissors"></i><span>PatchFiles</span></div>
-          <p class="footer__brand-desc">Archivos digitales de bordado premium para máquinas industriales y domésticas.</p>
+          <div class="footer__brand-logo"><i data-lucide="scissors"></i><span>MiniFrancine</span></div>
+          <p class="footer__brand-desc">Archivos digitales de bordado premium para máquinas bordadoras domésticas.</p>
         </div>
         <div class="footer__col">
           <a href="index.html">Inicio</a><a href="categories.html">Categorías</a><a href="help.html">Novedades</a><a href="help.html">Ayuda</a>
@@ -85,7 +88,7 @@ export const loadComponents = async () => {
       </div>
       <div class="footer__bottom">
         <span>
-          &copy; 2026 PatchFiles. Todos los derechos reservados.
+          &copy; 2026 MiniFrancine. Todos los derechos reservados.
           <a href="help.html" style="margin-left: 10px; color: inherit; text-decoration: none;">Términos y Condiciones</a>
         </span>
       </div>

@@ -29,6 +29,21 @@
     font-family: 'Bricolage Grotesque', serif;
     font-size: 24px;
     font-weight: 700;
+    line-height: 1;
+}
+
+.navbar__brand-wrap {
+    display: flex;
+    flex-direction: column;
+}
+
+.navbar__subtitle {
+    font-size: 11px;
+    font-weight: 600;
+    color: #9CA3AF;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    margin-top: 2px;
 }
 
 .navbar__links {

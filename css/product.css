@@ -31,7 +31,8 @@
 }
 
 .detail__images {
-    flex: 1;
+    flex: 0.7;
+    /* Reduced from 1 to give more space to info */
     display: flex;
     flex-direction: column;
     gap: 16px;
@@ -39,11 +40,14 @@
 
 .detail__main-img {
     width: 100%;
-    height: 500px;
+    aspect-ratio: 1 / 1;
     border-radius: 20px;
+    border: 1px solid #E5E7EB;
     background-size: cover;
     background-position: center;
     overflow: hidden;
+    position: relative;
+    /* Ensure relative positioning for contained absolute elements */
 }
 
 .detail__image-wrapper {
@@ -89,6 +93,7 @@
     width: 100%;
     height: 100%;
     object-fit: cover;
+    object-position: center;
     border-radius: 20px;
 }
 
@@ -117,7 +122,8 @@
 }
 
 .detail__info {
-    flex: 1;
+    flex: 1.3;
+    /* Increased from 1 */
     display: flex;
     flex-direction: column;
     gap: 24px;
@@ -256,6 +262,10 @@
     padding: 14px;
     border-radius: 12px;
     background: #F6F7F8;
+}
+
+.detail__spec-item--full {
+    grid-column: 1 / -1;
 }
 
 .detail__spec-label {

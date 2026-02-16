@@ -23,11 +23,11 @@ document.addEventListener('DOMContentLoaded', async () => {
             categoryHeader.style.display = 'block';
             categoryTitle.textContent = category;
         }
-        document.title = `Categoría: ${category} — PatchFiles`;
+        document.title = `Categoría: ${category} — MiniFrancine`;
     } else if (tag) {
         // Tag View
         if (pageTitle) pageTitle.textContent = `Etiqueta: "${tag}"`;
-        document.title = `Etiqueta: ${tag} — PatchFiles`;
+        document.title = `Etiqueta: ${tag} — MiniFrancine`;
     } else {
         // Default All View
         if (pageTitle) pageTitle.textContent = 'Catálogo Completo';

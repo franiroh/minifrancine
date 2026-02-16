@@ -39,7 +39,7 @@ serve(async (req) => {
                 'Authorization': `Bearer ${RESEND_API_KEY}`,
             },
             body: JSON.stringify({
-                from: 'PatchFiles Support <onboarding@resend.dev>', // Or verify a collection domain
+                from: 'MiniFrancine Support <onboarding@resend.dev>', // Or verify a collection domain
                 to: ['minifrancine@gmail.com'],
                 subject: `Consulta de ${email}`,
                 html: `
