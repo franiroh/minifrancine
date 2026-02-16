@@ -158,7 +158,7 @@ async function renderProduct() {
         }
     }
 
-    setText('detail-price', `$${p.price}`);
+    setText('detail-price', `USD ${p.price}`);
 
     // Specs
     setText('detail-size', p.size);

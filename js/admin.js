@@ -136,7 +136,7 @@ async function loadDashboard() {
 
     const stats = await fetchAdminStats(dateStart, dateEnd);
 
-    document.getElementById('stat-total-sales').textContent = `$${stats.totalSales.toFixed(2)}`;
+    document.getElementById('stat-total-sales').textContent = `USD ${stats.totalSales.toFixed(2)}`;
     document.getElementById('stat-total-orders').textContent = stats.totalOrders;
     document.getElementById('stat-paid-orders').textContent = stats.paidOrders;
     document.getElementById('stat-pending-orders').textContent = stats.pendingOrders;
@@ -169,7 +169,7 @@ async function loadProducts() {
             }
                 </td>
                 <td><strong>${escapeHtml(p.title)}</strong></td>
-                <td>$${parseFloat(p.price).toFixed(2)}</td>
+                <td>USD ${parseFloat(p.price).toFixed(2)}</td>
                 <td>
                     <label class="toggle-switch">
                         <input type="checkbox" ${p.published !== false ? 'checked' : ''} onchange="togglePublishHandler(${parseInt(p.id)}, this.checked)">
@@ -243,7 +243,7 @@ async function loadOrders() {
                 <small class="text-gray">${o.created_at ? new Date(o.created_at).toLocaleDateString() : '-'}</small>
             </td>
             <td>${o.created_at ? new Date(o.created_at).toLocaleTimeString() : '-'}</td>
-            <td><strong>$${parseFloat(o.total).toFixed(2)}</strong></td>
+            <td><strong>USD ${parseFloat(o.total).toFixed(2)}</strong></td>
             <td>
                 <span class="status-badge status-${escapeHtml(o.status)}">${escapeHtml(o.status)}</span>
                 <button class="btn-icon" style="margin-left:8px;" onclick="window.location.href='admin-order-detail.html?id=${escapeHtml(o.id)}'">

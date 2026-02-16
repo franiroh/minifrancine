@@ -204,7 +204,7 @@ export const createProductCard = (product) => {
           ${product.tags ? product.tags.map(tag => `<span class="tag">${escapeHtml(tag)}</span>`).join('') : ''}
         </div>
         <div class="product-card__price-row">
-          <span class="product-card__price">$${parseFloat(product.price).toFixed(2)}</span>
+          <span class="product-card__price">USD ${parseFloat(product.price).toFixed(2)}</span>
           <div class="product-card__btns">
             ${purchased
       ? `<a href="mis-disenos.html#product-${parseInt(product.id)}" class="btn btn--sm btn--purchased">

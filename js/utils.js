@@ -30,7 +30,7 @@ export const sanitizeCssValue = (value) => {
 };
 
 export const formatPrice = (price) => {
-    return `$${parseFloat(price).toFixed(2)}`;
+    return `USD ${parseFloat(price).toFixed(2)}`;
 };
 
 export const getUrlParam = (param) => {

@@ -42,8 +42,8 @@ function renderCart() {
 
     if (cart.length === 0) {
         container.innerHTML = '<p style="text-align:center; padding: 20px; color: #9CA3AF;">Tu carrito está vacío.</p>';
-        subtotalEl.textContent = '$0.00';
-        totalEl.textContent = '$0.00';
+        subtotalEl.textContent = 'USD 0.00';
+        totalEl.textContent = 'USD 0.00';
     } else {
         container.innerHTML = cart.map((item, index) => `
         <div class="cart-item">
@@ -51,7 +51,7 @@ function renderCart() {
           <div class="cart-item__info">
             <span class="cart-item__name">${escapeHtml(item.title)}</span>
             <span class="cart-item__meta">${escapeHtml(item.category)} · ${escapeHtml(item.size || 'Standard')}</span>
-            <span class="cart-item__price">$${parseFloat(item.price).toFixed(2)}</span>
+            <span class="cart-item__price">USD ${parseFloat(item.price).toFixed(2)}</span>
           </div>
           <button class="cart-item__delete" data-index="${index}"><i data-lucide="trash-2"></i></button>
         </div>
@@ -65,8 +65,8 @@ function renderCart() {
         });
 
         const total = getCartTotal();
-        subtotalEl.textContent = `$${total}`;
-        totalEl.textContent = `$${total}`;
+        subtotalEl.textContent = `USD ${total}`;
+        totalEl.textContent = `USD ${total}`;
     }
 
     // Clear cart listener

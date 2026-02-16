@@ -80,12 +80,12 @@ function renderCheckout() {
 
     if (itemsContainer) {
         itemsContainer.innerHTML = cart.map(item => `
-            <div class="checkout-summary__row"><span>${escapeHtml(item.title)}</span><span>$${parseFloat(item.price).toFixed(2)}</span></div>
+            <div class="checkout-summary__row"><span>${escapeHtml(item.title)}</span><span>USD ${parseFloat(item.price).toFixed(2)}</span></div>
         `).join('');
     }
 
-    if (subtotalEl) subtotalEl.textContent = `$${total}`;
-    if (totalEl) totalEl.textContent = `$${total}`;
+    if (subtotalEl) subtotalEl.textContent = `USD ${total}`;
+    if (totalEl) totalEl.textContent = `USD ${total}`;
 
     // PayPal Buttons
     if (window.paypal) {
@@ -181,7 +181,7 @@ function renderCheckout() {
 
     if (payBtn) {
         if (window.paypal) payBtn.style.display = 'none';
-        payBtn.textContent = `Pagar con PayPal — $${total}`;
+        payBtn.textContent = `Pagar con PayPal — USD ${total}`;
     }
 }
 

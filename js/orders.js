@@ -165,7 +165,7 @@ function renderOrderCard(order, reviewsMap = {}) {
                 </div>
                 
                 <div class="order-item__col-price">
-                    $${parseFloat(item.price).toFixed(2)}
+                    USD ${parseFloat(item.price).toFixed(2)}
                 </div>
             </div>
             `;
@@ -190,7 +190,7 @@ function renderOrderCard(order, reviewsMap = {}) {
 
             <div class="order-card__footer">
                 <span class="order-card__total-label">Total</span>
-                <span class="order-card__total">$${parseFloat(order.total).toFixed(2)}</span>
+                <span class="order-card__total">USD ${parseFloat(order.total).toFixed(2)}</span>
             </div>
         </div>
     `;

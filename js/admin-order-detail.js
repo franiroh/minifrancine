@@ -55,7 +55,7 @@ async function loadOrderDetails(orderId) {
     document.getElementById('order-date-display').textContent = new Date(order.created_at).toLocaleString();
     document.getElementById('order-email').textContent = order.email || 'N/A';
     document.getElementById('order-user').textContent = `ID: ${order.user_id}`;
-    document.getElementById('order-total').textContent = `$${order.total}`;
+    document.getElementById('order-total').textContent = `USD ${order.total}`;
 
     // Status Badge
     const statusEl = document.getElementById('order-status');
@@ -90,9 +90,9 @@ async function loadOrderDetails(orderId) {
                         <strong>${p ? escapeHtml(p.title) : 'Producto Eliminado'}</strong>
                     </div>
                 </td>
-                <td>$${parseFloat(item.price).toFixed(2)}</td>
+                <td>USD ${parseFloat(item.price).toFixed(2)}</td>
                 <td>${parseInt(item.quantity)}</td>
-                <td><strong>$${(parseFloat(item.price) * parseInt(item.quantity)).toFixed(2)}</strong></td>
+                <td><strong>USD ${(parseFloat(item.price) * parseInt(item.quantity)).toFixed(2)}</strong></td>
             </tr>
         `;
     }).join('');
