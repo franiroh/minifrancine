@@ -6,6 +6,8 @@
 .hero {
     display: flex;
     align-items: center;
+    gap: 60px;
+    /* Add gap between left and right */
     height: 480px;
     padding: 0 80px;
     background: linear-gradient(135deg, #FFF5F5 0%, #FFFFFF 60%, #FFF0F5 100%);
@@ -41,14 +43,16 @@
     font-size: 48px;
     font-weight: 800;
     line-height: 1.1;
-    max-width: 520px;
+    max-width: 100%;
+    /* Allow full width of flex container */
 }
 
 .hero__sub {
     font-size: 18px;
     color: #6B7280;
     line-height: 1.5;
-    max-width: 480px;
+    max-width: 100%;
+    /* Allow full width */
 }
 
 .hero__ctas {

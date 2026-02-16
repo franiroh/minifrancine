@@ -124,6 +124,46 @@ function showHomeView() {
     // Clear Breadcrumbs
     const breadcrumbsContainer = document.getElementById('breadcrumbs-placeholder');
     if (breadcrumbsContainer) breadcrumbsContainer.innerHTML = '';
+
+    loadContentConfig();
+}
+
+async function loadContentConfig() {
+    try {
+        const { data, error } = await supabase
+            .from('site_config')
+            .select('*')
+            .limit(1)
+            .single();
+
+        if (data) {
+            if (data.hero_badge) {
+                const badge = document.querySelector('.hero__badge');
+                if (badge) {
+                    badge.innerHTML = `<i data-lucide="sparkles"></i> ${escapeHtml(data.hero_badge)}`;
+                    if (window.lucide) window.lucide.createIcons();
+                }
+            }
+            if (data.hero_title) {
+                const title = document.querySelector('.hero__title');
+                if (title) title.textContent = data.hero_title;
+            }
+            if (data.hero_description) {
+                const sub = document.querySelector('.hero__sub');
+                if (sub) sub.textContent = data.hero_description;
+            }
+            if (data.hero_image_url) {
+                const heroImg = document.querySelector('.hero__image');
+                if (heroImg) {
+                    heroImg.style.backgroundImage = `url('${data.hero_image_url}')`;
+                    heroImg.style.backgroundSize = 'cover';
+                    heroImg.style.backgroundPosition = 'center';
+                }
+            }
+        }
+    } catch (err) {
+        console.error('Error loading content config:', err);
+    }
 }
 
 function setupFilterListeners() {

@@ -44,6 +44,9 @@
                 <button class="nav-item" data-tab="messages">
                     <i data-lucide="message-square"></i> Mensajes
                 </button>
+                <button class="nav-item" data-tab="content">
+                    <i data-lucide="layout-template"></i> Contenido Home
+                </button>
             </nav>
         </aside>
 
@@ -163,6 +166,48 @@
                                 <p>Selecciona una conversación.</p>
                             </div>
                         </main>
+                    </div>
+                </div>
+
+                <!-- Home Content View -->
+                <div id="view-content" class="view">
+                    <div class="view-header">
+                        <h2>Contenido de Inicio (Home)</h2>
+                        <button class="btn btn--primary" id="btn-save-content">
+                            <i data-lucide="save"></i> Guardar Cambios
+                        </button>
+                    </div>
+
+                    <div class="card" style="max-width: 800px; margin: 0 auto;">
+                        <form id="home-content-form">
+                            <div class="form-group">
+                                <label>Badge Texto (Arriba del título)</label>
+                                <input type="text" id="home-badge" placeholder="Ej: Más de 5,000 diseños disponibles">
+                            </div>
+
+                            <div class="form-group">
+                                <label>Título Principal</label>
+                                <input type="text" id="home-title" placeholder="Ej: Diseños de Bordado Profesionales">
+                            </div>
+
+                            <div class="form-group">
+                                <label>Descripción</label>
+                                <textarea id="home-description" rows="3" placeholder="Descripción corta..."></textarea>
+                            </div>
+
+                            <div class="form-group" style="margin-top: 24px;">
+                                <label>Imagen Principal (Hero)</label>
+                                <div class="image-upload-preview" id="hero-img-preview"
+                                    style="width: 100%; height: 300px; background-color: #f3f4f6; border-radius: 12px; display: flex; align-items: center; justify-content: center; overflow: hidden; margin-bottom: 12px; background-size: cover; background-position: center;">
+                                    <span class="text-gray">Sin imagen</span>
+                                </div>
+                                <input type="file" id="hero-img-input" accept="image/*" style="display: none;">
+                                <button type="button" class="btn btn--outline"
+                                    onclick="document.getElementById('hero-img-input').click()">
+                                    <i data-lucide="image"></i> Cambiar Imagen
+                                </button>
+                            </div>
+                        </form>
                     </div>
                 </div>
             </div>

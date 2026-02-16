@@ -3,6 +3,7 @@ import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js
 import { getUser, signOut, fetchProducts, updateProduct } from './api.js';
 import { fetchAllOrders, fetchAdminStats, deleteProduct, fetchCategories, createCategory, updateCategory, deleteCategory } from './api.js';
 import { loadAdminMessages } from './admin-messages.js';
+import { initContent } from './admin-content.js';
 import { escapeHtml, sanitizeCssValue } from './utils.js';
 
 let currentView = 'dashboard';
@@ -114,6 +115,7 @@ function setupNavigation() {
             if (viewId === 'orders') loadOrders();
             if (viewId === 'categories') loadCategories();
             if (viewId === 'messages') loadAdminMessages();
+            if (viewId === 'content') initContent();
         };
     });
 
