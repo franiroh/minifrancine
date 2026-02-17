@@ -240,6 +240,12 @@ export const createProductCard = (product) => {
   const purchased = isPurchased(product.id);
   const favorite = isFavorite(product.id);
 
+  // Discount Calculation
+  const price = parseFloat(product.price);
+  const oldPrice = parseFloat(product.oldPrice || product.old_price); // Handle both camelCase and snake_case if needed
+  const hasDiscount = oldPrice > price;
+  const discountPerc = hasDiscount ? Math.round(((oldPrice - price) / oldPrice) * 100) : 0;
+
   return `
     <div class="product-card ${purchased ? 'product-card--purchased' : ''}" data-id="${parseInt(product.id)}">
       <div class="product-card__image" style="background: ${sanitizeCssValue(product.imageColor)};">
@@ -249,10 +255,6 @@ export const createProductCard = (product) => {
       : (product.badge ? (() => {
         const bKey = 'badge.' + getBadgeKey(product.badge);
         const bTrans = i18n.t(bKey);
-        // If translation missing, use capitalized key or original if it was 'Nuevo' etc.
-        // Actually i18n.t returns key if missing. 
-        // We want to show "Nuevo" if key is 'new' and lang is ES.
-        // variable bTrans holds the result. 
         return `<span class="product-card__badge ${product.badgeColor === 'green' ? 'product-card__badge--green' : ''}">${escapeHtml(bTrans)}</span>`;
       })() : '')}
         <div class="product-card__heart ${favorite ? 'product-card__heart--active' : ''}" data-id="${parseInt(product.id)}">
@@ -264,7 +266,10 @@ export const createProductCard = (product) => {
         <h3 class="product-card__title">${escapeHtml(product.title)}</h3>
 
         <div class="product-card__price-row">
-          <span class="product-card__price">USD ${parseFloat(product.price).toFixed(2)}</span>
+            <div class="product-card__price-wrap" style="display: flex; flex-direction: column; align-items: flex-start; gap: 0;">
+                <span class="product-card__price">USD ${price.toFixed(2)}</span>
+                ${hasDiscount ? `<span class="product-card__old-price" style="font-size: 12px; color: #EF4444; text-decoration: line-through;">USD ${oldPrice.toFixed(2)}</span>` : ''}
+            </div>
           <div class="product-card__btns">
             ${purchased
       ? `<a href="mis-disenos.html#product-${parseInt(product.id)}" class="btn btn--sm btn--purchased">

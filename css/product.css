@@ -213,10 +213,19 @@
 }
 
 .detail__price {
-    display: flex;
-    align-items: center;
-    gap: 12px;
     margin-bottom: 24px;
+}
+
+.detail__price-column {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+.detail__price-old {
+    font-size: 16px;
+    text-decoration: line-through;
+    color: #EF4444;
 }
 
 .detail__price-current {

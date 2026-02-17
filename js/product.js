@@ -187,7 +187,27 @@ async function renderProduct() {
         }
     }
 
-    setText('detail-price', `USD ${p.price}`);
+    // Discount Logic
+    const price = parseFloat(p.price);
+    const oldPrice = parseFloat(p.oldPrice || p.old_price);
+    const hasDiscount = oldPrice > price;
+    const discountPerc = hasDiscount ? Math.round(((oldPrice - price) / oldPrice) * 100) : 0;
+
+    const priceHtml = hasDiscount
+        ? `<div class="detail__price-column">
+             <span class="detail__price-current">USD ${price.toFixed(2)}</span>
+             <div class="detail__discount-row">
+                <span class="detail__price-old" style="text-decoration: line-through; color: #9CA3AF; margin-right: 8px;">USD ${oldPrice.toFixed(2)}</span>
+                <span class="detail__discount-badge" style="background: #FEE2E2; color: #EF4444; padding: 2px 8px; border-radius: 4px; font-weight: 600; font-size: 14px;">-${discountPerc}%</span>
+             </div>
+           </div>`
+        : `<span id="detail-price" class="detail__price-current">USD ${price.toFixed(2)}</span>`;
+
+    const priceContainer = document.querySelector('.detail__price');
+    if (priceContainer) {
+        priceContainer.innerHTML = priceHtml;
+    }
+    // setText('detail-price', `USD ${p.price}`); // Removed as we handle HTML manually above
 
     // Specs
     setText('detail-size', p.size);

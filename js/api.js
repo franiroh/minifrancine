@@ -153,6 +153,45 @@ export async function updateProfile(userId, updates) {
     return { data, error }
 }
 
+export async function anonymizeUser(userId) {
+    // 1. Security Check: Ensure the user is modifying their own account
+    const { data: { user } } = await supabase.auth.getUser();
+    if (!user || user.id !== userId) {
+        console.error('Security Alert: Attempt to delete another user account blocked.');
+        return { error: { message: 'Unauthorized: You can only delete your own account.' } };
+    }
+
+    // 2. Check Role: Admins cannot delete their account
+    const { data: profile } = await supabase
+        .from('profiles')
+        .select('role')
+        .eq('id', userId)
+        .single();
+
+    if (profile && profile.role === 'admin') {
+        console.error('Security Alert: Admin attempted to delete account.');
+        return { error: { message: 'Unauthorized: Admins cannot delete their account.' } };
+    }
+
+    // Generate a unique dummy email to satisfy unique constraints and remove PII
+    const timestamp = Date.now();
+    const dummyEmail = `deleted_${timestamp}_${userId.substring(0, 8)}@minifrancine.com`;
+
+    const updates = {
+        full_name: 'Usuario Eliminado',
+        // phone: null, // Removed from schema/UI, but safe to ignore if not present
+        email: dummyEmail, // Store dummy email in profiles to anonymize
+        updated_at: new Date()
+    };
+
+    const { data, error } = await supabase
+        .from('profiles')
+        .update(updates)
+        .eq('id', userId);
+
+    return { data, error };
+}
+
 export function onAuthStateChange(callback) {
     return supabase.auth.onAuthStateChange((event, session) => {
         callback(event, session)
@@ -882,6 +921,34 @@ export async function fetchAllUserReviews(userId) {
     return data;
 }
 
+
+// Helper to update product stats after review change
+async function _updateProductStats(productId) {
+    // 1. Get average rating and count
+    const { data, error } = await supabase
+        .from('reviews')
+        .select('rating')
+        .eq('product_id', productId);
+
+    if (error) {
+        console.error('Error calculating stats:', error);
+        return;
+    }
+
+    const count = data.length;
+    const total = data.reduce((sum, r) => sum + r.rating, 0);
+    const avg = count > 0 ? total / count : 0;
+
+    // 2. Update product
+    await supabase
+        .from('products')
+        .update({
+            rating: avg,
+            reviews: count
+        })
+        .eq('id', productId);
+}
+
 export async function addReview(userId, productId, rating, comment) {
     const { data, error } = await supabase
         .from('reviews')
@@ -894,10 +961,21 @@ export async function addReview(userId, productId, rating, comment) {
         .select()
         .single();
 
+    if (!error) {
+        await _updateProductStats(productId);
+    }
+
     return { data, error };
 }
 
 export async function updateReview(reviewId, rating, comment) {
+    // Get productId first to update stats
+    const { data: oldReview } = await supabase
+        .from('reviews')
+        .select('product_id')
+        .eq('id', reviewId)
+        .single();
+
     const { data, error } = await supabase
         .from('reviews')
         .update({
@@ -908,14 +986,30 @@ export async function updateReview(reviewId, rating, comment) {
         .select()
         .single();
 
+    if (!error && oldReview) {
+        await _updateProductStats(oldReview.product_id);
+    }
+
     return { data, error };
 }
 
 export async function deleteReview(reviewId) {
+    // Get productId first
+    const { data: oldReview } = await supabase
+        .from('reviews')
+        .select('product_id')
+        .eq('id', reviewId)
+        .single();
+
     const { error } = await supabase
         .from('reviews')
         .delete()
         .eq('id', reviewId);
 
+    if (!error && oldReview) {
+        await _updateProductStats(oldReview.product_id);
+    }
+
     return { error };
 }
+

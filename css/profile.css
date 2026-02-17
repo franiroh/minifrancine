@@ -17,9 +17,11 @@
 }
 
 .profile-container {
-    max-width: 600px;
+    max-width: none !important;
+    width: 100% !important;
     margin: 0 auto 64px;
-    padding: 0 24px;
+    padding: 0 80px !important;
+    box-sizing: border-box !important;
 }
 
 .profile-card {

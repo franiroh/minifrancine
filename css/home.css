@@ -288,6 +288,20 @@
     font-family: 'Bricolage Grotesque', serif;
     font-size: 22px;
     font-weight: 800;
+    white-space: nowrap;
+    margin-right: 0;
+}
+
+.product-card__price-wrap {
+    display: flex;
+    flex-direction: column;
+    gap: 0;
+}
+
+.product-card__old-price {
+    font-size: 12px;
+    text-decoration: line-through;
+    color: #EF4444;
 }
 
 .product-card__btns {
@@ -295,7 +309,10 @@
     flex-direction: column;
     gap: 8px;
     align-items: stretch;
-    width: 100%;
+    width: auto;
+    /* Allow buttons to size to content, preventing price squeeze */
+    min-width: 100px;
+    /* But ensure they aren't too tiny */
 }
 
 .product-card__btns .btn--outline {

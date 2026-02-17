@@ -382,6 +382,11 @@ async function handleSave(e) {
             }
         }
 
+        // --- FIX: Clear pending buffers so subsequent saves don't re-upload/duplicate ---
+        pendingImages = [];
+        pendingFile = null;
+        // -------------------------------------------------------------------------------
+
         alert('Producto guardado correctamente');
 
         // If it was a new product, redirect to edit mode for this product

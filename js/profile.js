@@ -1,6 +1,6 @@
 
 import { loadComponents, updateNavbarAuth } from './components.js';
-import { getUser, getProfile, updateProfile } from './api.js';
+import { getUser, getProfile, updateProfile, anonymizeUser, signOut } from './api.js';
 import { showToast } from './utils.js';
 import i18n from './i18n.js';
 
@@ -20,6 +20,69 @@ async function init() {
         e.preventDefault();
         await handleSave(user.id);
     });
+
+    // Delete Account Logic
+    const deleteBtn = document.getElementById('delete-account-btn');
+    const deleteModal = document.getElementById('delete-modal');
+    const cancelDeleteBtn = document.getElementById('cancel-delete-btn');
+    const confirmDeleteBtn = document.getElementById('confirm-delete-btn');
+
+    if (deleteBtn) {
+        deleteBtn.addEventListener('click', () => {
+            deleteModal.style.display = 'block';
+            if (window.lucide) window.lucide.createIcons();
+        });
+    }
+
+    if (cancelDeleteBtn) {
+        cancelDeleteBtn.addEventListener('click', () => {
+            deleteModal.style.display = 'none';
+        });
+    }
+
+    // Close modal if clicking outside
+    window.addEventListener('click', (e) => {
+        if (e.target === deleteModal) {
+            deleteModal.style.display = 'none';
+        }
+    });
+
+    if (confirmDeleteBtn) {
+        confirmDeleteBtn.addEventListener('click', async () => {
+            await handleDeleteAccount(user.id);
+        });
+    }
+}
+
+// ... existing functions ...
+
+async function handleDeleteAccount(userId) {
+    const confirmBtn = document.getElementById('confirm-delete-btn');
+    const originalText = confirmBtn.innerHTML;
+
+    confirmBtn.innerHTML = `<i data-lucide="loader-2" class="animate-spin"></i> Eliminando...`;
+    confirmBtn.disabled = true;
+    if (window.lucide) window.lucide.createIcons();
+
+    // 1. Anonymize Profile
+    const { error } = await anonymizeUser(userId);
+
+    if (error) {
+        console.error('Error deleting account:', error);
+        showToast('Error al eliminar cuenta. Intenta nuevamente.', 'error');
+        confirmBtn.innerHTML = originalText;
+        confirmBtn.disabled = false;
+        return;
+    }
+
+    // 2. Sign Out
+    await signOut();
+
+    // 3. Redirect
+    showToast('Tu cuenta ha sido eliminada.', 'success');
+    setTimeout(() => {
+        window.location.href = 'index.html';
+    }, 1500);
 }
 
 async function loadUserProfile(userId, email) {
@@ -34,7 +97,14 @@ async function loadUserProfile(userId, email) {
 
     if (profile) {
         document.getElementById('full_name').value = profile.full_name || '';
-        document.getElementById('phone').value = profile.phone || '';
+
+        // Hide delete option if admin
+        if (profile.role === 'admin') {
+            const deleteBtn = document.getElementById('delete-account-btn');
+            if (deleteBtn) {
+                deleteBtn.style.display = 'none';
+            }
+        }
     }
 }
 
@@ -47,7 +117,6 @@ async function handleSave(userId) {
 
     const updates = {
         full_name: document.getElementById('full_name').value,
-        phone: document.getElementById('phone').value,
         updated_at: new Date()
     };
 
