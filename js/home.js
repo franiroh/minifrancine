@@ -1,7 +1,7 @@
 import { loadComponents, updateNavbarAuth, updateNavbarCartCount, createProductCard, createSkeletonCard } from './components.js';
 import { fetchProducts, fetchCategories, getUser, onAuthStateChange, addToFavorites, removeFromFavorites, fetchFavoriteProducts } from './api.js';
 import { state, loadCart, getCartCount, addToCart, loadFavorites, isFavorite, toggleFavorite, loadPurchases, isPurchased } from './state.js';
-import { renderBreadcrumbs, escapeHtml, sanitizeCssValue } from './utils.js';
+import { renderBreadcrumbs, escapeHtml, sanitizeCssValue, InfiniteScrollManager } from './utils.js';
 import { supabase } from './api.js';
 import i18n from './i18n.js';
 
@@ -246,6 +246,8 @@ function setupAuthListener() {
     });
 }
 
+let catalogScrollManager = null;
+
 function renderCatalog(items) {
     const grid = document.getElementById('catalog-grid');
     if (!grid) return;
@@ -255,13 +257,70 @@ function renderCatalog(items) {
         return;
     }
 
-    grid.innerHTML = items.map(product => createProductCard(product)).join('');
+    // Initialize scroll manager
+    if (catalogScrollManager) {
+        catalogScrollManager.disconnect();
+    }
+    catalogScrollManager = new InfiniteScrollManager(items, 24);
+
+    // Clear grid and load first page
+    grid.innerHTML = '';
+    const firstBatch = catalogScrollManager.loadMore();
+    grid.innerHTML = firstBatch.map(product => createProductCard(product)).join('');
+
+    // Create or get sentinel and loading indicator
+    let sentinel = document.getElementById('catalog-scroll-sentinel');
+    let loadingIndicator = document.getElementById('catalog-loading-more');
+
+    if (!sentinel) {
+        sentinel = document.createElement('div');
+        sentinel.id = 'catalog-scroll-sentinel';
+        sentinel.style.height = '1px';
+        grid.parentElement.appendChild(sentinel);
+    }
+
+    if (!loadingIndicator) {
+        loadingIndicator = document.createElement('div');
+        loadingIndicator.id = 'catalog-loading-more';
+        loadingIndicator.style.cssText = 'display: none; text-align: center; padding: 20px;';
+        loadingIndicator.innerHTML = Array(4).fill(0).map(() => createSkeletonCard()).join('');
+        grid.parentElement.appendChild(loadingIndicator);
+    }
+
+    // Setup infinite scroll
+    catalogScrollManager.setupObserver(sentinel, () => {
+        if (!catalogScrollManager.hasMore()) return;
+
+        // Show loading indicator
+        loadingIndicator.style.display = 'grid';
+        loadingIndicator.style.gridTemplateColumns = 'repeat(auto-fill, minmax(280px, 1fr))';
+        loadingIndicator.style.gap = '24px';
+
+        // Simulate slight delay for better UX
+        setTimeout(() => {
+            const newBatch = catalogScrollManager.loadMore();
+            const newCards = newBatch.map(product => createProductCard(product)).join('');
+            grid.insertAdjacentHTML('beforeend', newCards);
+
+            // Hide loading indicator
+            loadingIndicator.style.display = 'none';
+
+            // Re-init icons
+            if (window.lucide) window.lucide.createIcons();
+
+            // Attach listeners to new cards
+            attachCatalogListeners(grid);
+        }, 300);
+    });
 
     // Re-init icons
     if (window.lucide) window.lucide.createIcons();
 
     // Add Event Listeners
+    attachCatalogListeners(grid);
+}
 
+function attachCatalogListeners(grid) {
     // Add to Cart
     grid.querySelectorAll('.btn-add-cart').forEach(btn => {
         btn.addEventListener('click', (e) => {

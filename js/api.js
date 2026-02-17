@@ -416,6 +416,100 @@ export async function captureOrderSecure(orderID, dbOrderId) {
     return data;
 }
 
+// --- Send Order Confirmation Email ---
+export async function sendOrderConfirmationEmail(orderId) {
+    console.log('🔔 sendOrderConfirmationEmail called with orderId:', orderId);
+    try {
+        // Fetch order details with items
+        const { data: order, error: orderError } = await supabase
+            .from('orders')
+            .select(`
+                id,
+                user_id,
+                total,
+                created_at,
+                order_items (
+                    product_id,
+                    quantity,
+                    price,
+                    products (
+                        title
+                    )
+                )
+            `)
+            .eq('id', orderId)
+            .single();
+
+        if (orderError || !order) {
+            console.error('Error fetching order for email:', orderError);
+            return { error: orderError };
+        }
+
+        // Fetch user email from profiles
+        const { data: userData, error: userError } = await supabase
+            .from('profiles')
+            .select('id, full_name')
+            .eq('id', order.user_id)
+            .single();
+
+        if (userError || !userData) {
+            console.error('Error fetching user for email:', userError);
+            return { error: userError };
+        }
+
+        // Get email from auth.users
+        const { data: { user } } = await supabase.auth.getUser();
+        const userEmail = user?.email;
+
+        // Format order items
+        const items = order.order_items.map(item => ({
+            title: item.products.title,
+            price: parseFloat(item.price)
+        }));
+
+        // Format date
+        const orderDate = new Date(order.created_at).toLocaleDateString('es-AR', {
+            year: 'numeric',
+            month: 'long',
+            day: 'numeric',
+            hour: '2-digit',
+            minute: '2-digit'
+        });
+
+        // Send email via Edge Function
+        console.log('📧 Preparing to send email to:', userEmail);
+        console.log('📧 Email data:', { userName: userData.full_name, itemCount: items.length, total: order.total });
+
+        const { data, error } = await supabase.functions.invoke('send-email', {
+            body: {
+                type: 'order_confirmation',
+                order: {
+                    id: order.id,
+                    userEmail: userEmail,
+                    userName: userData.full_name || userEmail?.split('@')[0] || 'Cliente',
+                    items: items,
+                    total: parseFloat(order.total),
+                    date: orderDate
+                }
+            }
+        });
+
+        console.log('📧 Edge Function response:', { data, error });
+
+        if (error) {
+            console.error('Error sending order confirmation email:', error);
+            return { error };
+        }
+
+        console.log('Order confirmation email sent successfully:', data);
+        return { data };
+
+    } catch (error) {
+        console.error('Exception sending order confirmation email:', error);
+        return { error };
+    }
+}
+
 export async function createOrder() {
     const { data, error } = await supabase
         .rpc('create_order_from_cart')

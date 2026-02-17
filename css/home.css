@@ -188,6 +188,7 @@
     height: 100%;
     object-fit: cover;
     object-position: center;
+    border-bottom: 1px solid #E5E7EB;
 }
 
 .product-card__badge {

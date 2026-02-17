@@ -104,3 +104,88 @@ export const getBadgeKey = (badge) => {
     if (lower === 'hot') return 'hot';
     return lower; // Fallback to whatever it is (e.g if we add more later)
 };
+
+/**
+ * Manages infinite scroll pagination for product grids
+ */
+export class InfiniteScrollManager {
+    constructor(items, itemsPerPage = 24) {
+        this.allItems = items;
+        this.itemsPerPage = itemsPerPage;
+        this.currentPage = 0;
+        this.loadedItems = [];
+        this.observer = null;
+    }
+
+    /**
+     * Load the next page of items
+     * @returns {Array} New items loaded
+     */
+    loadMore() {
+        const start = this.currentPage * this.itemsPerPage;
+        const end = start + this.itemsPerPage;
+        const newItems = this.allItems.slice(start, end);
+        this.loadedItems.push(...newItems);
+        this.currentPage++;
+        return newItems;
+    }
+
+    /**
+     * Check if there are more items to load
+     * @returns {boolean}
+     */
+    hasMore() {
+        return this.currentPage * this.itemsPerPage < this.allItems.length;
+    }
+
+    /**
+     * Reset pagination with new items
+     * @param {Array} newItems - New array of items
+     */
+    reset(newItems) {
+        this.allItems = newItems;
+        this.currentPage = 0;
+        this.loadedItems = [];
+    }
+
+    /**
+     * Get all currently loaded items
+     * @returns {Array}
+     */
+    getLoadedItems() {
+        return this.loadedItems;
+    }
+
+    /**
+     * Setup intersection observer for infinite scroll
+     * @param {HTMLElement} sentinel - Element to observe
+     * @param {Function} onLoadMore - Callback when more items should load
+     */
+    setupObserver(sentinel, onLoadMore) {
+        if (this.observer) {
+            this.observer.disconnect();
+        }
+
+        this.observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting && this.hasMore()) {
+                    onLoadMore();
+                }
+            });
+        }, {
+            rootMargin: '100px' // Start loading 100px before reaching sentinel
+        });
+
+        this.observer.observe(sentinel);
+    }
+
+    /**
+     * Disconnect the observer
+     */
+    disconnect() {
+        if (this.observer) {
+            this.observer.disconnect();
+            this.observer = null;
+        }
+    }
+}

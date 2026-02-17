@@ -79,7 +79,11 @@ async function handleSubmit(e) {
     try {
         const { supabase } = await import('./api.js');
         const { data, error } = await supabase.functions.invoke('send-email', {
-            body: { email, message },
+            body: {
+                type: 'contact',
+                email,
+                message
+            },
         });
 
         if (error) throw error;

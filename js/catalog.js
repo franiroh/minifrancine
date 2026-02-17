@@ -1,7 +1,7 @@
 import { fetchProducts, getUser, fetchCategories } from './api.js';
 import { loadComponents, createProductCard, createSkeletonCard } from './components.js';
 import { loadFavorites, loadPurchases, addToCart, toggleFavorite } from './state.js';
-import { renderBreadcrumbs, escapeHtml } from './utils.js';
+import { renderBreadcrumbs, escapeHtml, InfiniteScrollManager } from './utils.js';
 import i18n from './i18n.js';
 
 document.addEventListener('DOMContentLoaded', async () => {
@@ -64,9 +64,19 @@ document.addEventListener('DOMContentLoaded', async () => {
         }
         document.title = `Etiqueta: ${tag} — MiniFrancine`;
     } else {
-        // Default All View
-        // Do nothing, let data-i18n="catalog.full_title" in HTML handle it via i18n.updatePage()
-        // Or ensure it is set if we are switching views dynamically (not the case here, it's page load)
+        // Default All View - Show category header with full catalog title
+        if (catalogHeader) catalogHeader.style.display = 'none';
+        categoryHeader.style.display = 'block';
+        if (categoryTitle) {
+            categoryTitle.textContent = i18n.t('catalog.full_title') || 'Catálogo Completo';
+            categoryTitle.setAttribute('data-i18n', 'catalog.full_title');
+        }
+        // Update subtitle
+        const categorySubtitle = categoryHeader?.querySelector('p');
+        if (categorySubtitle) {
+            categorySubtitle.textContent = i18n.t('catalog.full_subtitle') || 'Explora todos nuestros diseños de bordado';
+            categorySubtitle.setAttribute('data-i18n', 'catalog.full_subtitle');
+        }
     }
 
     const grid = document.getElementById('catalog-grid');
@@ -169,6 +179,8 @@ function renderFilters(categories, activeCategory) {
     container.innerHTML = html;
 }
 
+let scrollManager = null;
+
 function renderGrid(grid, products) {
     if (!grid) return;
 
@@ -177,7 +189,61 @@ function renderGrid(grid, products) {
         return;
     }
 
-    grid.innerHTML = products.map(p => createProductCard(p)).join('');
+    // Initialize scroll manager
+    if (scrollManager) {
+        scrollManager.disconnect();
+    }
+    scrollManager = new InfiniteScrollManager(products, 24);
+
+    // Clear grid and load first page
+    grid.innerHTML = '';
+    const firstBatch = scrollManager.loadMore();
+    grid.innerHTML = firstBatch.map(p => createProductCard(p)).join('');
+
+    // Create or get sentinel and loading indicator
+    let sentinel = document.getElementById('scroll-sentinel');
+    let loadingIndicator = document.getElementById('loading-more');
+
+    if (!sentinel) {
+        sentinel = document.createElement('div');
+        sentinel.id = 'scroll-sentinel';
+        sentinel.style.height = '1px';
+        grid.parentElement.appendChild(sentinel);
+    }
+
+    if (!loadingIndicator) {
+        loadingIndicator = document.createElement('div');
+        loadingIndicator.id = 'loading-more';
+        loadingIndicator.style.cssText = 'display: none; text-align: center; padding: 20px;';
+        loadingIndicator.innerHTML = Array(4).fill(0).map(() => createSkeletonCard()).join('');
+        grid.parentElement.appendChild(loadingIndicator);
+    }
+
+    // Setup infinite scroll
+    scrollManager.setupObserver(sentinel, () => {
+        if (!scrollManager.hasMore()) return;
+
+        // Show loading indicator
+        loadingIndicator.style.display = 'grid';
+        loadingIndicator.style.gridTemplateColumns = 'repeat(auto-fill, minmax(280px, 1fr))';
+        loadingIndicator.style.gap = '24px';
+
+        // Simulate slight delay for better UX
+        setTimeout(() => {
+            const newBatch = scrollManager.loadMore();
+            const newCards = newBatch.map(p => createProductCard(p)).join('');
+            grid.insertAdjacentHTML('beforeend', newCards);
+
+            // Hide loading indicator
+            loadingIndicator.style.display = 'none';
+
+            // Re-init icons
+            if (window.lucide) window.lucide.createIcons();
+
+            // Attach listeners to new cards
+            attachCardListeners(grid, products);
+        }, 300);
+    });
 
     // Re-init icons
     if (window.lucide) window.lucide.createIcons();

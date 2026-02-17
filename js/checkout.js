@@ -154,6 +154,21 @@ function renderCheckout() {
                         if (result && (result.status === 'success' || result.status === 'COMPLETED')) {
                             const paymentId = result.data?.id || data.orderID;
                             showToast(`¡Pago exitoso! ID: ${paymentId}`, 'success');
+
+                            // Send order confirmation email
+                            // Don't block on email - send asynchronously
+                            import('./api.js').then(m => {
+                                m.sendOrderConfirmationEmail(window.currentDbOrderId)
+                                    .then(emailResult => {
+                                        if (emailResult.error) {
+                                            console.warn('Email confirmation failed (non-blocking):', emailResult.error);
+                                        } else {
+                                            console.log('Order confirmation email sent');
+                                        }
+                                    })
+                                    .catch(err => console.warn('Email send error (non-blocking):', err));
+                            });
+
                             state.cart = [];
                             setTimeout(() => window.location.href = 'orders.html', 2000);
                         } else if (result && result.error) {
@@ -163,6 +178,13 @@ function renderCheckout() {
                             // Check if result exists at all
                             console.warn('Unexpected capture result shape:', result);
                             showToast('Pago procesado. Verificá en "Mis Compras".', 'info');
+
+                            // Try to send email anyway
+                            import('./api.js').then(m => {
+                                m.sendOrderConfirmationEmail(window.currentDbOrderId)
+                                    .catch(err => console.warn('Email send error (non-blocking):', err));
+                            });
+
                             state.cart = [];
                             setTimeout(() => window.location.href = 'orders.html', 2000);
                         }
