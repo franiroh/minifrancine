@@ -143,6 +143,16 @@ export async function getProfile(userId) {
     return { data, error }
 }
 
+export async function updateProfile(userId, updates) {
+    const { data, error } = await supabase
+        .from('profiles')
+        .update(updates)
+        .eq('id', userId)
+        .select()
+        .single()
+    return { data, error }
+}
+
 export function onAuthStateChange(callback) {
     return supabase.auth.onAuthStateChange((event, session) => {
         callback(event, session)
@@ -744,6 +754,26 @@ export async function fetchOrderItems(orderId) {
 // --- Categories ---
 
 export async function fetchCategories() {
+    // 1. Check Cache
+    const CACHE_KEY = 'minifrancine_categories';
+    const CACHE_DURATION = 60 * 60 * 1000; // 1 hour
+
+    const cached = localStorage.getItem(CACHE_KEY);
+    if (cached) {
+        try {
+            const { data, timestamp } = JSON.parse(cached);
+            const age = Date.now() - timestamp;
+            if (age < CACHE_DURATION) {
+                // Return cached data immediately
+                return data;
+            }
+        } catch (e) {
+            console.error('Error parsing categories cache', e);
+            localStorage.removeItem(CACHE_KEY);
+        }
+    }
+
+    // 2. Fetch from DB
     const { data, error } = await supabase
         .from('categories')
         .select('*')
@@ -753,8 +783,19 @@ export async function fetchCategories() {
         console.error('Error fetching categories:', error)
         return []
     }
+
+    // 3. Save to Cache
+    if (data) {
+        localStorage.setItem(CACHE_KEY, JSON.stringify({
+            data: data,
+            timestamp: Date.now()
+        }));
+    }
+
     return data
 }
+
+const CACHE_KEY = 'minifrancine_categories';
 
 export async function createCategory(categoryData) {
     const { data, error } = await supabase
@@ -762,6 +803,8 @@ export async function createCategory(categoryData) {
         .insert(categoryData)
         .select()
         .single()
+
+    if (!error) localStorage.removeItem(CACHE_KEY);
     return { data, error }
 }
 
@@ -772,6 +815,8 @@ export async function updateCategory(id, categoryData) {
         .eq('id', id)
         .select()
         .single()
+
+    if (!error) localStorage.removeItem(CACHE_KEY);
     return { data, error }
 }
 
@@ -780,6 +825,8 @@ export async function deleteCategory(id) {
         .from('categories')
         .delete()
         .eq('id', id)
+
+    if (!error) localStorage.removeItem(CACHE_KEY);
     return { error }
 }
 

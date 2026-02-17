@@ -3,6 +3,7 @@ import { loadComponents, updateNavbarAuth, updateNavbarCartCount } from './compo
 import { getUser, onAuthStateChange, fetchMyOrders, downloadProductFile, fetchAllUserReviews, fetchUserReview, addReview, updateReview, deleteReview } from './api.js';
 import { state, loadCart, getCartCount } from './state.js';
 import { escapeHtml, sanitizeCssValue, showToast } from './utils.js';
+import i18n from './i18n.js';
 
 // ... (rest of imports)
 
@@ -61,8 +62,8 @@ async function loadOrders(userId) {
             listContainer.innerHTML = `
                 <div class="orders-empty">
                     <i data-lucide="shopping-bag"></i>
-                    <p>Aún no has realizado ninguna compra.</p>
-                    <a href="index.html" class="btn btn--primary" style="margin-top: 8px;">Explorar Catálogo</a>
+                    <p>${i18n.t('orders.empty')}</p>
+                    <a href="index.html" class="btn btn--primary" style="margin-top: 8px;">${i18n.t('favorites.action')}</a>
                 </div>
             `;
             if (window.lucide) window.lucide.createIcons();
@@ -78,7 +79,7 @@ async function loadOrders(userId) {
         console.error("Error loading orders:", error);
         listContainer.innerHTML = `
             <div class="orders-empty">
-                <p>Hubo un error al cargar tus compras.</p>
+                <p>${i18n.t('error.orders_load')}</p>
             </div>
         `;
     }
@@ -91,13 +92,13 @@ function renderOrderCard(order, reviewsMap = {}) {
 
     const isPaid = order.status === 'paid';
     const statusClass = isPaid ? 'order-card__status--paid' : 'order-card__status--pending';
-    const statusText = isPaid ? 'Pagado' : 'Pendiente';
+    const statusText = isPaid ? i18n.t('status.paid') : i18n.t('status.pending');
 
     let itemsHtml = '';
     if (order.order_items && order.order_items.length > 0) {
         itemsHtml = order.order_items.map(item => {
             const product = item.products || {};
-            const title = product.title || 'Producto';
+            const title = product.title || i18n.t('orders.product_default');
             const mainImage = product.main_image || '';
             const imageColor = product.image_color || '#F3F4F6';
             const productId = parseInt(item.product_id);

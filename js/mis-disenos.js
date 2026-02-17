@@ -3,6 +3,7 @@ import { loadComponents, updateNavbarAuth, updateNavbarCartCount, createSkeleton
 import { getUser, onAuthStateChange, fetchPurchasedProducts, downloadProductFile } from './api.js';
 import { loadCart, getCartCount } from './state.js';
 import { escapeHtml, sanitizeCssValue, showToast } from './utils.js';
+import i18n from './i18n.js';
 
 async function init() {
     await loadComponents();
@@ -47,7 +48,7 @@ async function loadAndRender() {
         console.error('Error loading purchased products:', error);
         grid.innerHTML = `
             <div class="empty-state">
-                <p>Hubo un error al cargar tus diseños.</p>
+                <p>${i18n.t('error.designs_load')}</p>
             </div>
         `;
     }
@@ -60,8 +61,8 @@ function renderDesigns(products) {
         grid.innerHTML = `
             <div class="empty-state">
                 <i data-lucide="package" style="width:48px; height:48px; opacity:0.5;"></i>
-                <p>Aún no has comprado ningún diseño.</p>
-                <a href="index.html" class="btn btn--primary" style="margin-top: 8px;">Explorar Catálogo</a>
+                <p>${i18n.t('designs.empty')}</p>
+                <a href="index.html" class="btn btn--primary" style="margin-top: 8px;">${i18n.t('favorites.action')}</a>
             </div>
         `;
         if (window.lucide) window.lucide.createIcons();
@@ -73,7 +74,7 @@ function renderDesigns(products) {
             <a href="product.html?id=${product.id}" class="product-card__image" style="background: ${sanitizeCssValue(product.imageColor)}; display: block;">
                 ${product.mainImage ? `<img src="${escapeHtml(product.mainImage)}" alt="${escapeHtml(product.title)}" class="product-card__img" loading="lazy">` : ''}
                 <span class="product-card__badge product-card__badge--purchased">
-                    <i data-lucide="check-circle"></i> Comprado
+                    <i data-lucide="check-circle"></i> ${i18n.t('designs.purchased')}
                 </span>
             </a>
             <div class="product-card__info">
@@ -82,7 +83,7 @@ function renderDesigns(products) {
                 <div class="product-card__price-row">
                     <div class="product-card__btns">
                         <button class="btn btn--sm btn--purchased btn-download" data-id="${parseInt(product.id)}" data-title="${escapeHtml(product.title)}">
-                            <i data-lucide="download"></i> Descargar
+                            <i data-lucide="download"></i> ${i18n.t('btn.download')}
                         </button>
                     </div>
                 </div>
@@ -103,7 +104,7 @@ function attachDownloadListeners() {
             const productTitle = btn.dataset.title;
 
             const originalHTML = btn.innerHTML;
-            btn.innerHTML = '<i data-lucide="loader"></i> Descargando...';
+            btn.innerHTML = `<i data-lucide="loader"></i> ${i18n.t('btn.downloading')}`;
             btn.disabled = true;
             if (window.lucide) window.lucide.createIcons();
 
@@ -117,7 +118,7 @@ function attachDownloadListeners() {
                     link.click();
                     document.body.removeChild(link);
 
-                    btn.innerHTML = '<i data-lucide="check"></i> Descargado';
+                    btn.innerHTML = `<i data-lucide="check"></i> ${i18n.t('btn.downloaded')}`;
                     if (window.lucide) window.lucide.createIcons();
                     setTimeout(() => {
                         btn.innerHTML = originalHTML;
@@ -125,7 +126,7 @@ function attachDownloadListeners() {
                         if (window.lucide) window.lucide.createIcons();
                     }, 2000);
                 } else {
-                    showToast('El archivo digital para este producto no está disponible todavía.', 'error');
+                    showToast(i18n.t('error.file_unavailable'), 'error');
                     btn.innerHTML = originalHTML;
                     btn.disabled = false;
                     if (window.lucide) window.lucide.createIcons();

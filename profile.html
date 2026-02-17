@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MiniFrancine — Mi Perfil</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:wght@700;800&family=DM+Sans:wght@400;500;600;700&display=swap"
+        rel="stylesheet">
+    <script src="https://unpkg.com/lucide@latest"></script>
+
+    <link rel="stylesheet" href="css/main.css">
+    <link rel="stylesheet" href="css/components.css">
+    <link rel="stylesheet" href="css/profile.css">
+</head>
+
+<body class="loading-i18n">
+
+    <div class="page">
+        <div id="navbar-placeholder"></div>
+
+        <section class="profile-header">
+            <h1 data-i18n="profile.title">Mi Perfil</h1>
+            <p data-i18n="profile.subtitle">Gestiona tu información personal</p>
+        </section>
+
+        <section class="profile-container">
+            <div class="profile-card">
+                <form id="profile-form">
+                    <div class="form-group">
+                        <label for="email" data-i18n="profile.email">Email</label>
+                        <input type="email" id="email" disabled class="input-disabled">
+                        <small data-i18n="profile.email_helper">El email no se puede cambiar.</small>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="full_name" data-i18n="profile.name">Nombre Completo</label>
+                        <input type="text" id="full_name" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="phone" data-i18n="profile.phone">Teléfono</label>
+                        <input type="tel" id="phone" placeholder="+54 9 11 1234 5678">
+                    </div>
+
+                    <div class="form-actions">
+                        <button type="submit" class="btn btn--primary" id="save-btn">
+                            <i data-lucide="save"></i> <span data-i18n="profile.save">Guardar Cambios</span>
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </section>
+
+        <div id="footer-placeholder"></div>
+    </div>
+
+    <script type="module" src="js/profile.js"></script>
+</body>
+
+</html>

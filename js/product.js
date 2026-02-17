@@ -2,7 +2,7 @@
 import { loadComponents, updateNavbarAuth, updateNavbarCartCount } from './components.js';
 import { fetchProductById, fetchProductImages, getUser, onAuthStateChange, downloadProductFile, fetchProductReviews, fetchUserReview } from './api.js';
 import { state, loadCart, getCartCount, addToCart, loadFavorites, isFavorite, toggleFavorite, loadPurchases, isPurchased } from './state.js';
-import { getUrlParam, renderBreadcrumbs, escapeHtml, showToast } from './utils.js';
+import { getUrlParam, renderBreadcrumbs, escapeHtml, showToast, getBadgeKey } from './utils.js';
 import i18n from './i18n.js';
 
 let currentProduct = null;
@@ -42,15 +42,30 @@ async function init() {
     window.addEventListener('cart-updated', () => {
         updateNavbarCartCount(getCartCount());
     });
+
+    window.addEventListener('language-changed', () => {
+        if (currentProduct) {
+            renderProduct();
+            renderProductBreadcrumbs();
+            // Also re-render reviews?
+            // loadAndRenderReviews(currentProduct.id); // Maybe not strictly needed if reviews are just text, but dates might need formatting. 
+            // Let's leave reviews for now as they might be user content (except for "Anonymous" etc).
+        }
+    });
 }
 
 function renderProductBreadcrumbs() {
     const placeholder = document.getElementById('breadcrumbs-placeholder');
     if (placeholder && currentProduct) {
+        // Resolve translated category name
+        const transKey = `category.${currentProduct.categoryId}`;
+        const translatedCat = i18n.t(transKey);
+        const categoryLabel = translatedCat === transKey ? currentProduct.category : translatedCat;
+
         placeholder.innerHTML = renderBreadcrumbs([
             { label: i18n.t('nav.home'), href: 'index.html' },
             { label: i18n.t('nav.catalog'), href: 'categories.html' },
-            { label: currentProduct.category, href: `catalog.html?category=${encodeURIComponent(currentProduct.category)}` },
+            { label: categoryLabel, href: `catalog.html?category=${encodeURIComponent(currentProduct.category)}` },
             { label: currentProduct.title, href: null }
         ]);
     }
@@ -115,7 +130,11 @@ async function renderProduct() {
     // Make category clickable
     const catEl = document.getElementById('detail-category');
     if (catEl) {
-        catEl.innerHTML = `<a href="catalog.html?category=${encodeURIComponent(p.category)}" style="color:inherit; text-decoration:none; transition:opacity 0.2s;">${p.category}</a>`;
+        const transKey = `category.${p.categoryId}`;
+        const translatedCat = i18n.t(transKey);
+        const categoryLabel = translatedCat === transKey ? p.category : translatedCat;
+
+        catEl.innerHTML = `<a href="catalog.html?category=${encodeURIComponent(p.category)}" style="color:inherit; text-decoration:none; transition:opacity 0.2s;">${escapeHtml(categoryLabel)}</a>`;
         catEl.querySelector('a').onmouseover = e => e.target.style.opacity = '0.7';
         catEl.querySelector('a').onmouseout = e => e.target.style.opacity = '1';
     }
@@ -143,7 +162,9 @@ async function renderProduct() {
         if (p.badge) {
             const badgeEl = document.createElement('div');
             badgeEl.className = 'detail__badge';
-            badgeEl.textContent = p.badge;
+            const bKey = 'badge.' + getBadgeKey(p.badge);
+            const bTrans = i18n.t(bKey);
+            badgeEl.textContent = bTrans;
             badgeEl.style.backgroundColor = p.badgeColor || '#000';
             titleEl.insertAdjacentElement('afterend', badgeEl);
         }

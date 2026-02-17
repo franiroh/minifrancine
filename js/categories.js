@@ -1,7 +1,8 @@
 import { loadComponents, updateNavbarAuth, updateNavbarCartCount } from './components.js';
 import { fetchProducts, getUser, onAuthStateChange } from './api.js';
 import { getCartCount, loadCart } from './state.js';
-import { escapeHtml, sanitizeCssValue } from './utils.js';
+import { escapeHtml, sanitizeCssValue, renderBreadcrumbs } from './utils.js';
+import i18n from './i18n.js';
 
 async function init() {
     await loadComponents();
@@ -18,6 +19,16 @@ async function init() {
 
     // Load Data
     const products = await fetchProducts({ publishedOnly: true });
+
+    // Render Breadcrumbs
+    const breadcrumbs = document.getElementById('breadcrumbs-placeholder');
+    if (breadcrumbs) {
+        breadcrumbs.innerHTML = renderBreadcrumbs([
+            { label: i18n.t('nav.home'), href: 'index.html' },
+            { label: i18n.t('nav.catalog'), href: null }
+        ]);
+    }
+
     renderCategories(products);
 }
 
@@ -32,9 +43,10 @@ function renderCategories(products) {
         if (!categories[p.category]) {
             categories[p.category] = {
                 name: p.category,
+                id: p.categoryId, // Capture ID for translation
                 count: 0,
                 image: null,
-                bg: p.imageColor // Use first product's color/image as fallback
+                bg: p.imageColor
             };
         }
         categories[p.category].count++;
@@ -47,7 +59,7 @@ function renderCategories(products) {
     const sortedCategories = Object.values(categories).sort((a, b) => b.count - a.count);
 
     if (sortedCategories.length === 0) {
-        grid.innerHTML = '<p>No hay categorías disponibles.</p>';
+        grid.innerHTML = `<p>${i18n.t('common.no_categories') || 'No hay categorías disponibles.'}</p>`;
         return;
     }
 
@@ -69,12 +81,20 @@ function renderCategories(products) {
             bgContent = `<div class="category-card__bg" style="background: ${sanitizeCssValue(gradient)};"></div>`;
         }
 
+        const translatedName = cat.id ? i18n.t(`category.${cat.id}`) : cat.name;
+        // Check if translation exists, fallback to name if it equals the key
+        const displayName = translatedName === `category.${cat.id}` ? cat.name : translatedName;
+
+        const countLabel = cat.count === 1
+            ? (i18n.lang === 'es' ? 'diseño' : 'design')
+            : (i18n.lang === 'es' ? 'diseños' : 'designs');
+
         return `
             <a href="index.html?category=${encodeURIComponent(cat.name)}" class="category-card">
                 ${bgContent}
                 <div class="category-card__overlay">
-                    <h3 class="category-card__name">${escapeHtml(cat.name)}</h3>
-                    <span class="category-card__count">${parseInt(cat.count)} diseño${cat.count !== 1 ? 's' : ''}</span>
+                    <h3 class="category-card__name">${escapeHtml(displayName)}</h3>
+                    <span class="category-card__count">${parseInt(cat.count)} ${countLabel}</span>
                 </div>
             </a>
         `;

@@ -5,11 +5,15 @@ import { fetchAllOrders, fetchAdminStats, deleteProduct, fetchCategories, create
 import { loadAdminMessages } from './admin-messages.js';
 import { initContent } from './admin-content.js';
 import { initI18nEditor } from './admin-i18n.js';
-import { escapeHtml, sanitizeCssValue } from './utils.js';
+import i18n from './i18n.js';
+import { escapeHtml, sanitizeCssValue, getBadgeKey } from './utils.js';
 
 let currentView = 'dashboard';
 
 async function init() {
+    // 0. Init i18n
+    await i18n.init();
+
     // 1. Check Auth & Role
     const user = await getUser();
     if (!user) {
@@ -62,6 +66,12 @@ async function init() {
     }
 
 
+
+    // 6. Listen for Language Changes (for Badges/Status)
+    window.addEventListener('language-changed', () => {
+        if (currentView === 'products') loadProducts();
+        if (currentView === 'orders') loadOrders();
+    });
 
     fadeOutPreloader();
 }
@@ -172,6 +182,9 @@ async function loadProducts() {
             }
                 </td>
                 <td><strong>${escapeHtml(p.title)}</strong></td>
+                <td>
+                    ${p.badge ? `<span class="product-card__badge" style="position:static; display:inline-block; font-size: 10px; padding: 2px 6px;">${escapeHtml(i18n.t('badge.' + getBadgeKey(p.badge)))}</span>` : '-'}
+                </td>
                 <td>USD ${parseFloat(p.price).toFixed(2)}</td>
                 <td>
                     <label class="toggle-switch">
@@ -190,11 +203,12 @@ async function loadProducts() {
             <div class="category-group">
                 <h3 class="category-group__title">${escapeHtml(cat)} <span class="category-group__count">${grouped[cat].length}</span></h3>
                 <div class="table-container">
-                    <table class="data-table">
+                     <table class="data-table">
                         <thead>
                             <tr>
                                 <th>Imagen</th>
                                 <th>Título</th>
+                                <th>Badge</th>
                                 <th>Precio</th>
                                 <th>Estado</th>
                                 <th>Acciones</th>
@@ -248,7 +262,7 @@ async function loadOrders() {
             <td>${o.created_at ? new Date(o.created_at).toLocaleTimeString() : '-'}</td>
             <td><strong>USD ${parseFloat(o.total).toFixed(2)}</strong></td>
             <td>
-                <span class="status-badge status-${escapeHtml(o.status)}">${escapeHtml(o.status)}</span>
+                <span class="status-badge status-${escapeHtml(o.status)}">${escapeHtml(i18n.t('status.' + o.status))}</span>
                 <button class="btn-icon" style="margin-left:8px;" onclick="window.location.href='admin-order-detail.html?id=${escapeHtml(o.id)}'">
                     <i data-lucide="eye"></i>
                 </button>

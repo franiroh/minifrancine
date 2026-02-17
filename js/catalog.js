@@ -30,7 +30,11 @@ document.addEventListener('DOMContentLoaded', async () => {
     } else if (tag) {
         // Tag View
         if (pageTitle) {
-            pageTitle.textContent = `Etiqueta: "${tag}"`;
+            // Use i18n for "Tag:" prefix if possible, or just hardcode as existing but allow dynamic updates
+            // Better: Set data-i18n to a key that accepts params? 
+            // Or just manual construction:
+            const tagPrefix = i18n.t('catalog.tag_prefix') || 'Etiqueta:';
+            pageTitle.textContent = `${tagPrefix} "${tag}"`;
             pageTitle.removeAttribute('data-i18n');
         }
         document.title = `Etiqueta: ${tag} — MiniFrancine`;
@@ -52,9 +56,10 @@ document.addEventListener('DOMContentLoaded', async () => {
         categoryTitle.removeAttribute('data-i18n');
         document.title = `Categoría: ${category} — MiniFrancine`;
     } else if (tag) {
-        // Tag View
+        // Tag View - Re-apply title with correct translation now that i18n is initialized
         if (pageTitle) {
-            pageTitle.textContent = `Etiqueta: "${tag}"`;
+            const tagPrefix = i18n.t('catalog.tag_prefix');
+            pageTitle.textContent = `${tagPrefix} "${tag}"`;
             pageTitle.removeAttribute('data-i18n');
         }
         document.title = `Etiqueta: ${tag} — MiniFrancine`;
@@ -130,7 +135,11 @@ document.addEventListener('DOMContentLoaded', async () => {
     }
 
     // Update count
-    if (resultCount) resultCount.textContent = `${products.length} diseños encontrados`;
+    if (resultCount) {
+        resultCount.dataset.count = products.length;
+        const key = products.length === 1 ? 'catalog.result_single' : 'catalog.result_plural';
+        resultCount.textContent = `${products.length} ${i18n.t(key)}`;
+    }
 
     // 7. Render Grid
     renderGrid(grid, products);
@@ -144,7 +153,7 @@ function renderFilters(categories, activeCategory) {
 
     // 'Todos' button
     let html = `
-        <a href="catalog.html" class="filter-chip ${!activeCategory ? 'filter-chip--active' : ''}" style="text-decoration: none;" data-i18n="category.all">Todos</a>
+        <a href="catalog.html" class="filter-chip ${!activeCategory ? 'filter-chip--active' : ''}" style="text-decoration: none;" data-i18n="category.all">${i18n.t('category.all') || 'Todos'}</a>
     `;
 
     // Categories
@@ -232,5 +241,28 @@ function attachCardListeners(grid, products) {
                 window.location.href = `product.html?id=${id}`;
             }
         });
+    });
+
+    // Language Listener
+    window.addEventListener('language-changed', () => {
+        const params = new URLSearchParams(window.location.search);
+        const tag = params.get('tag');
+        const category = params.get('category');
+
+        if (tag) {
+            const pageTitle = document.getElementById('page-title');
+            if (pageTitle) {
+                const tagPrefix = i18n.t('catalog.tag_prefix');
+                pageTitle.textContent = `${tagPrefix} "${tag}"`;
+            }
+        }
+
+        // Update Result Count Text
+        const resultCount = document.getElementById('result-count');
+        if (resultCount && resultCount.dataset.count !== undefined) {
+            const count = parseInt(resultCount.dataset.count);
+            const key = count === 1 ? 'catalog.result_single' : 'catalog.result_plural';
+            resultCount.textContent = `${count} ${i18n.t(key)}`;
+        }
     });
 }

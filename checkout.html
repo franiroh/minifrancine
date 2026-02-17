@@ -18,7 +18,7 @@
     <link rel="stylesheet" href="css/checkout.css">
 </head>
 
-<body>
+<body class="loading-i18n">
 
     <div class="page">
 
@@ -28,48 +28,50 @@
         <div class="checkout-steps">
             <div class="checkout-steps__item checkout-steps__item--done">
                 <span class="checkout-steps__num checkout-steps__num--done"><i data-lucide="check"></i></span>
-                <span>Carrito</span>
+                <span data-i18n="checkout.step_cart">Carrito</span>
             </div>
             <div class="checkout-steps__line"></div>
             <div class="checkout-steps__item checkout-steps__item--active">
                 <span class="checkout-steps__num checkout-steps__num--active">2</span>
-                <span>Pago</span>
+                <span data-i18n="checkout.step_payment">Pago</span>
             </div>
             <div class="checkout-steps__line"></div>
             <div class="checkout-steps__item">
                 <span class="checkout-steps__num">3</span>
-                <span>Confirmación</span>
+                <span data-i18n="checkout.step_confirm">Confirmación</span>
             </div>
         </div>
 
         <section class="checkout-body">
             <div class="checkout-body__left">
-                <h2 class="checkout-body__title">Método de Pago</h2>
+                <h2 class="checkout-body__title" data-i18n="checkout.pay_method">Método de Pago</h2>
 
                 <div class="pay-methods">
                     <div class="pay-method pay-method--active">
                         <span class="pay-method__radio pay-method__radio--active"><span
                                 class="pay-method__dot"></span></span>
                         <span class="pay-method__logo pay-method__logo--paypal">PayPal</span>
-                        <span>Pago seguro con PayPal</span>
+                        <span data-i18n="checkout.secure_paypal">Pago seguro con PayPal</span>
                     </div>
                 </div>
 
-                <h3 class="checkout-body__subtitle">Información de Facturación</h3>
+                <h3 class="checkout-body__subtitle" data-i18n="checkout.billing">Información de Facturación</h3>
 
                 <div class="checkout-form">
                     <div class="checkout-form__row">
                         <div class="form-field">
-                            <label>Nombre completo</label>
-                            <div class="form-input"><input type="text" placeholder="Tu nombre"></div>
+                            <label data-i18n="checkout.name">Nombre completo</label>
+                            <div class="form-input"><input type="text" placeholder="Tu nombre"
+                                    data-i18n-placeholder="checkout.placeholder_name"></div>
                         </div>
                         <div class="form-field">
-                            <label>Email</label>
-                            <div class="form-input"><input type="email" placeholder="tu@email.com"></div>
+                            <label data-i18n="checkout.email">Email</label>
+                            <div class="form-input"><input type="email" placeholder="tu@email.com"
+                                    data-i18n-placeholder="checkout.placeholder_email"></div>
                         </div>
                     </div>
                     <div class="form-field">
-                        <label>País</label>
+                        <label data-i18n="checkout.country">País</label>
                         <div class="form-input form-input--select">
                             <span>Argentina</span>
                             <i data-lucide="chevron-down" class="form-input__trail"></i>
@@ -81,12 +83,12 @@
                 <!-- <button class="btn btn--paypal btn--block btn--lg" id="pay-btn">Pagar con PayPal — $0.00</button> -->
                 <div class="checkout-secure">
                     <i data-lucide="lock" style="color: #22C55E;"></i>
-                    <span>Pago seguro con encriptación SSL de 256 bits</span>
+                    <span data-i18n="checkout.secure_ssl">Pago seguro con encriptación SSL de 256 bits</span>
                 </div>
             </div>
 
             <aside class="checkout-summary">
-                <h3 class="checkout-summary__title">Tu Pedido</h3>
+                <h3 class="checkout-summary__title" data-i18n="checkout.order_summary">Tu Pedido</h3>
                 <hr class="checkout-summary__divider">
 
                 <div id="checkout-items">

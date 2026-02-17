@@ -62,14 +62,15 @@
     </style>
 </head>
 
-<body>
+<body class="loading-i18n">
 
     <div class="page">
         <div id="navbar-placeholder"></div>
 
         <section class="page-header">
-            <h1 class="page-title">Mis Favoritos</h1>
-            <p class="page-subtitle">Los diseños que más te gustan, guardados para ti.</p>
+            <h1 class="page-title" data-i18n="favorites.title">Mis Favoritos</h1>
+            <p class="page-subtitle" data-i18n="favorites.subtitle">Los diseños que más te gustan, guardados para ti.
+            </p>
         </section>
 
         <section class="favorites-content">
@@ -79,9 +80,9 @@
 
             <div id="empty-state">
                 <i data-lucide="heart"></i>
-                <p>Aún no tienes favoritos guardados.</p>
-                <a href="index.html" class="btn btn--primary btn--sm"
-                    style="margin-top: 16px; display: inline-flex;">Explorar Catálogo</a>
+                <p data-i18n="favorites.empty">Aún no tienes favoritos guardados.</p>
+                <a href="index.html" class="btn btn--primary btn--sm" style="margin-top: 16px; display: inline-flex;"
+                    data-i18n="favorites.action">Explorar Catálogo</a>
             </div>
 
             <div class="product-grid" id="favorites-grid" style="display: none;">

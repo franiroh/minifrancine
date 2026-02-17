@@ -18,7 +18,7 @@
     <link rel="stylesheet" href="css/product.css">
 </head>
 
-<body>
+<body class="loading-i18n">
 
     <div class="page">
 
@@ -39,8 +39,10 @@
             </div>
 
             <div class="detail__info">
-                <span id="detail-category" class="detail__cat-badge" data-i18n="product.category_label">Categoría</span>
-                <h1 id="detail-title" class="detail__title">Título Producto</h1>
+                <span id="detail-category" class="detail__cat-badge"><span class="skeleton-text"
+                        style="width: 80px; display: inline-block;"></span></span>
+                <h1 id="detail-title" class="detail__title"><span class="skeleton-text"
+                        style="width: 70%; display: block; height: 1.2em;"></span></h1>
 
                 <div class="detail__rating">
                     <i data-lucide="star" class="detail__star detail__star--filled"></i>
@@ -48,13 +50,16 @@
                     <i data-lucide="star" class="detail__star detail__star--filled"></i>
                     <i data-lucide="star" class="detail__star detail__star--filled"></i>
                     <i data-lucide="star" class="detail__star"></i>
-                    <span class="detail__rating-text">4.8 (124 reseñas)</span>
+                    <span class="detail__rating-text"></span>
                 </div>
 
-                <p id="detail-desc" class="detail__desc">Descripción...</p>
+                <p id="detail-desc" class="detail__desc"><span class="skeleton-text"
+                        style="width: 100%; display: block; margin-bottom: 0.5rem;"></span><span class="skeleton-text"
+                        style="width: 90%; display: block;"></span></p>
                 <div id="detail-tags" class="detail__tags"></div>
                 <div class="detail__price">
-                    <span id="detail-price" class="detail__price-current">$0.00</span>
+                    <span id="detail-price" class="detail__price-current"><span class="skeleton-text"
+                            style="width: 100px; display: inline-block;"></span></span>
                     <!-- <span class="detail__price-old">$0.00</span> -->
                 </div>
 

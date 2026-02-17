@@ -1,0 +1,83 @@
+.profile-header {
+    text-align: center;
+    padding: 48px 24px 32px;
+}
+
+.profile-header h1 {
+    font-family: 'Bricolage Grotesque', serif;
+    font-size: 32px;
+    font-weight: 800;
+    margin-bottom: 8px;
+    color: var(--text-color);
+}
+
+.profile-header p {
+    color: #6B7280;
+    font-size: 16px;
+}
+
+.profile-container {
+    max-width: 600px;
+    margin: 0 auto 64px;
+    padding: 0 24px;
+}
+
+.profile-card {
+    background: white;
+    padding: 32px;
+    border-radius: 12px;
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+    border: 1px solid #E5E7EB;
+}
+
+.form-group {
+    margin-bottom: 20px;
+}
+
+.form-group label {
+    display: block;
+    font-weight: 600;
+    margin-bottom: 8px;
+    color: var(--text-color);
+}
+
+.form-group input {
+    width: 100%;
+    padding: 10px 12px;
+    border: 1px solid #D1D5DB;
+    border-radius: 6px;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 16px;
+    transition: border-color 0.2s;
+}
+
+.form-group input:focus {
+    border-color: var(--primary-color);
+    outline: none;
+    box-shadow: 0 0 0 3px rgba(240, 98, 146, 0.1);
+}
+
+.input-disabled {
+    background-color: #F3F4F6;
+    color: #6B7280;
+    cursor: not-allowed;
+}
+
+.form-group small {
+    display: block;
+    margin-top: 6px;
+    color: #9CA3AF;
+    font-size: 13px;
+}
+
+.form-actions {
+    margin-top: 32px;
+    display: flex;
+    justify-content: flex-end;
+}
+
+#save-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+}

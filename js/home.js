@@ -53,7 +53,7 @@ async function init() {
         const chipsHTML = categories.map(c =>
             `<button class="filter-chip" data-category="${escapeHtml(c.name)}" data-i18n="category.${c.id}">${i18n.t(`category.${c.id}`) || escapeHtml(c.name)}</button>`
         ).join('');
-        filtersContainer.innerHTML = `<button class="filter-chip filter-chip--active" data-category="Todos" data-i18n="category.all">Todos</button>${chipsHTML}`;
+        filtersContainer.innerHTML = `<button class="filter-chip filter-chip--active" data-category="Todos" data-i18n="category.all">${i18n.t('category.all') || 'Todos'}</button>${chipsHTML}`;
     }
 
     // 4. Fetch & Render Products (only published)
@@ -96,7 +96,7 @@ async function init() {
             }
         });
     }
-    setupFilterListeners();
+
 
     // Listen for state updates from other components
     window.addEventListener('cart-updated', () => {
@@ -200,32 +200,13 @@ async function loadContentConfig() {
     }
 }
 
-function setupFilterListeners() {
-    const chips = document.querySelectorAll('.filter-chip');
-    chips.forEach(chip => {
-        chip.addEventListener('click', () => {
-            // Update UI
-            chips.forEach(c => c.classList.remove('filter-chip--active'));
-            chip.classList.add('filter-chip--active');
-
-            // Filter Data
-            const category = chip.textContent;
-
-            // Should clicking a chip switch view? check with user intent.
-            // "Si entras a una categoría... El Banner desaparece"
-            // Let's assume manual filtering also triggers this view change for consistency.
-            filterProducts(category);
-        });
-    });
-}
-
 function filterProducts(category) {
     currentCategory = category || 'Todos';
 
     // Update UI active state if function called manually (e.g. from URL)
     const chips = document.querySelectorAll('.filter-chip');
     chips.forEach(c => {
-        if (c.textContent === currentCategory) {
+        if (c.dataset.category === currentCategory) {
             c.classList.add('filter-chip--active');
         } else {
             c.classList.remove('filter-chip--active');
@@ -235,7 +216,7 @@ function filterProducts(category) {
     // Special case for "Todos"
     if (currentCategory === 'Todos') {
         // Reset UI to 'Todos' if necessary
-        const allChip = Array.from(chips).find(c => c.textContent === 'Todos');
+        const allChip = Array.from(chips).find(c => c.dataset.category === 'Todos');
         if (allChip) {
             chips.forEach(c => c.classList.remove('filter-chip--active'));
             allChip.classList.add('filter-chip--active');
@@ -270,7 +251,7 @@ function renderCatalog(items) {
     if (!grid) return;
 
     if (!items || items.length === 0) {
-        grid.innerHTML = '<p class="col-span-full text-center py-12 text-gray-500">No se encontraron productos en esta categoría.</p>';
+        grid.innerHTML = `<p class="col-span-full text-center py-12 text-gray-500" data-i18n="msg.no_products_category">${i18n.t('msg.no_products_category')}</p>`;
         return;
     }
 

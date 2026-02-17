@@ -71,6 +71,11 @@ input {
     min-height: 72px;
 }
 
+#footer-placeholder {
+    min-height: 400px;
+    /* Approximate footer height to prevent CLS */
+}
+
 /* --- Preloader --- */
 .preloader {
     position: fixed;
@@ -108,4 +113,11 @@ input {
     100% {
         transform: rotate(360deg);
     }
+}
+
+/* --- I18n Loading State --- */
+body.loading-i18n {
+    opacity: 0;
+    visibility: hidden;
+    transition: opacity 0.2s ease;
 }

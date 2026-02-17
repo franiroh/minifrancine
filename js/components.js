@@ -8,6 +8,7 @@ export const loadComponents = async () => {
 
   // Initialize i18n first
   await i18n.init();
+  document.body.classList.remove('loading-i18n');
 
   if (navbarPlaceholder) {
     // Fetch categories for dropdown
@@ -45,12 +46,18 @@ export const loadComponents = async () => {
       </div>
       <div class="navbar__right">
         <!-- Language Switcher -->
-        <div class="navbar__lang-switch">
-            <select id="lang-select" class="lang-select">
-                <option value="es" ${i18n.lang === 'es' ? 'selected' : ''}>ES</option>
-                <option value="en" ${i18n.lang === 'en' ? 'selected' : ''}>EN</option>
-                <option value="pt" ${i18n.lang === 'pt' ? 'selected' : ''}>PT</option>
-            </select>
+        <!-- Language Switcher -->
+        <div class="navbar__menu-item" id="lang-menu" style="margin-right:8px;">
+            <button class="navbar__link" style="display:flex;align-items:center;gap:6px;background:none;border:none;cursor:pointer;padding:0;">
+                <i data-lucide="globe" style="width:18px;height:18px;"></i>
+                <span style="font-weight:600; font-size:14px; color:#374151;">${{ es: 'Español', en: 'English', pt: 'Português' }[i18n.lang] || 'Español'}</span>
+                <i data-lucide="chevron-down" style="width:14px;height:14px;opacity:0.5;"></i>
+            </button>
+            <div class="navbar__dropdown" style="min-width:140px; right:0; left:auto;">
+                <button class="navbar__dropdown-item lang-btn" data-lang="es" style="width:100%;text-align:left;">Español</button>
+                <button class="navbar__dropdown-item lang-btn" data-lang="en" style="width:100%;text-align:left;">English</button>
+                <button class="navbar__dropdown-item lang-btn" data-lang="pt" style="width:100%;text-align:left;">Português</button>
+            </div>
         </div>
 
         <i data-lucide="search" class="navbar__icon"></i>
@@ -65,6 +72,9 @@ export const loadComponents = async () => {
             <i data-lucide="chevron-down" id="navbar-user-arrow" style="width: 16px; height: 16px; margin-left: -2px; display: none;"></i>
           </button>
           <div class="navbar__dropdown" id="navbar-dropdown">
+            <a href="profile.html" class="navbar__dropdown-item">
+              <i data-lucide="user"></i> <span data-i18n="nav.profile">Mi Perfil</span>
+            </a>
             <a href="favorites.html" class="navbar__dropdown-item">
               <i data-lucide="heart"></i> <span data-i18n="nav.favorites">Mis Favoritos</span>
             </a>
@@ -113,12 +123,16 @@ export const loadComponents = async () => {
         `;
 
     // Add language switcher listener
-    const langSelect = document.getElementById('lang-select');
-    if (langSelect) {
-      langSelect.addEventListener('change', (e) => {
-        i18n.setLanguage(e.target.value);
+    // Add language switcher listener
+    const langBtns = document.querySelectorAll('.lang-btn');
+    langBtns.forEach(btn => {
+      btn.addEventListener('click', (e) => {
+        const lang = e.target.dataset.lang;
+        // setLanguage likely reloads or updates, assuming it exists on i18n object or we do it manually
+        localStorage.setItem('minifrancine_lang', lang);
+        window.location.reload();
       });
-    }
+    });
   }
 
   // Ensure translations are applied to the newly injected HTML
@@ -143,7 +157,14 @@ export const updateNavbarAuth = async (user) => {
 
   if (userBtn && userText) {
     if (user) {
-      userText.textContent = escapeHtml(user.email);
+      // Fetch profile first
+      let profile = null;
+      const { data } = await getProfile(user.id);
+      profile = data;
+
+      // Prefer full name if available, otherwise email
+      const displayName = (profile && profile.full_name) ? profile.full_name : user.email;
+      userText.textContent = escapeHtml(displayName);
       userText.removeAttribute('data-i18n'); // Prevent i18n from overwriting email
 
       // Show arrow
@@ -176,7 +197,6 @@ export const updateNavbarAuth = async (user) => {
       }
 
       // Check for Admin role
-      const { data: profile } = await getProfile(user.id);
       if (profile && profile.role === 'admin') {
         // Add Admin link if it doesn't exist
         if (navLinks && !document.getElementById('admin-link')) {
@@ -190,7 +210,6 @@ export const updateNavbarAuth = async (user) => {
           navLinks.appendChild(adminLink);
         }
       }
-
     } else {
       userText.setAttribute('data-i18n', 'nav.login');
       userText.textContent = i18n.t('nav.login');
@@ -206,7 +225,8 @@ export const updateNavbarAuth = async (user) => {
       if (adminLink) adminLink.remove();
     }
   }
-};
+}
+
 
 export const updateNavbarCartCount = (count) => {
   const badges = document.querySelectorAll('.navbar__cart-badge');
@@ -214,7 +234,7 @@ export const updateNavbarCartCount = (count) => {
 };
 
 import { isFavorite, isPurchased } from './state.js';
-import { sanitizeCssValue } from './utils.js';
+import { sanitizeCssValue, getBadgeKey } from './utils.js';
 
 export const createProductCard = (product) => {
   const purchased = isPurchased(product.id);
@@ -225,30 +245,36 @@ export const createProductCard = (product) => {
       <div class="product-card__image" style="background: ${sanitizeCssValue(product.imageColor)};">
         ${product.mainImage ? `<img src="${escapeHtml(product.mainImage)}" alt="${escapeHtml(product.title)}" class="product-card__img" loading="lazy">` : ''}
         ${purchased
-      ? `<span class="product-card__badge product-card__badge--purchased"><i data-lucide="check-circle"></i> Comprado</span>`
-      : (product.badge ? `<span class="product-card__badge ${product.badgeColor === 'green' ? 'product-card__badge--green' : ''}">${escapeHtml(product.badge)}</span>` : '')}
+      ? `<span class="product-card__badge product-card__badge--purchased"><i data-lucide="check-circle"></i> ${i18n.t('btn.purchased')}</span>`
+      : (product.badge ? (() => {
+        const bKey = 'badge.' + getBadgeKey(product.badge);
+        const bTrans = i18n.t(bKey);
+        // If translation missing, use capitalized key or original if it was 'Nuevo' etc.
+        // Actually i18n.t returns key if missing. 
+        // We want to show "Nuevo" if key is 'new' and lang is ES.
+        // variable bTrans holds the result. 
+        return `<span class="product-card__badge ${product.badgeColor === 'green' ? 'product-card__badge--green' : ''}">${escapeHtml(bTrans)}</span>`;
+      })() : '')}
         <div class="product-card__heart ${favorite ? 'product-card__heart--active' : ''}" data-id="${parseInt(product.id)}">
             <i data-lucide="heart"></i>
         </div>
       </div>
       <div class="product-card__info">
-        <span class="product-card__category">${escapeHtml(product.category)}</span>
+        <span class="product-card__category">${escapeHtml(i18n.t(`category.${product.categoryId}`) || product.category)}</span>
         <h3 class="product-card__title">${escapeHtml(product.title)}</h3>
-        <div class="product-card__tags">
-          ${product.tags ? product.tags.map(tag => `<span class="tag">${escapeHtml(tag)}</span>`).join('') : ''}
-        </div>
+
         <div class="product-card__price-row">
           <span class="product-card__price">USD ${parseFloat(product.price).toFixed(2)}</span>
           <div class="product-card__btns">
             ${purchased
       ? `<a href="mis-disenos.html#product-${parseInt(product.id)}" class="btn btn--sm btn--purchased">
-                   <i data-lucide="download"></i> Mis diseños
+                   <i data-lucide="download"></i> ${i18n.t('btn.my_designs')}
                  </a>`
-      : `<button class="btn btn--sm btn--outline btn-add-cart" data-id="${parseInt(product.id)}">
-                   <i data-lucide="shopping-cart"></i>
+      : `<button class="btn btn--sm btn--outline btn-add-cart" data-id="${parseInt(product.id)}" style="flex:1;">
+                   ${i18n.t('btn.add_to_cart')}
                  </button>
-                 <button class="btn btn--sm btn--primary btn-buy-now" data-id="${parseInt(product.id)}">
-                    Comprar
+                 <button class="btn btn--sm btn--primary btn-buy-now" data-id="${parseInt(product.id)}" style="flex:1;">
+                    ${i18n.t('btn.buy_now')}
                  </button>`}
           </div>
         </div>

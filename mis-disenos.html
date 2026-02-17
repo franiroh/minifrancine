@@ -18,21 +18,22 @@
     <link rel="stylesheet" href="css/mis-disenos.css">
 </head>
 
-<body>
+<body class="loading-i18n">
 
     <div class="page">
         <div id="navbar-placeholder"></div>
 
         <section class="designs-header">
-            <h1 class="designs-title">Mis Diseños</h1>
-            <p class="designs-subtitle">Todos tus diseños de bordado descargables en un solo lugar</p>
+            <h1 class="designs-title" data-i18n="designs.title">Mis Diseños</h1>
+            <p class="designs-subtitle" data-i18n="designs.subtitle">Todos tus diseños de bordado descargables en un
+                solo lugar</p>
         </section>
 
         <section class="designs-catalog">
             <div class="product-grid" id="designs-grid">
                 <div class="empty-state">
                     <i data-lucide="loader-2" class="animate-spin" style="font-size: 2rem;"></i>
-                    <p style="margin-top: 16px;">Cargando tus diseños...</p>
+                    <p style="margin-top: 16px;" data-i18n="designs.loading">Cargando tus diseños...</p>
                 </div>
             </div>
         </section>

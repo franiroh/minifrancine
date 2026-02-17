@@ -1,9 +1,11 @@
 import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js/+esm'
 import { getUser, fetchOrderById, fetchOrderItems } from './api.js';
 import { supabase } from './api.js';
+import i18n from './i18n.js';
 import { escapeHtml, sanitizeCssValue } from './utils.js';
 
 async function init() {
+    await i18n.init();
     // Auth Check
     const user = await getUser();
     if (!user) {
@@ -38,6 +40,18 @@ async function init() {
     }
 
     if (window.lucide) window.lucide.createIcons();
+
+    // Listen for language changes
+    window.addEventListener('language-changed', () => {
+        // Re-render status with new language
+        const statusEl = document.getElementById('order-status');
+        if (statusEl) {
+            // We need the order object again? or just re-fetch?
+            // Simplest: Reload details.
+            loadOrderDetails(orderId).catch(console.error);
+        }
+    });
+
     fadeOutPreloader();
 }
 
@@ -59,7 +73,7 @@ async function loadOrderDetails(orderId) {
 
     // Status Badge
     const statusEl = document.getElementById('order-status');
-    statusEl.innerHTML = `<span class="status-badge status-${escapeHtml(order.status)}">${escapeHtml(order.status)}</span>`;
+    statusEl.innerHTML = `<span class="status-badge status-${escapeHtml(order.status)}">${escapeHtml(i18n.t('status.' + order.status))}</span>`;
 
     // Render Items
     const tbody = document.querySelector('#order-items-table tbody');

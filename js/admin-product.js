@@ -104,7 +104,10 @@ async function loadProductData(id) {
     document.getElementById('prod-price').value = product.price || '';
     document.getElementById('prod-old-price').value = product.oldPrice || '';
     document.getElementById('prod-category').value = product.categoryId || '';
-    document.getElementById('prod-badge').value = product.badge || '';
+    const badgeVal = product.badge ? product.badge.toLowerCase() : '';
+    // Map existing common values to standardized keys if needed
+    const standardizedBadge = badgeVal === 'nuevo' ? 'new' : (badgeVal === 'oferta' ? 'sale' : badgeVal);
+    document.getElementById('prod-badge').value = standardizedBadge;
     document.getElementById('prod-badge-color').value = product.badgeColor || 'red';
     document.getElementById('prod-tags').value = (product.tags || []).join(', ');
     document.getElementById('prod-image-color').value = product.imageColor || '';

@@ -40,7 +40,7 @@ export const getUrlParam = (param) => {
 
 export const renderBreadcrumbs = (items) => {
     return `
-        <nav class="breadcrumbs" style="padding: 16px 80px; font-size: 14px; color: #6B7280; display:flex; gap: 8px; align-items: center;">
+        <nav class="breadcrumbs">
             ${items.map((item, index) => `
                 ${index > 0 ? '<span style="color:#d1d5db;">/</span>' : ''}
                 ${item.href
@@ -94,4 +94,13 @@ export const showToast = (message, type = 'info') => {
             }
         });
     }, 3000);
+};
+
+export const getBadgeKey = (badge) => {
+    if (!badge) return null;
+    const lower = badge.toLowerCase().trim();
+    if (lower === 'nuevo' || lower === 'new') return 'new';
+    if (lower === 'oferta' || lower === 'sale') return 'sale';
+    if (lower === 'hot') return 'hot';
+    return lower; // Fallback to whatever it is (e.g if we add more later)
 };

@@ -4,6 +4,7 @@ import { getUser, onAuthStateChange } from './api.js';
 import { state, loadCart, getCartCount, getCartTotal, removeFromCart, loadPurchases, isPurchased } from './state.js';
 import { escapeHtml, showToast } from './utils.js';
 import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js/+esm'
+import i18n from './i18n.js';
 
 // Initialize Supabase Client for direct function invocation if needed, 
 // though we usually go through api.js. 
@@ -38,7 +39,7 @@ async function init() {
     await loadPurchases(user);
     const purchasedInCart = state.cart.filter(item => isPurchased(item.id));
     if (purchasedInCart.length > 0) {
-        showToast(`${purchasedInCart.length} producto(s) en tu carrito ya fueron comprados. Se han removido.`, 'info');
+        showToast(`${purchasedInCart.length} ${i18n.t('msg.purchased_removed')}`, 'info');
         for (let i = state.cart.length - 1; i >= 0; i--) {
             if (isPurchased(state.cart[i].id)) {
                 await removeFromCart(i);
@@ -97,7 +98,7 @@ function renderCheckout() {
             window.paypal.Buttons({
                 createOrder: async (data, actions) => {
                     if (!state.user) {
-                        showToast('Debes iniciar sesión', 'error');
+                        showToast(i18n.t('msg.login_required'), 'error');
                         return Promise.reject(new Error('User not logged in'));
                     }
 

@@ -557,8 +557,18 @@
 
 /* --- Breadcrumbs --- */
 #breadcrumbs-placeholder {
-    min-height: 42px;
-    /* Validated height of breadcrumbs */
+    min-height: 54px;
+    /* Matches .breadcrumbs height to prevent CLS */
     display: flex;
     align-items: center;
+}
+
+.breadcrumbs {
+    padding: 16px 80px;
+    font-size: 14px;
+    color: #6B7280;
+    display: flex;
+    gap: 8px;
+    align-items: center;
+    width: 100%;
 }
