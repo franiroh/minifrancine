@@ -97,13 +97,34 @@
                 <div id="view-products" class="view">
                     <div class="view-header">
                         <h2>Catálogo de Productos</h2>
-                        <button class="btn btn--primary" id="btn-add-product"
-                            onclick="window.location.href='admin-product.html'">
-                            <i data-lucide="plus"></i> Nuevo Producto
-                        </button>
+                        <div style="display: flex; gap: 12px; align-items: center;">
+                            <select id="category-filter" class="form-input" style="width: 220px;">
+                                <option value="">Todas las categorías</option>
+                                <!-- Dynamic categories -->
+                            </select>
+                            <button class="btn btn--primary" id="btn-add-product"
+                                onclick="window.location.href='admin-product.html'">
+                                <i data-lucide="plus"></i> Nuevo Producto
+                            </button>
+                        </div>
                     </div>
-                    <div id="products-by-category">
-                        <!-- Dynamic: one table per category -->
+                    <div class="table-container">
+                        <table class="data-table" id="products-table">
+                            <thead>
+                                <tr>
+                                    <th>Imagen</th>
+                                    <th>Título</th>
+                                    <th>Categoría</th>
+                                    <th>Badge</th>
+                                    <th>Precio</th>
+                                    <th>Estado</th>
+                                    <th>Acciones</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <!-- Dynamic -->
+                            </tbody>
+                        </table>
                     </div>
                 </div>
 

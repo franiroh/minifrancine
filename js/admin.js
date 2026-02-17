@@ -158,68 +158,72 @@ async function loadDashboard() {
 
 async function loadProducts() {
     const products = await fetchProducts();
-    const container = document.getElementById('products-by-category');
+    const categories = await fetchCategories();
+    const tbody = document.querySelector('#products-table tbody');
+    const categoryFilter = document.getElementById('category-filter');
 
-    // Group by category
-    const grouped = {};
-    products.forEach(p => {
-        const cat = p.category || 'Sin categoría';
-        if (!grouped[cat]) grouped[cat] = [];
-        grouped[cat].push(p);
-    });
-
-    const categoryNames = Object.keys(grouped).sort();
-
-    container.innerHTML = categoryNames.map(cat => {
-        const rows = grouped[cat].map(p => `
-            <tr class="${p.published === false ? 'product-row--unpublished' : ''}">
-                <td>
-                    ${(p.mainImage)
-                ? `<img src="${escapeHtml(p.mainImage)}" alt="${escapeHtml(p.title)}" class="img-preview" style="object-fit: cover;">`
-                : (p.imageColor && p.imageColor.includes('gradient'))
-                    ? `<div class="img-preview" style="background: ${sanitizeCssValue(p.imageColor)}; width: 48px; height: 48px; border-radius: 12px;"></div>`
-                    : `<img src="${escapeHtml(p.imageColor || 'https://placehold.co/48')}" alt="${escapeHtml(p.title)}" class="img-preview" style="object-fit: cover;">`
-            }
-                </td>
-                <td><strong>${escapeHtml(p.title)}</strong></td>
-                <td>
-                    ${p.badge ? `<span class="product-card__badge" style="position:static; display:inline-block; font-size: 10px; padding: 2px 6px;">${escapeHtml(i18n.t('badge.' + getBadgeKey(p.badge)))}</span>` : '-'}
-                </td>
-                <td>USD ${parseFloat(p.price).toFixed(2)}</td>
-                <td>
-                    <label class="toggle-switch">
-                        <input type="checkbox" ${p.published !== false ? 'checked' : ''} onchange="togglePublishHandler(${parseInt(p.id)}, this.checked)">
-                        <span class="slider"></span>
-                    </label>
-                </td>
-                <td>
-                    <button class="btn-icon" onclick="window.location.href='admin-product.html?id=${parseInt(p.id)}'"><i data-lucide="edit-3"></i></button>
-                    <button class="btn-icon" onclick="deleteProductHandler('${parseInt(p.id)}')"><i data-lucide="trash-2"></i></button>
-                </td>
-            </tr>
-        `).join('');
-
-        return `
-            <div class="category-group">
-                <h3 class="category-group__title">${escapeHtml(cat)} <span class="category-group__count">${grouped[cat].length}</span></h3>
-                <div class="table-container">
-                     <table class="data-table">
-                        <thead>
-                            <tr>
-                                <th>Imagen</th>
-                                <th>Título</th>
-                                <th>Badge</th>
-                                <th>Precio</th>
-                                <th>Estado</th>
-                                <th>Acciones</th>
-                            </tr>
-                        </thead>
-                        <tbody>${rows}</tbody>
-                    </table>
-                </div>
-            </div>
+    // Populate category filter dropdown
+    if (categoryFilter) {
+        const currentValue = categoryFilter.value;
+        categoryFilter.innerHTML = `
+            <option value="">Todas las categorías (${products.length})</option>
+            ${categories.map(cat => {
+            const count = products.filter(p => p.categoryId === cat.id).length;
+            return `<option value="${cat.id}">${escapeHtml(cat.name)} (${count})</option>`;
+        }).join('')}
         `;
-    }).join('');
+        categoryFilter.value = currentValue; // Preserve selection
+
+        // Add filter event listener
+        categoryFilter.onchange = () => renderProductsTable(products, categoryFilter.value);
+    }
+
+    // Initial render
+    renderProductsTable(products, categoryFilter?.value || '');
+}
+
+function renderProductsTable(allProducts, selectedCategoryId) {
+    const tbody = document.querySelector('#products-table tbody');
+
+    // Filter products by category
+    const filteredProducts = selectedCategoryId
+        ? allProducts.filter(p => p.categoryId === parseInt(selectedCategoryId))
+        : allProducts;
+
+    if (filteredProducts.length === 0) {
+        tbody.innerHTML = '<tr><td colspan="7" style="text-align:center; padding: 20px;">No hay productos en esta categoría.</td></tr>';
+        if (window.lucide) window.lucide.createIcons();
+        return;
+    }
+
+    tbody.innerHTML = filteredProducts.map(p => `
+        <tr class="${p.published === false ? 'product-row--unpublished' : ''}">
+            <td>
+                ${(p.mainImage)
+            ? `<img src="${escapeHtml(p.mainImage)}" alt="${escapeHtml(p.title)}" class="img-preview" style="object-fit: cover;">`
+            : (p.imageColor && p.imageColor.includes('gradient'))
+                ? `<div class="img-preview" style="background: ${sanitizeCssValue(p.imageColor)}; width: 48px; height: 48px; border-radius: 12px;"></div>`
+                : `<img src="${escapeHtml(p.imageColor || 'https://placehold.co/48')}" alt="${escapeHtml(p.title)}" class="img-preview" style="object-fit: cover;">`
+        }
+            </td>
+            <td><strong>${escapeHtml(p.title)}</strong></td>
+            <td>${escapeHtml(p.category || 'Sin categoría')}</td>
+            <td>
+                ${p.badge ? `<span class="product-card__badge" style="position:static; display:inline-block; font-size: 10px; padding: 2px 6px;">${escapeHtml(i18n.t('badge.' + getBadgeKey(p.badge)))}</span>` : '-'}
+            </td>
+            <td>USD ${parseFloat(p.price).toFixed(2)}</td>
+            <td>
+                <label class="toggle-switch">
+                    <input type="checkbox" ${p.published !== false ? 'checked' : ''} onchange="togglePublishHandler(${parseInt(p.id)}, this.checked)">
+                    <span class="slider"></span>
+                </label>
+            </td>
+            <td>
+                <button class="btn-icon" onclick="window.location.href='admin-product.html?id=${parseInt(p.id)}'"><i data-lucide="edit-3"></i></button>
+                <button class="btn-icon" onclick="deleteProductHandler('${parseInt(p.id)}')"><i data-lucide="trash-2"></i></button>
+            </td>
+        </tr>
+    `).join('');
 
     if (window.lucide) window.lucide.createIcons();
 }

@@ -360,13 +360,12 @@ async function handleSave(e) {
                 }
             }
 
-            // If it was a new product, or existing one with no main image, set the first uploaded one as main
-            // Or just always update main_image to the latest or first? 
-            // Simplified: If product has no main_image, set it.
-            if ((!currentProduct || !currentProduct.mainImage) && firstImageUrl) {
+            // Always update main_image to the first uploaded image
+            if (firstImageUrl) {
                 const { error: mainImgErr } = await updateProduct(savedProductId, { main_image: firstImageUrl });
                 if (mainImgErr) throw mainImgErr;
             }
+
         }
 
         // 3. Upload Pending File
