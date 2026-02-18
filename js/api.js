@@ -5,7 +5,7 @@ const supabaseUrl = 'https://dxqsdzktytehycpnrbtn.supabase.co'
 const supabaseKey = 'sb_publishable_crjG8THHPXfnLrtQityLWg_7pLdQPhG'
 export const supabase = createClient(supabaseUrl, supabaseKey)
 
-export async function fetchProducts({ publishedOnly = false, tag = null, search = null, sort = null, includeArchived = false } = {}) {
+export async function fetchProducts({ publishedOnly = false, tag = null, search = null, sort = null, badge = null, includeArchived = false } = {}) {
     let query = supabase
         .from('products')
         .select('*, categories(name)')
@@ -28,6 +28,11 @@ export async function fetchProducts({ publishedOnly = false, tag = null, search 
 
     if (tag) {
         query = query.contains('tags', [tag])
+    }
+
+    if (badge) {
+        // We use ilike to be safe with case sensitivity (SALE vs sale)
+        query = query.ilike('badge', `%${badge}%`)
     }
 
     if (search) {

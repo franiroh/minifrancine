@@ -41,7 +41,8 @@ export const loadComponents = async () => {
             </div>
         </div>
 
-        <a href="catalog.html?sort=newest" class="navbar__link" data-i18n="nav.new">Novedades</a>
+        <a href="catalog.html?sort=newest" class="navbar__link ${window.location.search.includes('sort=newest') ? 'navbar__link--active' : ''}" data-i18n="nav.new">Novedades</a>
+        <a href="catalog.html?sale=true" class="navbar__link ${window.location.search.includes('sale=true') ? 'navbar__link--active' : ''}" data-i18n="nav.sale">Ofertas</a>
         <a href="faq.html" class="navbar__link" data-i18n="nav.faq">FAQ</a>
       </div>
       <div class="navbar__right">

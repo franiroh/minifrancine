@@ -11,6 +11,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     const category = params.get('category');
     const search = params.get('search');
     const origin = params.get('origin');
+    const sale = params.get('sale') === 'true';
 
     const pageTitle = document.getElementById('page-title');
     const catalogHeader = document.querySelector('.catalog__header');
@@ -48,6 +49,15 @@ document.addEventListener('DOMContentLoaded', async () => {
             pageTitle.removeAttribute('data-i18n');
         }
         document.title = `Búsqueda: ${search} — MiniFrancine`;
+    } else if (sale) {
+        // Sale View
+        if (catalogHeader) catalogHeader.style.display = 'none';
+        categoryHeader.style.display = 'block';
+        if (categoryTitle) {
+            categoryTitle.textContent = i18n.t('nav.sale') || 'Ofertas';
+            categoryTitle.setAttribute('data-i18n', 'nav.sale');
+        }
+        document.title = `Ofertas — MiniFrancine`;
     }
 
     // 2. Load Components (Navbar/Footer) - This initializes i18n
@@ -161,6 +171,12 @@ document.addEventListener('DOMContentLoaded', async () => {
                 { label: i18n.t('nav.catalog'), href: 'catalog.html' },
                 { label: tag, href: null }
             ]);
+        } else if (sale) {
+            breadcrumbsContainer.innerHTML = renderBreadcrumbs([
+                { label: i18n.t('nav.home'), href: 'index.html' },
+                { label: i18n.t('nav.catalog'), href: 'catalog.html' },
+                { label: i18n.t('nav.sale'), href: null }
+            ]);
         } else if (search) {
             breadcrumbsContainer.innerHTML = renderBreadcrumbs([
                 { label: i18n.t('nav.home'), href: 'index.html' },
@@ -186,7 +202,8 @@ document.addEventListener('DOMContentLoaded', async () => {
         // If NO category, we can use DB-level tag/search filtering
         tag: category ? null : tag,
         search: search,
-        sort: sort
+        sort: sort,
+        badge: sale ? 'sale' : null
     });
 
     let displayProducts = fetchedProducts;

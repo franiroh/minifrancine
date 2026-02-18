@@ -208,18 +208,27 @@
 
 .product-card__badge {
     position: absolute;
-    top: 12px;
-    left: 12px;
-    padding: 4px 10px;
-    border-radius: 12px;
+    top: 16px;
+    left: 0;
+    padding: 8px 18px;
+    border-radius: 0 8px 8px 0;
     background: #FF6B6B;
     color: #FFF;
-    font-size: 11px;
-    font-weight: 600;
+    font-size: 13px;
+    font-weight: 800;
+    text-transform: uppercase;
+    letter-spacing: 0.8px;
+    box-shadow: 2px 4px 8px -1px rgba(0, 0, 0, 0.25);
+    border: 1px solid rgba(255, 255, 255, 0.25);
+    border-left: none;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    z-index: 2;
 }
 
 .product-card__badge--green {
-    background: #22C55E;
+    background: #10B981;
 }
 
 .product-card__heart {
@@ -342,7 +351,9 @@
 
 /* --- Purchased Product State --- */
 .product-card__badge--purchased {
-    background: #22C55E;
+    background: #059669;
+    /* Slightly darker emerald */
+    border: 1px solid rgba(255, 255, 255, 0.3);
     display: inline-flex;
     align-items: center;
     gap: 4px;
