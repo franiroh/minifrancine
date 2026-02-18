@@ -25,6 +25,7 @@ export const i18n = {
             'catalog.tag_prefix': { es: 'Etiqueta:', en: 'Tag:', pt: 'Tag:' },
             'catalog.result_single': { es: 'resultado', en: 'result', pt: 'resultado' },
             'catalog.result_plural': { es: 'resultados', en: 'results', pt: 'resultados' },
+            'catalog.back_to_selection': { es: 'Volver a la selección de', en: 'Back to selection of', pt: 'Voltar à seleção de' },
             'btn.my_designs': { es: 'Mis diseños', en: 'My designs', pt: 'Meus designs' },
             'btn.buy_now': { es: 'Comprar', en: 'Buy now', pt: 'Comprar' },
             'category.all': { es: 'Todos', en: 'All', pt: 'Todos' },

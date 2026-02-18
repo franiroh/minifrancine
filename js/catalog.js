@@ -10,6 +10,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     const tag = params.get('tag');
     const category = params.get('category');
     const search = params.get('search');
+    const origin = params.get('origin');
 
     const pageTitle = document.getElementById('page-title');
     const catalogHeader = document.querySelector('.catalog__header');
@@ -52,8 +53,13 @@ document.addEventListener('DOMContentLoaded', async () => {
     // 2. Load Components (Navbar/Footer) - This initializes i18n
     await loadComponents();
 
-    // Import i18n dynamically or from module if possible, but loadComponents initializes it. 
-    // We can import it at top level.
+    // 3. Fetch Categories for Translations (Needed for Title, Breadcrumbs and Return Button)
+    let categories = [];
+    try {
+        categories = await fetchCategories();
+    } catch (e) {
+        console.error("Error loading categories:", e);
+    }
 
     if (category) {
         // Category View
@@ -67,11 +73,31 @@ document.addEventListener('DOMContentLoaded', async () => {
     } else if (tag) {
         // Tag View - Re-apply title with correct translation now that i18n is initialized
         if (pageTitle) {
-            const tagPrefix = i18n.t('catalog.tag_prefix');
+            const tagPrefix = i18n.t('catalog.tag_prefix') || 'Etiqueta:';
             pageTitle.textContent = `${tagPrefix} "${tag}"`;
             pageTitle.removeAttribute('data-i18n');
         }
         document.title = `Etiqueta: ${tag} — MiniFrancine`;
+
+        // If from an origin category, show a back link
+        if (origin) {
+            const catObj = categories.find(c => c.name === origin);
+            const translatedOrigin = catObj ? i18n.t(`category.${catObj.id}`) : origin;
+
+            const tagFilters = document.getElementById('tag-filters');
+            if (tagFilters) {
+                tagFilters.style.display = 'flex';
+                tagFilters.style.justifyContent = 'flex-end';
+                tagFilters.style.marginBottom = '24px';
+                tagFilters.innerHTML = `
+                    <a href="catalog.html?category=${encodeURIComponent(origin)}" class="btn-return" style="display: flex; align-items: center; gap: 10px; font-size: 14px; font-weight: 500; color: #FF6B6B; text-decoration: none; padding: 10px 20px; border-radius: 20px; background: #FFF0F0; border: 1px solid #FFE0E0; transition: all 0.2s ease;">
+                        <i data-lucide="arrow-left" style="width: 18px; height: 18px;"></i>
+                        <span>${i18n.t('catalog.back_to_selection')} <strong>${translatedOrigin}</strong></span>
+                    </a>
+                `;
+                if (window.lucide) window.lucide.createIcons();
+            }
+        }
     } else {
         // Default All View - Show category header with full catalog title
         if (catalogHeader) catalogHeader.style.display = 'none';
@@ -104,14 +130,6 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     // 4. Initial Breadcrumbs State
     renderBreadcrumbs([]); // Placeholder UI
-
-    // 5. Fetch Categories for Translations
-    let categories = [];
-    try {
-        categories = await fetchCategories();
-    } catch (e) {
-        console.error("Error loading categories:", e);
-    }
 
     // Update Title with Translation if category is present
     if (category) {
@@ -178,12 +196,14 @@ document.addEventListener('DOMContentLoaded', async () => {
         renderTagFilters(displayProducts, category, tag);
 
         // Then apply the tag filter for the grid if present
-        if (tag) {
+        if (tag && !origin) {
             displayProducts = displayProducts.filter(p => p.tags && p.tags.includes(tag));
         }
     } else {
-        const tagContainer = document.getElementById('tag-filters');
-        if (tagContainer) tagContainer.style.display = 'none';
+        if (!origin) {
+            const tagContainer = document.getElementById('tag-filters');
+            if (tagContainer) tagContainer.style.display = 'none';
+        }
     }
 
     // Update count
@@ -215,6 +235,7 @@ function renderTagFilters(categoryProducts, categoryName, activeTag) {
     }
 
     container.style.display = 'flex';
+    container.style.justifyContent = 'center';
 
     // "Todos" chip for the current category
     let html = `
@@ -231,7 +252,7 @@ function renderTagFilters(categoryProducts, categoryName, activeTag) {
     html += sortedTags.map(t => {
         const isActive = activeTag === t;
         return `
-            <a href="catalog.html?category=${encodeURIComponent(categoryName)}&tag=${encodeURIComponent(t)}" 
+            <a href="catalog.html?tag=${encodeURIComponent(t)}${categoryName ? `&origin=${encodeURIComponent(categoryName)}` : ''}" 
                class="filter-chip filter-chip--tag ${isActive ? 'filter-chip--active' : ''}" 
                style="text-decoration: none;">
                ${escapeHtml(t)}
@@ -383,6 +404,20 @@ function attachCardListeners(grid, products) {
             if (pageTitle) {
                 const tagPrefix = i18n.t('catalog.tag_prefix');
                 pageTitle.textContent = `${tagPrefix} "${tag}"`;
+            }
+
+            // Update Back Button if origin present
+            const origin = params.get('origin');
+            if (origin) {
+                const backBtnSpan = document.querySelector('.btn-return span');
+                if (backBtnSpan) {
+                    // We need categories to translate the origin name
+                    fetchCategories().then(cats => {
+                        const catObj = cats.find(c => c.name === origin);
+                        const translatedOrigin = catObj ? i18n.t(`category.${catObj.id}`) : origin;
+                        backBtnSpan.innerHTML = `${i18n.t('catalog.back_to_selection')} <strong>${translatedOrigin}</strong>`;
+                    });
+                }
             }
         }
 
