@@ -1,0 +1,170 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Términos y Condiciones — MiniFrancine</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:wght@700;800&family=DM+Sans:wght@400;500;600;700&display=swap"
+        rel="stylesheet">
+    <script src="https://unpkg.com/lucide@latest"></script>
+
+    <link rel="stylesheet" href="css/main.css">
+    <link rel="stylesheet" href="css/components.css">
+    <style>
+        /* Breadcrumb */
+        .breadcrumb {
+            padding: 12px 40px;
+            font-size: 13px;
+            color: #6B7280;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .breadcrumb a {
+            color: #6B7280;
+            text-decoration: none;
+            transition: color 0.2s;
+        }
+
+        .breadcrumb a:hover {
+            color: #FF6B6B;
+        }
+
+        .breadcrumb__sep {
+            color: #D1D5DB;
+        }
+
+        .breadcrumb__current {
+            color: #1A1A1A;
+            font-weight: 500;
+        }
+
+        /* Hero with gradient */
+        .terms-hero {
+            padding: 48px 40px 40px;
+            text-align: center;
+            background: linear-gradient(135deg, #FFF5F5 0%, #FFFFFF 100%);
+            border-bottom: 1px solid #F3F4F6;
+        }
+
+        .terms-hero__title {
+            font-family: 'Bricolage Grotesque', serif;
+            font-size: 48px;
+            font-weight: 800;
+            margin-bottom: 16px;
+            color: #1A1A1A;
+        }
+
+        .terms-hero__subtitle {
+            font-size: 18px;
+            color: #6B7280;
+            line-height: 1.6;
+            max-width: 800px;
+            margin: 0 auto;
+        }
+
+        .terms-container {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 40px 20px 80px;
+            line-height: 1.6;
+            color: #374151;
+        }
+
+        .terms-section {
+            margin-bottom: 2.5rem;
+            background: white;
+            padding: 30px;
+            border-radius: 12px;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+            border: 1px solid #E5E7EB;
+        }
+
+        .terms-section h2 {
+            font-family: 'Bricolage Grotesque', serif;
+            font-size: 1.25rem;
+            color: #111827;
+            margin-bottom: 1rem;
+            border-bottom: 2px solid #F3F4F6;
+            padding-bottom: 10px;
+            font-weight: 700;
+        }
+
+        @media (max-width: 768px) {
+            .terms-hero__title {
+                font-size: 36px;
+            }
+
+            .terms-section h2 {
+                font-size: 1.1rem;
+            }
+        }
+    </style>
+</head>
+
+<body class="loading-i18n">
+    <div class="page">
+        <!-- Navbar -->
+        <div id="navbar-placeholder"></div>
+
+        <!-- Breadcrumbs -->
+        <nav class="breadcrumbs" aria-label="breadcrumb">
+            <a href="index.html" data-i18n="nav.home">Inicio</a>
+            <span style="color:#d1d5db;">/</span>
+            <span class="breadcrumb__current" data-i18n="footer.terms">Términos y Condiciones</span>
+        </nav>
+
+        <!-- Hero with gradient -->
+        <section class="terms-hero">
+            <h1 class="terms-hero__title" data-i18n="terms.title">Términos y Condiciones</h1>
+            <p class="terms-hero__subtitle" data-i18n="terms.hero_subtitle">
+                Lea atentamente las condiciones de uso de nuestro servicio y la licencia de nuestros diseños digitales.
+            </p>
+        </section>
+
+        <main class="terms-container">
+            <div class="terms-section">
+                <h2 data-i18n="terms.intro_title">1. Introducción</h2>
+                <p data-i18n="terms.intro_text">Al acceder y utilizar este sitio web, usted acepta cumplir con los
+                    siguientes términos y condiciones de uso.</p>
+            </div>
+
+            <div class="terms-section">
+                <h2 data-i18n="terms.license_title">2. Licencia de Uso</h2>
+                <p data-i18n="terms.license_text">Todos los diseños adquiridos en MiniFrancine son para uso personal y
+                    para la creación de productos físicos. Queda estrictamente prohibida la reventa, distribución,
+                    sublicencia o intercambio de los archivos digitales originales.</p>
+            </div>
+
+            <div class="terms-section">
+                <h2 data-i18n="terms.refund_title">3. Política de Reembolso</h2>
+                <p data-i18n="terms.refund_text">Debido a la naturaleza digital de nuestros productos, todas las ventas
+                    son finales. No se ofrecen reembolsos una vez que los archivos han sido descargados o enviados.</p>
+            </div>
+
+            <div class="terms-section">
+                <h2 data-i18n="terms.liability_title">4. Limitación de Responsabilidad</h2>
+                <p data-i18n="terms.liability_text">MiniFrancine no será responsable de ningún daño derivado del uso de
+                    nuestros archivos o de problemas técnicos con su maquinaria de bordado.</p>
+            </div>
+
+            <div class="terms-section">
+                <h2 data-i18n="terms.contact_title">5. Contacto</h2>
+                <p data-i18n="terms.contact_text">Si tiene alguna pregunta sobre estos términos, contáctenos en
+                    minifrancine@gmail.com.</p>
+            </div>
+        </main>
+
+        <!-- Footer -->
+        <div id="footer-placeholder"></div>
+    </div>
+
+    <script type="module" src="js/terms.js"></script>
+</body>
+
+</html>

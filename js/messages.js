@@ -151,7 +151,9 @@ async function loadChatArea(conversationId) {
     }).join('');
 
     // Scroll to bottom
-    messagesContainer.scrollTop = messagesContainer.scrollHeight;
+    setTimeout(() => {
+        messagesContainer.scrollTop = messagesContainer.scrollHeight;
+    }, 50);
 
     // Handle Reply
     const replyForm = document.getElementById('reply-form');

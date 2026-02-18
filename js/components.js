@@ -60,7 +60,15 @@ export const loadComponents = async () => {
             </div>
         </div>
 
-        <i data-lucide="search" class="navbar__icon"></i>
+        <div class="navbar__search">
+            <button class="navbar__icon" id="btn-search-toggle">
+                <i data-lucide="search"></i>
+            </button>
+            <form class="navbar__search-form hidden" id="nav-search-form">
+                <input type="text" class="navbar__search-input" placeholder="Buscar..." id="nav-search-input" data-i18n-placeholder="nav.search_placeholder">
+                <button type="submit" class="hidden"></button>
+            </form>
+        </div>
         <div class="navbar__cart-wrap" onclick="window.location.href='cart.html'">
           <i data-lucide="shopping-cart" class="navbar__icon"></i>
           <span class="navbar__cart-badge">0</span>
@@ -116,7 +124,7 @@ export const loadComponents = async () => {
       <div class="footer__bottom">
         <span>
           &copy; 2026 MiniFrancine. <span data-i18n="footer.rights">Todos los derechos reservados.</span>
-          <a href="faq.html" style="margin-left: 10px; color: inherit; text-decoration: none;" data-i18n="footer.terms">Términos y Condiciones</a>
+          <a href="terms.html" style="margin-left: 10px; color: inherit; text-decoration: none;" data-i18n="footer.terms">Términos y Condiciones</a>
         </span>
       </div>
     </footer>
@@ -132,6 +140,36 @@ export const loadComponents = async () => {
         localStorage.setItem('minifrancine_lang', lang);
         window.location.reload();
       });
+    });
+  }
+
+  // Handle Search Logic
+  const searchToggle = document.getElementById('btn-search-toggle');
+  const searchForm = document.getElementById('nav-search-form');
+  const searchInput = document.getElementById('nav-search-input');
+
+  if (searchToggle && searchForm && searchInput) {
+    searchToggle.onclick = (e) => {
+      e.stopPropagation();
+      searchForm.classList.toggle('hidden');
+      if (!searchForm.classList.contains('hidden')) {
+        searchInput.focus();
+      }
+    };
+
+    searchForm.onsubmit = (e) => {
+      e.preventDefault();
+      const query = searchInput.value.trim();
+      if (query) {
+        window.location.href = `catalog.html?search=${encodeURIComponent(query)}`;
+      }
+    };
+
+    // Close search on click outside
+    document.addEventListener('click', (e) => {
+      if (!searchForm.contains(e.target) && !searchToggle.contains(e.target)) {
+        searchForm.classList.add('hidden');
+      }
     });
   }
 

@@ -165,27 +165,7 @@ async function loadContentConfig() {
             .single();
 
         if (data) {
-            if (data.hero_badge) {
-                const badge = document.querySelector('.hero__badge');
-                if (badge) {
-                    // Start of i18n fix: Do not overwrite if we want to use translations
-                    // badge.innerHTML = `<i data-lucide="sparkles"></i> ${escapeHtml(data.hero_badge)}`;
-                    // Instead, just ensure the icon exists. The text is handled by data-i18n="hero.badge" in HTML.
-                    // If we want to allow admin override via site_config, that system needs to be multi-language aware.
-                    // For now, disabling this overwrite to fix the "not changing language" bug.
-                    if (window.lucide) window.lucide.createIcons();
-                }
-            }
-            if (data.hero_title) {
-                const title = document.querySelector('.hero__title');
-                // if (title) title.textContent = data.hero_title;
-                // Disabling overwrite to allow i18n
-            }
-            if (data.hero_description) {
-                const sub = document.querySelector('.hero__sub');
-                // if (sub) sub.textContent = data.hero_description;
-                // Disabling overwrite to allow i18n
-            }
+            // Load Hero Image
             if (data.hero_image_url) {
                 const heroImg = document.querySelector('.hero__image');
                 if (heroImg) {
@@ -194,6 +174,9 @@ async function loadContentConfig() {
                     heroImg.style.backgroundPosition = 'center';
                 }
             }
+
+            // Ensure Lucide icons are rendered (especially if badge translation contains one)
+            if (window.lucide) window.lucide.createIcons();
         }
     } catch (err) {
         console.error('Error loading content config:', err);

@@ -551,6 +551,13 @@
     gap: 20px;
 }
 
+.form-row-group {
+    margin-bottom: 32px;
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    gap: 20px;
+}
+
 .form-group textarea {
     width: 100%;
     padding: 14px 18px;

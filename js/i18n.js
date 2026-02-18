@@ -30,12 +30,19 @@ export const i18n = {
             'category.all': { es: 'Todos', en: 'All', pt: 'Todos' },
             'catalog.full_title': { es: 'Catálogo Completo', en: 'Full Catalog', pt: 'Catálogo Completo' },
             'catalog.full_subtitle': { es: 'Explora todos nuestros diseños de bordado', en: 'Explore all our embroidery designs', pt: 'Explore todos os nossos designs de bordado' },
+            'catalog.tag_prefix': { es: 'Etiqueta:', en: 'Tag:', pt: 'Tag:' },
+            'catalog.search_prefix': { es: 'Resultados para:', en: 'Results for:', pt: 'Resultados para:' },
+            'catalog.result_single': { es: 'resultado encontrado', en: 'result found', pt: 'resultado encontrado' },
+            'catalog.result_plural': { es: 'resultados encontrados', en: 'results found', pt: 'resultados encontrados' },
+            'hero.badge': { es: 'Más de 5,000 diseños disponibles', en: 'Over 5,000 designs available', pt: 'Mais de 5.000 designs disponíveis' },
+            'hero.title': { es: 'Diseños de Bordado Profesionales', en: 'Professional Embroidery Designs', pt: 'Desenhos de Bordado Profissionais' },
+            'hero.description': { es: 'Archivos digitales listos para tu máquina. Formatos DST, PES, JEF, VP3 y más. Descarga instantánea.', en: 'Digital files ready for your embroidery machine. DST, PES, JEF, VP3 formats and more. Instant download.', pt: 'Arquivos digitais prontos para sua máquina. Formatos DST, PES, JEF, VP3 e mais. Download instantâneo.' },
 
             // Favorites
             'favorites.title': { es: 'Mis Favoritos', en: 'My Favorites', pt: 'Meus Favoritos' },
             'favorites.subtitle': { es: 'Los diseños que más te gustan, guardados para ti.', en: 'The designs you love, saved for you.', pt: 'Os designs que você ama, salvos para você.' },
             'favorites.empty': { es: 'Aún no tienes favoritos guardados.', en: 'You have no saved favorites yet.', pt: 'Você ainda não tem favoritos salvos.' },
-            'favorites.action': { es: 'Explorar Catálogo', en: 'Browse Catalog', pt: 'Explorar Catálogo' },
+            'favorites.action': { es: 'Explorar Categorías', en: 'Browse Categories', pt: 'Explorar Categorias' },
 
             // My Designs
             'designs.title': { es: 'Mis Diseños', en: 'My Designs', pt: 'Meus Designs' },
@@ -91,6 +98,20 @@ export const i18n = {
             'error.orders_load': { es: 'Hubo un error al cargar tus compras.', en: 'There was an error loading your purchases.', pt: 'Houve um erro ao carregar suas compras.' },
             'error.file_unavailable': { es: 'El archivo digital para este producto no está disponible todavía.', en: 'The digital file for this product is not available yet.', pt: 'O arquivo digital para este produto ainda não está disponível.' },
             'msg.purchased_removed': { es: 'producto(s) en tu carrito ya fueron comprados. Se han removido.', en: 'product(s) in your cart were already purchased and have been removed.', pt: 'produto(s) no seu carrinho já foram comprados. Foram removidos.' },
+
+            // Terms and Conditions
+            'terms.title': { es: 'Términos y Condiciones', en: 'Terms and Conditions', pt: 'Termos e Condições' },
+            'terms.hero_subtitle': { es: 'Lea atentamente las condiciones de uso de nuestro servicio y la licencia de nuestros diseños digitales.', en: 'Please read carefully the conditions of use of our service and the license for our digital designs.', pt: 'Leia atentamente as condições de uso do nosso serviço e a licença dos nossos designs digitais.' },
+            'terms.intro_title': { es: '1. Introducción', en: '1. Introduction', pt: '1. Introdução' },
+            'terms.intro_text': { es: 'Al acceder y utilizar este sitio web, usted acepta cumplir con los siguientes términos y condiciones de uso.', en: 'By accessing and using this website, you agree to comply with the following terms and conditions of use.', pt: 'Ao acessar e usar este site, você concorda em cumprir os seguintes termos e condições de uso.' },
+            'terms.license_title': { es: '2. Licencia de Uso', en: '2. Usage License', pt: '2. Licença de Uso' },
+            'terms.license_text': { es: 'Todos los diseños adquiridos en MiniFrancine son para uso personal y para la creación de productos físicos. Queda estrictamente prohibida la reventa, distribución, sublicencia o intercambio de los archivos digitales originales.', en: 'All designs purchased from MiniFrancine are for personal use and for the creation of physical products. Reselling, distributing, sublicensing, or exchanging the original digital files is strictly prohibited.', pt: 'Todos os designs adquiridos na MiniFrancine são para uso pessoal e para a criação de produtos físicos. É estritamente proibida a revenda, distribuição, sublicenciamento ou troca dos arquivos digitais originais.' },
+            'terms.refund_title': { es: '3. Política de Reembolso', en: '3. Refund Policy', pt: '3. Política de Reembolso' },
+            'terms.refund_text': { es: 'Debido a la naturaleza digital de nuestros productos, todas las ventas son finales. No se ofrecen reembolsos una vez que los archivos han sido descargados o enviados.', en: 'Due to the digital nature of our products, all sales are final. No refunds are offered once the files have been downloaded or sent.', pt: 'Devido à natureza digital de nossos produtos, todas as vendas são finais. Não são oferecidos reembolsos após o download ou envio dos arquivos.' },
+            'terms.liability_title': { es: '4. Limitación de Responsabilidad', en: '4. Limitation of Liability', pt: '4. Limitação de Responsabilidade' },
+            'terms.liability_text': { es: 'MiniFrancine no será responsable de ningún daño derivado del uso de nuestros archivos o de problemas técnicos con su maquinaria de bordado.', en: 'MiniFrancine shall not be liable for any damages arising from the use of our files or technical issues with your embroidery machinery.', pt: 'A MiniFrancine não será responsável por quaisquer danos decorrentes do uso de nossos arquivos ou problemas técnicos com sua maquinaria de bordado.' },
+            'terms.contact_title': { es: '5. Contacto', en: '5. Contact', pt: '5. Contato' },
+            'terms.contact_text': { es: 'Si tiene alguna pregunta sobre estos términos, contáctenos en minifrancine@gmail.com.', en: 'If you have any questions about these terms, please contact us at minifrancine@gmail.com.', pt: 'Se você tiver alguma dúvida sobre estes termos, entre em contato conosco em minifrancine@gmail.com.' },
             'msg.login_required': { es: 'Debes iniciar sesión', en: 'You must log in', pt: 'Você deve fazer login' },
             'designs.purchased': { es: 'Comprado', en: 'Purchased', pt: 'Comprado' },
             'btn.download': { es: 'Descargar', en: 'Download', pt: 'Baixar' },
@@ -99,8 +120,14 @@ export const i18n = {
             'orders.product_default': { es: 'Producto', en: 'Product', pt: 'Produto' },
             'btn.purchased': { es: 'Comprado', en: 'Purchased', pt: 'Comprado' },
             'btn.add_to_cart': { es: 'Agregar al Carrito', en: 'Add to Cart', pt: 'Adicionar ao Carrinho' },
-            'nav.login': { es: 'Iniciar Sesión', en: 'Log In', pt: 'Entrar' },
+            'nav.home': { es: 'Inicio', en: 'Home', pt: 'Início' },
+            'nav.catalog': { es: 'Categorías', en: 'Categories', pt: 'Categorias' },
+            'nav.new': { es: 'Novedades', en: 'New', pt: 'Novidades' },
+            'nav.search_placeholder': { es: 'Buscar diseños...', en: 'Search designs...', pt: 'Buscar desenhos...' },
+            'nav.all_categories': { es: 'Ver todas', en: 'See all', pt: 'Ver todas' },
             'nav.faq': { es: 'FAQ', en: 'FAQ', pt: 'FAQ' },
+            'footer.terms': { es: 'Términos y Condiciones', en: 'Terms and Conditions', pt: 'Termos e Condições' },
+            'footer.rights': { es: 'Todos los derechos reservados.', en: 'All rights reserved.', pt: 'Todos os direitos reservados.' },
             'auth.login': { es: 'Iniciar Sesión', en: 'Log In', pt: 'Entrar' },
             'auth.register': { es: 'Registrarse', en: 'Register', pt: 'Registrar' },
             'auth.email': { es: 'Email', en: 'Email', pt: 'Email' },
@@ -162,7 +189,7 @@ export const i18n = {
             'faq.section_support': { es: 'Soporte', en: 'Support', pt: 'Suporte' },
 
             'faq.q1_browse': { es: '¿Cómo navego por los diseños?', en: 'How do I browse designs?', pt: 'Como navego pelos designs?' },
-            'faq.a1_browse': { es: 'Puedes explorar nuestros diseños desde la página de <strong>Catálogo</strong> en el menú principal. Usa los filtros por categoría o busca diseños específicos. Cada diseño muestra una vista previa y detalles del archivo.', en: 'You can explore our designs from the <strong>Catalog</strong> page in the main menu. Use category filters or search for specific designs. Each design shows a preview and file details.', pt: 'Você pode explorar nossos designs na página <strong>Catálogo</strong> no menu principal. Use filtros por categoria ou pesquise designs específicos. Cada design mostra uma prévia e detalhes do arquivo.' },
+            'faq.a1_browse': { es: 'Puedes explorar nuestros diseños desde la página de <strong>Categorías</strong> en el menú principal. Usa los filtros por categoría o busca diseños específicos. Cada diseño muestra una vista previa y detalles del archivo.', en: 'You can explore our designs from the <strong>Categories</strong> page in the main menu. Use category filters or search for specific designs. Each design shows a preview and file details.', pt: 'Você pode explorar nossos designs na página <strong>Categorias</strong> no menu principal. Use filtros por categoria ou pesquise designs específicos. Cada design mostra uma prévia e detalhes do arquivo.' },
 
             'faq.q2_purchase': { es: '¿Cómo compro un diseño?', en: 'How do I purchase a design?', pt: 'Como compro um design?' },
             'faq.a2_purchase': { es: 'Haz clic en <strong>"Comprar"</strong> en cualquier diseño para agregarlo al carrito. Luego ve al carrito y completa el pago con PayPal. Una vez confirmado el pago, el diseño estará disponible en <strong>"Mis Diseños"</strong>.', en: 'Click <strong>"Buy"</strong> on any design to add it to your cart. Then go to cart and complete payment with PayPal. Once payment is confirmed, the design will be available in <strong>"My Designs"</strong>.', pt: 'Clique em <strong>"Comprar"</strong> em qualquer design para adicioná-lo ao carrinho. Em seguida, vá ao carrinho e complete o pagamento com PayPal. Após a confirmação do pagamento, o design estará disponível em <strong>"Meus Designs"</strong>.' },
@@ -190,6 +217,17 @@ export const i18n = {
             'faq.q7_extract_mac': { es: '¿Cómo descomprimo en Mac?', en: 'How do I extract on Mac?', pt: 'Como extraio no Mac?' },
             'faq.a7_extract_mac': { es: 'En Mac, simplemente <strong>haz doble clic</strong> en el archivo ZIP y se extraerá automáticamente en la misma carpeta.', en: 'On Mac, simply <strong>double-click</strong> the ZIP file and it will automatically extract in the same folder.', pt: 'No Mac, simplesmente <strong>clique duas vezes</strong> no arquivo ZIP e ele será extraído automaticamente na mesma pasta.' },
 
+            'faq.extract_software_windows': {
+                es: 'Si tienes problemas, te recomendamos usar programas gratuitos como <a href="https://www.7-zip.org/" target="_blank" style="color:#FF6B6B;">7-Zip</a> o <a href="https://www.win-rar.com/" target="_blank" style="color:#FF6B6B;">WinRAR</a>.',
+                en: 'If you have issues, we recommend using free programs like <a href="https://www.7-zip.org/" target="_blank" style="color:#FF6B6B;">7-Zip</a> or <a href="https://www.win-rar.com/" target="_blank" style="color:#FF6B6B;">WinRAR</a>.',
+                pt: 'Se você tiver problemas, recomendamos usar programas gratuitos como <a href="https://www.7-zip.org/" target="_blank" style="color:#FF6B6B;">7-Zip</a> ou <a href="https://www.win-rar.com/" target="_blank" style="color:#FF6B6B;">WinRAR</a>.'
+            },
+            'faq.extract_software_mac': {
+                es: 'Si el sistema no lo reconoce, te recomendamos usar <a href="https://theunarchiver.com/" target="_blank" style="color:#FF6B6B;">The Unarchiver</a> (gratis).',
+                en: 'If the system doesn\'t recognize it, we recommend using <a href="https://theunarchiver.com/" target="_blank" style="color:#FF6B6B;">The Unarchiver</a> (free).',
+                pt: 'Se o sistema não o reconhecer, recomendamos usar o <a href="https://theunarchiver.com/" target="_blank" style="color:#FF6B6B;">The Unarchiver</a> (grátis).'
+            },
+
             'faq.q8_what_need': { es: '¿Qué necesito para usar estos diseños?', en: 'What do I need to use these designs?', pt: 'O que preciso para usar esses designs?' },
             'faq.a8_equipment_title': { es: 'Equipo Necesario:', en: 'Required Equipment:', pt: 'Equipamento Necessário:' },
             'faq.a8_equipment_machine': { es: '<strong>Máquina bordadora</strong> - Compatible con formatos de bordado digitales', en: '<strong>Embroidery machine</strong> - Compatible with digital embroidery formats', pt: '<strong>Máquina de bordar</strong> - Compatível com formatos de bordado digitais' },
@@ -200,19 +238,22 @@ export const i18n = {
             'faq.q9_formats': { es: '¿Qué formatos de archivo están disponibles?', en: 'What file formats are available?', pt: 'Quais formatos de arquivo estão disponíveis?' },
             'faq.a9_formats': { es: 'Nuestros diseños están disponibles en los formatos más comunes de bordado. Verifica la compatibilidad con tu máquina bordadora antes de comprar. Los formatos típicos incluyen PES, DST, JEF, y otros.', en: 'Our designs are available in the most common embroidery formats. Check compatibility with your embroidery machine before purchasing. Typical formats include PES, DST, JEF, and others.', pt: 'Nossos designs estão disponíveis nos formatos de bordado mais comuns. Verifique a compatibilidade com sua máquina de bordar antes de comprar. Os formatos típicos incluem PES, DST, JEF e outros.' },
 
-            'faq.q10_contact': { es: '¿Cómo puedo contactar soporte?', en: 'How can I contact support?', pt: 'Como posso contatar o suporte?' },
-            'faq.a10_contact': { es: 'Si tienes alguna pregunta o problema, puedes contactarnos a través de nuestro formulario de contacto o enviando un email. Respondemos todas las consultas en un plazo de 24-48 horas.', en: 'If you have any questions or issues, you can contact us through our contact form or by sending an email. We respond to all inquiries within 24-48 hours.', pt: 'Se você tiver alguma dúvida ou problema, pode nos contatar através do nosso formulário de contato ou enviando um e-mail. Respondemos a todas as consultas em 24-48 horas.' }
+            'faq.q10_contact': { es: '¿Aún tienes dudas o necesitas ayuda personalizada?', en: 'Still have questions or need personalized help?', pt: 'Ainda tem dúvidas ou precisa de ajuda personalizada?' },
+            'faq.a10_contact': {
+                es: '¡Estamos aquí para ayudarte! Si no encontraste la respuesta que buscabas, puedes enviarnos un email a <a href="mailto:minifrancine@gmail.com" style="color:#FF6B6B; font-weight:600;">minifrancine@gmail.com</a>. Respondemos todas las consultas en un plazo de 24-48 horas.',
+                en: 'We are here to help! If you didn\'t find the answer you were looking for, you can send us an email at <a href="mailto:minifrancine@gmail.com" style="color:#FF6B6B; font-weight:600;">minifrancine@gmail.com</a>. We respond to all inquiries within 24-48 hours.',
+                pt: 'Estamos aqui para ajudar! Se você não encontrou a resposta que procurava, pode nos enviar um e-mail para <a href="mailto:minifrancine@gmail.com" style="color:#FF6B6B; font-weight:600;">minifrancine@gmail.com</a>. Respondemos a todas as consultas em um prazo de 24-48 horas.'
+            }
         };
 
         // 1. Try to load from local storage first (Cache)
         const cachedFn = localStorage.getItem('site_translations_cache');
         if (cachedFn) {
             try {
-                this.translations = JSON.parse(cachedFn);
-                // Ensure static translations are present even if cache is old
-                Object.assign(this.translations, staticTranslations);
+                this.translations = { ...staticTranslations, ...JSON.parse(cachedFn) };
             } catch (e) {
                 console.error('Error parsing cached translations', e);
+                this.translations = { ...staticTranslations };
             }
         } else {
             // Init with static if no cache
@@ -233,14 +274,14 @@ export const i18n = {
                     return acc;
                 }, {});
 
-                // Merge static translations
-                Object.assign(newTranslations, staticTranslations);
+                // Merge: Dynamic > Static
+                const mergedTranslations = { ...staticTranslations, ...newTranslations };
 
                 // Update cache
-                localStorage.setItem('site_translations_cache', JSON.stringify(newTranslations));
+                localStorage.setItem('site_translations_cache', JSON.stringify(mergedTranslations));
 
-                // If we didn't have cache, or if we want to ensure freshness, update memory
-                this.translations = newTranslations;
+                // Update memory and page
+                this.translations = mergedTranslations;
                 this.updatePage();
             }
         } catch (err) {

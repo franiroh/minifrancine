@@ -36,7 +36,7 @@ async function init() {
 
     // 3. Load Initial View (Hash Routing)
     const hash = window.location.hash.replace('#', '');
-    if (hash && ['dashboard', 'products', 'orders', 'categories', 'messages'].includes(hash)) {
+    if (hash && ['dashboard', 'products', 'orders', 'categories', 'messages', 'translations'].includes(hash)) {
         const navItem = document.querySelector(`.nav-item[data-tab="${hash}"]`);
         if (navItem) navItem.click();
     } else {
@@ -127,12 +127,13 @@ function setupNavigation() {
             if (viewId === 'categories') loadCategories();
             if (viewId === 'messages') loadAdminMessages();
             if (viewId === 'content') initContent();
+            if (viewId === 'translations') initI18nEditor();
         };
     });
 
     // Handle Initial State (for hash loading)
     const hash = window.location.hash.replace('#', '');
-    if (hash && ['dashboard', 'products', 'orders', 'categories', 'messages'].includes(hash)) {
+    if (hash && ['dashboard', 'products', 'orders', 'categories', 'messages', 'translations', 'content'].includes(hash)) {
         const navItem = document.querySelector(`.nav-item[data-tab="${hash}"]`);
         if (navItem) navItem.click(); // This triggers onclick logic
     } else {

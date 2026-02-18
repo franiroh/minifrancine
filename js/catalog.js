@@ -9,6 +9,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     const params = new URLSearchParams(window.location.search);
     const tag = params.get('tag');
     const category = params.get('category');
+    const search = params.get('search');
 
     const pageTitle = document.getElementById('page-title');
     const catalogHeader = document.querySelector('.catalog__header');
@@ -38,6 +39,14 @@ document.addEventListener('DOMContentLoaded', async () => {
             pageTitle.removeAttribute('data-i18n');
         }
         document.title = `Etiqueta: ${tag} — MiniFrancine`;
+    } else if (search) {
+        // Search View
+        if (pageTitle) {
+            const searchPrefix = i18n.t('catalog.search_prefix') || 'Resultados para:';
+            pageTitle.textContent = `${searchPrefix} "${search}"`;
+            pageTitle.removeAttribute('data-i18n');
+        }
+        document.title = `Búsqueda: ${search} — MiniFrancine`;
     }
 
     // 2. Load Components (Navbar/Footer) - This initializes i18n
@@ -122,8 +131,14 @@ document.addEventListener('DOMContentLoaded', async () => {
         } else if (tag) {
             breadcrumbsContainer.innerHTML = renderBreadcrumbs([
                 { label: i18n.t('nav.home'), href: 'index.html' },
-                { label: i18n.t('nav.catalog'), href: 'catalog.html' }, // "Catálogo"
+                { label: i18n.t('nav.catalog'), href: 'catalog.html' },
                 { label: tag, href: null }
+            ]);
+        } else if (search) {
+            breadcrumbsContainer.innerHTML = renderBreadcrumbs([
+                { label: i18n.t('nav.home'), href: 'index.html' },
+                { label: i18n.t('nav.catalog'), href: 'catalog.html' },
+                { label: `"${search}"`, href: null }
             ]);
         } else {
             breadcrumbsContainer.innerHTML = renderBreadcrumbs([
@@ -134,14 +149,14 @@ document.addEventListener('DOMContentLoaded', async () => {
     }
 
     // 6. Fetch Products
-    let products = [];
+    let products = await fetchProducts({
+        publishedOnly: true,
+        tag: tag,
+        search: search
+    });
+
     if (category) {
-        const allProducts = await fetchProducts({ publishedOnly: true });
-        products = allProducts.filter(p => p.category === category);
-    } else if (tag) {
-        products = await fetchProducts({ publishedOnly: true, tag: tag });
-    } else {
-        products = await fetchProducts({ publishedOnly: true });
+        products = products.filter(p => p.category === category);
     }
 
     // Update count

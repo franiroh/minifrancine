@@ -85,8 +85,8 @@ async function updateTranslation(key, values) {
         console.error('Error updating translation:', error);
         alert('Error al guardar: ' + error.message);
     } else {
-        // Success toast?
-        // console.log('Saved', key);
+        // Clear i18n cache
+        localStorage.removeItem('site_translations_cache');
     }
 }
 
