@@ -99,7 +99,24 @@ export const i18n = {
             'orders.product_default': { es: 'Producto', en: 'Product', pt: 'Produto' },
             'btn.purchased': { es: 'Comprado', en: 'Purchased', pt: 'Comprado' },
             'btn.add_to_cart': { es: 'Agregar al Carrito', en: 'Add to Cart', pt: 'Adicionar ao Carrinho' },
-            'nav.login': { es: 'Iniciar Sesión', en: 'Log In', pt: 'Entrar' }
+            'nav.login': { es: 'Iniciar Sesión', en: 'Log In', pt: 'Entrar' },
+            'auth.reset_link_sent': { es: '¡Enlace enviado! Revisa tu email para restablecer tu contraseña.', en: 'Link sent! Check your email to reset your password.', pt: 'Link enviado! Verifique seu e-mail para redefinir sua senha.' },
+            'auth.send_reset_link': { es: 'Enviar enlace', en: 'Send link', pt: 'Enviar link' },
+            'auth.sending': { es: 'Enviando...', en: 'Sending...', pt: 'Enviando...' },
+
+            // Reset Password Page
+            'reset_password.page_title': { es: 'MiniFrancine — Restablecer Contraseña', en: 'MiniFrancine — Reset Password', pt: 'MiniFrancine — Redefinir Senha' },
+            'reset_password.title': { es: 'Restablecer Contraseña', en: 'Reset Password', pt: 'Redefinir Senha' },
+            'reset_password.subtitle': { es: 'Ingresa tu nueva contraseña', en: 'Enter your new password', pt: 'Digite sua nova senha' },
+            'reset_password.new_password': { es: 'Nueva Contraseña', en: 'New Password', pt: 'Nova Senha' },
+            'reset_password.confirm_password': { es: 'Confirmar Contraseña', en: 'Confirm Password', pt: 'Confirmar Senha' },
+            'reset_password.update_button': { es: 'Actualizar Contraseña', en: 'Update Password', pt: 'Atualizar Senha' },
+            'reset_password.updating': { es: 'Actualizando...', en: 'Updating...', pt: 'Atualizando...' },
+            'reset_password.invalid_session': { es: 'Sesión inválida. Por favor solicita un nuevo enlace de recuperación.', en: 'Invalid session. Please request a new recovery link.', pt: 'Sessão inválida. Por favor, solicite um novo link de recuperação.' },
+            'reset_password.fill_both_fields': { es: 'Por favor completa ambos campos', en: 'Please fill in both fields', pt: 'Por favor, preencha ambos os campos' },
+            'reset_password.min_length': { es: 'La contraseña debe tener al menos 6 caracteres', en: 'Password must be at least 6 characters', pt: 'A senha deve ter pelo menos 6 caracteres' },
+            'reset_password.no_match': { es: 'Las contraseñas no coinciden', en: 'Passwords do not match', pt: 'As senhas não coincidem' },
+            'reset_password.success': { es: '¡Contraseña actualizada exitosamente!', en: 'Password updated successfully!', pt: 'Senha atualizada com sucesso!' }
         };
 
         // 1. Try to load from local storage first (Cache)

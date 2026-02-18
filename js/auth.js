@@ -1,7 +1,7 @@
 
 
 import { loadComponents, updateNavbarAuth, updateNavbarCartCount } from './components.js';
-import { signIn, signUp, onAuthStateChange, getUser, signOut, checkNameExists } from './api.js';
+import { signIn, signUp, onAuthStateChange, getUser, signOut, checkNameExists, resetPassword } from './api.js';
 import { loadCart, getCartCount, loadFavorites } from './state.js';
 import { showToast } from './utils.js';
 
@@ -40,6 +40,7 @@ async function init() {
 
     setupTabs();
     setupForms();
+    setupPasswordReset();
 
     onAuthStateChange((event, session) => {
         if (event === 'SIGNED_IN') {
@@ -171,6 +172,84 @@ function setupForms() {
                 showToast('Error inesperado: ' + err.message, 'error');
                 registerBtn.textContent = 'Registrarse';
                 registerBtn.disabled = false;
+            }
+        });
+    }
+}
+
+function setupPasswordReset() {
+    const forgotPasswordLink = document.querySelector('.form-field__link');
+    const modal = document.getElementById('reset-password-modal');
+    const closeBtn = modal?.querySelector('.modal__close');
+    const overlay = modal?.querySelector('.modal__overlay');
+    const submitBtn = document.getElementById('reset-submit-btn');
+    const emailInput = document.getElementById('reset-email');
+    const messageDiv = document.getElementById('reset-message');
+
+    // Open modal
+    if (forgotPasswordLink && modal) {
+        forgotPasswordLink.addEventListener('click', (e) => {
+            e.preventDefault();
+            modal.classList.remove('hidden');
+            emailInput.value = '';
+            messageDiv.classList.add('hidden');
+            messageDiv.className = 'hidden';
+            if (window.lucide) window.lucide.createIcons();
+            // Apply i18n translations to modal content
+            if (window.i18n) {
+                window.i18n.translatePage();
+            }
+        });
+    }
+
+    // Close modal handlers
+    const closeModal = () => {
+        modal?.classList.add('hidden');
+    };
+
+    closeBtn?.addEventListener('click', closeModal);
+    overlay?.addEventListener('click', closeModal);
+
+    // Submit password reset
+    if (submitBtn && emailInput && messageDiv) {
+        submitBtn.addEventListener('click', async () => {
+            const email = emailInput.value.trim();
+
+            if (!email) {
+                showToast('Por favor ingresa tu email', 'error');
+                return;
+            }
+
+            // Basic email validation
+            const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+            if (!emailRegex.test(email)) {
+                showToast('Por favor ingresa un email válido', 'error');
+                return;
+            }
+
+            submitBtn.disabled = true;
+            submitBtn.innerHTML = `<span data-i18n="auth.sending">${window.i18n ? window.i18n.t('auth.sending') : 'Enviando...'}</span>`;
+
+            const { error } = await resetPassword(email);
+
+            if (error) {
+                messageDiv.textContent = 'Error: ' + error.message;
+                messageDiv.className = 'error';
+                submitBtn.disabled = false;
+                submitBtn.innerHTML = `<span data-i18n="auth.send_reset_link">${window.i18n ? window.i18n.t('auth.send_reset_link') : 'Enviar enlace'}</span>`;
+                if (window.i18n) window.i18n.translatePage();
+            } else {
+                messageDiv.textContent = window.i18n ? window.i18n.t('auth.reset_link_sent') : '¡Enlace enviado! Revisa tu email para restablecer tu contraseña.';
+                messageDiv.className = 'success';
+                emailInput.value = '';
+                submitBtn.disabled = false;
+                submitBtn.innerHTML = `<span data-i18n="auth.send_reset_link">${window.i18n ? window.i18n.t('auth.send_reset_link') : 'Enviar enlace'}</span>`;
+                if (window.i18n) window.i18n.translatePage();
+
+                // Close modal after 3 seconds
+                setTimeout(() => {
+                    closeModal();
+                }, 3000);
             }
         });
     }

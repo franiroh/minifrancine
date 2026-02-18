@@ -28,7 +28,7 @@
                 <div class="login-card__header">
                     <div class="login-card__logo">
                         <i data-lucide="scissors" style="color: #FF6B6B;"></i>
-                        <span>PatchFiles</span>
+                        <span>MiniFrancine</span>
                     </div>
                     <h2 id="auth-title" data-i18n="auth.welcome">Bienvenido de nuevo</h2>
                     <p id="auth-desc" data-i18n="auth.subtitle">Inicia sesión para acceder a tus diseños</p>
@@ -93,17 +93,39 @@
                         data-i18n="auth.btn_register">Registrarse</button>
                 </div>
 
-                <div class="login-card__divider">
-                    <hr><span data-i18n="auth.or_continue_with">o continúa con</span>
-                    <hr>
-                </div>
 
-                <div class="login-card__social">
-                    <button class="btn btn--outline btn--block">Google</button>
-                    <button class="btn btn--outline btn--block">Facebook</button>
-                </div>
             </div>
         </section>
+
+        <!-- Password Reset Modal -->
+        <div id="reset-password-modal" class="modal hidden">
+            <div class="modal__overlay"></div>
+            <div class="modal__content">
+                <div class="modal__header">
+                    <h3 data-i18n="auth.reset_password">Recuperar Contraseña</h3>
+                    <button class="modal__close" aria-label="Close">
+                        <i data-lucide="x"></i>
+                    </button>
+                </div>
+                <div class="modal__body">
+                    <p data-i18n="auth.reset_instructions">Ingresa tu email y te enviaremos un enlace para restablecer
+                        tu contraseña.</p>
+                    <div class="form-field">
+                        <label data-i18n="auth.email">Email</label>
+                        <div class="form-input">
+                            <i data-lucide="mail"></i>
+                            <input type="email" id="reset-email" placeholder="tu@email.com">
+                        </div>
+                    </div>
+                    <div id="reset-message" class="hidden"></div>
+                </div>
+                <div class="modal__footer">
+                    <button id="reset-submit-btn" class="btn btn--primary btn--block">
+                        <span data-i18n="auth.send_reset_link">Enviar enlace</span>
+                    </button>
+                </div>
+            </div>
+        </div>
 
         <div id="footer-placeholder"></div>
 

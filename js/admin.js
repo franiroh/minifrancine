@@ -1,7 +1,7 @@
 
 import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js/+esm'
 import { getUser, signOut, fetchProducts, updateProduct } from './api.js';
-import { fetchAllOrders, fetchAdminStats, deleteProduct, fetchCategories, createCategory, updateCategory, deleteCategory } from './api.js';
+import { fetchAllOrders, fetchAdminStats, deleteProduct, archiveProduct, unarchiveProduct, fetchCategories, createCategory, updateCategory, deleteCategory } from './api.js';
 import { loadAdminMessages } from './admin-messages.js';
 import { initContent } from './admin-content.js';
 import { initI18nEditor } from './admin-i18n.js';
@@ -157,10 +157,11 @@ async function loadDashboard() {
 }
 
 async function loadProducts() {
-    const products = await fetchProducts();
+    const products = await fetchProducts({ includeArchived: true }); // Get all products including archived
     const categories = await fetchCategories();
     const tbody = document.querySelector('#products-table tbody');
     const categoryFilter = document.getElementById('category-filter');
+    const archiveFilter = document.getElementById('archive-filter');
 
     // Populate category filter dropdown
     if (categoryFilter) {
@@ -175,20 +176,42 @@ async function loadProducts() {
         categoryFilter.value = currentValue; // Preserve selection
 
         // Add filter event listener
-        categoryFilter.onchange = () => renderProductsTable(products, categoryFilter.value);
+        categoryFilter.onchange = () => renderProductsTable(products, categoryFilter.value, archiveFilter?.value || 'active');
+    }
+
+    // Populate archive filter dropdown
+    if (archiveFilter) {
+        const currentArchiveValue = archiveFilter.value || 'active';
+        archiveFilter.innerHTML = `
+            <option value="active">Activos (${products.filter(p => !p.archived).length})</option>
+            <option value="archived">Archivados (${products.filter(p => p.archived).length})</option>
+            <option value="all">Todos (${products.length})</option>
+        `;
+        archiveFilter.value = currentArchiveValue;
+
+        // Add filter event listener
+        archiveFilter.onchange = () => renderProductsTable(products, categoryFilter?.value || '', archiveFilter.value);
     }
 
     // Initial render
-    renderProductsTable(products, categoryFilter?.value || '');
+    renderProductsTable(products, categoryFilter?.value || '', archiveFilter?.value || 'active');
 }
 
-function renderProductsTable(allProducts, selectedCategoryId) {
+function renderProductsTable(allProducts, selectedCategoryId, archiveStatus = 'active') {
     const tbody = document.querySelector('#products-table tbody');
 
     // Filter products by category
-    const filteredProducts = selectedCategoryId
+    let filteredProducts = selectedCategoryId
         ? allProducts.filter(p => p.categoryId === parseInt(selectedCategoryId))
         : allProducts;
+
+    // Filter by archive status
+    if (archiveStatus === 'active') {
+        filteredProducts = filteredProducts.filter(p => !p.archived);
+    } else if (archiveStatus === 'archived') {
+        filteredProducts = filteredProducts.filter(p => p.archived);
+    }
+    // 'all' shows everything, no additional filter needed
 
     if (filteredProducts.length === 0) {
         tbody.innerHTML = '<tr><td colspan="7" style="text-align:center; padding: 20px;">No hay productos en esta categoría.</td></tr>';
@@ -197,7 +220,7 @@ function renderProductsTable(allProducts, selectedCategoryId) {
     }
 
     tbody.innerHTML = filteredProducts.map(p => `
-        <tr class="${p.published === false ? 'product-row--unpublished' : ''}">
+        <tr class="${p.published === false ? 'product-row--unpublished' : ''} ${p.archived ? 'product-row--archived' : ''}">
             <td>
                 ${(p.mainImage)
             ? `<img src="${escapeHtml(p.mainImage)}" alt="${escapeHtml(p.title)}" class="img-preview" style="object-fit: cover;">`
@@ -206,7 +229,10 @@ function renderProductsTable(allProducts, selectedCategoryId) {
                 : `<img src="${escapeHtml(p.imageColor || 'https://placehold.co/48')}" alt="${escapeHtml(p.title)}" class="img-preview" style="object-fit: cover;">`
         }
             </td>
-            <td><strong>${escapeHtml(p.title)}</strong></td>
+            <td>
+                <strong>${escapeHtml(p.title)}</strong>
+                ${p.archived ? '<br><span style="font-size: 11px; color: #9CA3AF;">📦 Archivado</span>' : ''}
+            </td>
             <td>${escapeHtml(p.category || 'Sin categoría')}</td>
             <td>
                 ${p.badge ? `<span class="product-card__badge" style="position:static; display:inline-block; font-size: 10px; padding: 2px 6px;">${escapeHtml(i18n.t('badge.' + getBadgeKey(p.badge)))}</span>` : '-'}
@@ -214,13 +240,16 @@ function renderProductsTable(allProducts, selectedCategoryId) {
             <td>USD ${parseFloat(p.price).toFixed(2)}</td>
             <td>
                 <label class="toggle-switch">
-                    <input type="checkbox" ${p.published !== false ? 'checked' : ''} onchange="togglePublishHandler(${parseInt(p.id)}, this.checked)">
+                    <input type="checkbox" ${p.published !== false ? 'checked' : ''} ${p.archived ? 'disabled' : ''} onchange="togglePublishHandler(${parseInt(p.id)}, this.checked)">
                     <span class="slider"></span>
                 </label>
             </td>
             <td>
                 <button class="btn-icon" onclick="window.location.href='admin-product.html?id=${parseInt(p.id)}'"><i data-lucide="edit-3"></i></button>
-                <button class="btn-icon" onclick="deleteProductHandler('${parseInt(p.id)}')"><i data-lucide="trash-2"></i></button>
+                ${p.archived
+            ? `<button class="btn-icon" onclick="unarchiveProductHandler(${parseInt(p.id)})" title="Desarchivar"><i data-lucide="archive-restore"></i></button>`
+            : `<button class="btn-icon" onclick="archiveProductHandler(${parseInt(p.id)})" title="Archivar"><i data-lucide="archive"></i></button>`
+        }
             </td>
         </tr>
     `).join('');
@@ -341,6 +370,26 @@ window.togglePublishHandler = async (id, published) => {
 window.deleteProductHandler = async (id) => {
     if (confirm('¿Seguro que quieres eliminar este producto?')) {
         await deleteProduct(id);
+        loadProducts();
+    }
+};
+
+window.archiveProductHandler = async (id) => {
+    if (confirm('¿Archivar este producto? Se despublicará automáticamente y no aparecerá en el catálogo.')) {
+        const { error } = await archiveProduct(id);
+        if (error) {
+            alert('Error al archivar: ' + error.message);
+        }
+        loadProducts();
+    }
+};
+
+window.unarchiveProductHandler = async (id) => {
+    if (confirm('¿Desarchivar este producto? Deberás publicarlo manualmente si deseas que aparezca en el catálogo.')) {
+        const { error } = await unarchiveProduct(id);
+        if (error) {
+            alert('Error al desarchivar: ' + error.message);
+        }
         loadProducts();
     }
 };

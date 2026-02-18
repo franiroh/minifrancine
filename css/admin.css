@@ -372,6 +372,24 @@
     opacity: 1;
 }
 
+.product-row--archived {
+    background-color: #F9FAFB !important;
+}
+
+.product-row--archived td {
+    opacity: 0.6;
+}
+
+.product-row--archived .toggle-switch {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+.product-row--archived .toggle-switch input {
+    cursor: not-allowed;
+}
+
+
 /* --- Category Groups (Products View) --- */
 .category-group {
     margin-bottom: 32px;

@@ -5,7 +5,7 @@ const supabaseUrl = 'https://dxqsdzktytehycpnrbtn.supabase.co'
 const supabaseKey = 'sb_publishable_crjG8THHPXfnLrtQityLWg_7pLdQPhG'
 export const supabase = createClient(supabaseUrl, supabaseKey)
 
-export async function fetchProducts({ publishedOnly = false, tag = null } = {}) {
+export async function fetchProducts({ publishedOnly = false, tag = null, includeArchived = false } = {}) {
     let query = supabase
         .from('products')
         .select('*, categories(name)')
@@ -13,6 +13,11 @@ export async function fetchProducts({ publishedOnly = false, tag = null } = {}) 
 
     if (publishedOnly) {
         query = query.eq('published', true)
+    }
+
+    // Filter out archived products by default (unless explicitly requested)
+    if (!includeArchived) {
+        query = query.eq('archived', false)
     }
 
     if (tag) {
@@ -47,7 +52,8 @@ export async function fetchProducts({ publishedOnly = false, tag = null } = {}) 
         reviews: p.reviews,
         description: p.description,
         mainImage: p.main_image,
-        published: p.published
+        published: p.published,
+        archived: p.archived
     }));
 }
 
@@ -127,6 +133,20 @@ export async function signIn(email, password) {
 export async function signOut() {
     const { error } = await supabase.auth.signOut()
     return { error }
+}
+
+export async function resetPassword(email) {
+    const { data, error } = await supabase.auth.resetPasswordForEmail(email, {
+        redirectTo: `${window.location.origin}/reset-password.html`
+    })
+    return { data, error }
+}
+
+export async function updatePassword(newPassword) {
+    const { data, error } = await supabase.auth.updateUser({
+        password: newPassword
+    })
+    return { data, error }
 }
 
 export async function getUser() {
@@ -686,6 +706,32 @@ export async function deleteProduct(id) {
         .eq('id', id)
     return { error }
 }
+
+export async function archiveProduct(id) {
+    // Archive product and automatically unpublish it
+    const { data, error } = await supabase
+        .from('products')
+        .update({
+            archived: true,
+            published: false
+        })
+        .eq('id', id)
+        .select()
+        .single()
+    return { data, error }
+}
+
+export async function unarchiveProduct(id) {
+    // Unarchive product (keep published=false for manual review)
+    const { data, error } = await supabase
+        .from('products')
+        .update({ archived: false })
+        .eq('id', id)
+        .select()
+        .single()
+    return { data, error }
+}
+
 
 // Sanitize filename to prevent path traversal and special character issues
 function sanitizeFileName(name) {
