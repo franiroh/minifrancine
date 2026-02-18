@@ -24,7 +24,7 @@ export const loadComponents = async () => {
         <i data-lucide="scissors" class="navbar__logo-icon"></i>
         <div class="navbar__brand-wrap">
             <a href="index.html" class="navbar__logo-text">MiniFrancine</a>
-            <span class="navbar__subtitle" data-i18n="nav.subtitle">Embroidery Patterns</span>
+            <span class="navbar__subtitle" data-i18n="nav.subtitle">Embroidery ITH Files</span>
         </div>
       </div>
       <div class="navbar__links">
@@ -61,10 +61,8 @@ export const loadComponents = async () => {
         </div>
 
         <div class="navbar__search">
-            <button class="navbar__icon" id="btn-search-toggle">
-                <i data-lucide="search"></i>
-            </button>
-            <form class="navbar__search-form hidden" id="nav-search-form">
+            <form class="navbar__search-form" id="nav-search-form">
+                <i data-lucide="search" class="navbar__search-icon" style="width:16px;height:16px;color:#9CA3AF;margin-right:8px;"></i>
                 <input type="text" class="navbar__search-input" placeholder="Buscar..." id="nav-search-input" data-i18n-placeholder="nav.search_placeholder">
                 <button type="submit" class="hidden"></button>
             </form>
@@ -144,19 +142,10 @@ export const loadComponents = async () => {
   }
 
   // Handle Search Logic
-  const searchToggle = document.getElementById('btn-search-toggle');
   const searchForm = document.getElementById('nav-search-form');
   const searchInput = document.getElementById('nav-search-input');
 
-  if (searchToggle && searchForm && searchInput) {
-    searchToggle.onclick = (e) => {
-      e.stopPropagation();
-      searchForm.classList.toggle('hidden');
-      if (!searchForm.classList.contains('hidden')) {
-        searchInput.focus();
-      }
-    };
-
+  if (searchForm && searchInput) {
     searchForm.onsubmit = (e) => {
       e.preventDefault();
       const query = searchInput.value.trim();
@@ -164,13 +153,6 @@ export const loadComponents = async () => {
         window.location.href = `catalog.html?search=${encodeURIComponent(query)}`;
       }
     };
-
-    // Close search on click outside
-    document.addEventListener('click', (e) => {
-      if (!searchForm.contains(e.target) && !searchToggle.contains(e.target)) {
-        searchForm.classList.add('hidden');
-      }
-    });
   }
 
   // Ensure translations are applied to the newly injected HTML
