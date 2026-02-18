@@ -5,11 +5,16 @@ const supabaseUrl = 'https://dxqsdzktytehycpnrbtn.supabase.co'
 const supabaseKey = 'sb_publishable_crjG8THHPXfnLrtQityLWg_7pLdQPhG'
 export const supabase = createClient(supabaseUrl, supabaseKey)
 
-export async function fetchProducts({ publishedOnly = false, tag = null, search = null, includeArchived = false } = {}) {
+export async function fetchProducts({ publishedOnly = false, tag = null, search = null, sort = null, includeArchived = false } = {}) {
     let query = supabase
         .from('products')
         .select('*, categories(name)')
-        .order('id', { ascending: true })
+
+    if (sort === 'newest') {
+        query = query.order('id', { ascending: false })
+    } else {
+        query = query.order('id', { ascending: true })
+    }
 
     if (publishedOnly) {
         query = query.eq('published', true)
