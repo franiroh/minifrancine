@@ -102,9 +102,16 @@ document.addEventListener('DOMContentLoaded', async () => {
         ]);
     }
 
-    // 4. Fetch Categories & Render Filters
-    const categories = await fetchCategories();
-    renderFilters(categories, category);
+    // 4. Initial Breadcrumbs State
+    renderBreadcrumbs([]); // Placeholder UI
+
+    // 5. Fetch Categories for Translations
+    let categories = [];
+    try {
+        categories = await fetchCategories();
+    } catch (e) {
+        console.error("Error loading categories:", e);
+    }
 
     // Update Title with Translation if category is present
     if (category) {
@@ -113,10 +120,12 @@ document.addEventListener('DOMContentLoaded', async () => {
             const translatedName = i18n.t(`category.${catObj.id}`);
             if (categoryTitle) categoryTitle.textContent = translatedName;
             document.title = `Categoría: ${translatedName} — MiniFrancine`;
+        } else {
+            if (categoryTitle) categoryTitle.textContent = category;
         }
     }
 
-    // 5. Render Breadcrumbs
+    // 5. Build View Components
     const breadcrumbsContainer = document.getElementById('breadcrumbs-placeholder');
     if (breadcrumbsContainer) {
         if (category) {
@@ -229,30 +238,6 @@ function renderTagFilters(categoryProducts, categoryName, activeTag) {
             </a>
         `;
     }).join('');
-
-    container.innerHTML = html;
-}
-
-function renderFilters(categories, activeCategory) {
-    const container = document.getElementById('catalog-filters');
-    if (!container) return;
-
-    if (!categories || categories.length === 0) return;
-
-    // 'Todos' button
-    let html = `
-        <a href="catalog.html" class="filter-chip ${!activeCategory ? 'filter-chip--active' : ''}" style="text-decoration: none;" data-i18n="category.all">${i18n.t('category.all') || 'Todos'}</a>
-    `;
-
-    // Categories
-    html += categories.map(c => `
-        <a href="catalog.html?category=${encodeURIComponent(c.name)}" 
-           class="filter-chip ${activeCategory === c.name ? 'filter-chip--active' : ''}" 
-           style="text-decoration: none;"
-           data-i18n="category.${c.id}">
-           ${i18n.t(`category.${c.id}`) || escapeHtml(c.name)}
-        </a>
-    `).join('');
 
     container.innerHTML = html;
 }
