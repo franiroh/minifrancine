@@ -185,7 +185,7 @@ function renderGrid(grid, products) {
     if (!grid) return;
 
     if (products.length === 0) {
-        grid.innerHTML = '<p style="grid-column: 1/-1; text-align: center; color: #6b7280; padding: 40px;">No se encontraron productos.</p>';
+        grid.innerHTML = `<p style="grid-column: 1/-1; text-align: center; color: #6b7280; padding: 40px;">${i18n.t('msg.no_products_category') || 'No se encontraron productos.'}</p>`;
         return;
     }
 

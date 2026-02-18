@@ -42,7 +42,7 @@ export const loadComponents = async () => {
         </div>
 
         <a href="catalog.html?sort=newest" class="navbar__link" data-i18n="nav.new">Novedades</a>
-        <a href="help.html" class="navbar__link" data-i18n="nav.help">Ayuda</a>
+        <a href="faq.html" class="navbar__link" data-i18n="nav.faq">FAQ</a>
       </div>
       <div class="navbar__right">
         <!-- Language Switcher -->
@@ -110,13 +110,13 @@ export const loadComponents = async () => {
           <a href="index.html" data-i18n="nav.home">Inicio</a>
           <a href="categories.html" data-i18n="nav.catalog">Categorías</a>
           <a href="catalog.html?sort=newest" data-i18n="nav.new">Novedades</a>
-          <a href="help.html" data-i18n="nav.help">Ayuda</a>
+          <a href="faq.html" data-i18n="nav.faq">FAQ</a>
         </div>
       </div>
       <div class="footer__bottom">
         <span>
           &copy; 2026 MiniFrancine. <span data-i18n="footer.rights">Todos los derechos reservados.</span>
-          <a href="help.html" style="margin-left: 10px; color: inherit; text-decoration: none;" data-i18n="footer.terms">Términos y Condiciones</a>
+          <a href="faq.html" style="margin-left: 10px; color: inherit; text-decoration: none;" data-i18n="footer.terms">Términos y Condiciones</a>
         </span>
       </div>
     </footer>

@@ -100,6 +100,7 @@ export const i18n = {
             'btn.purchased': { es: 'Comprado', en: 'Purchased', pt: 'Comprado' },
             'btn.add_to_cart': { es: 'Agregar al Carrito', en: 'Add to Cart', pt: 'Adicionar ao Carrinho' },
             'nav.login': { es: 'Iniciar Sesión', en: 'Log In', pt: 'Entrar' },
+            'nav.faq': { es: 'FAQ', en: 'FAQ', pt: 'FAQ' },
             'auth.reset_link_sent': { es: '¡Enlace enviado! Revisa tu email para restablecer tu contraseña.', en: 'Link sent! Check your email to reset your password.', pt: 'Link enviado! Verifique seu e-mail para redefinir sua senha.' },
             'auth.send_reset_link': { es: 'Enviar enlace', en: 'Send link', pt: 'Enviar link' },
             'auth.sending': { es: 'Enviando...', en: 'Sending...', pt: 'Enviando...' },
@@ -116,7 +117,60 @@ export const i18n = {
             'reset_password.fill_both_fields': { es: 'Por favor completa ambos campos', en: 'Please fill in both fields', pt: 'Por favor, preencha ambos os campos' },
             'reset_password.min_length': { es: 'La contraseña debe tener al menos 6 caracteres', en: 'Password must be at least 6 characters', pt: 'A senha deve ter pelo menos 6 caracteres' },
             'reset_password.no_match': { es: 'Las contraseñas no coinciden', en: 'Passwords do not match', pt: 'As senhas não coincidem' },
-            'reset_password.success': { es: '¡Contraseña actualizada exitosamente!', en: 'Password updated successfully!', pt: 'Senha atualizada com sucesso!' }
+            'reset_password.success': { es: '¡Contraseña actualizada exitosamente!', en: 'Password updated successfully!', pt: 'Senha atualizada com sucesso!' },
+
+            // FAQ Page
+            'faq.page_title': { es: 'MiniFrancine — Preguntas Frecuentes', en: 'MiniFrancine — FAQ', pt: 'MiniFrancine — Perguntas Frequentes' },
+            'faq.hero_title': { es: 'Preguntas Frecuentes', en: 'Frequently Asked Questions', pt: 'Perguntas Frequentes' },
+            'faq.hero_subtitle': { es: 'Todo lo que necesitas saber sobre cómo usar MiniFrancine, descargar tus diseños y preparar tus archivos de bordado.', en: 'Everything you need to know about using MiniFrancine, downloading your designs, and preparing your embroidery files.', pt: 'Tudo o que você precisa saber sobre como usar MiniFrancine, baixar seus designs e preparar seus arquivos de bordado.' },
+
+            'faq.section_getting_started': { es: 'Comenzando', en: 'Getting Started', pt: 'Começando' },
+            'faq.section_downloading': { es: 'Descargando Archivos', en: 'Downloading Files', pt: 'Baixando Arquivos' },
+            'faq.section_extracting': { es: 'Descomprimiendo Archivos ZIP', en: 'Extracting ZIP Files', pt: 'Extraindo Arquivos ZIP' },
+            'faq.section_equipment': { es: 'Equipo Necesario', en: 'Required Equipment', pt: 'Equipamento Necessário' },
+            'faq.section_support': { es: 'Soporte', en: 'Support', pt: 'Suporte' },
+
+            'faq.q1_browse': { es: '¿Cómo navego por los diseños?', en: 'How do I browse designs?', pt: 'Como navego pelos designs?' },
+            'faq.a1_browse': { es: 'Puedes explorar nuestros diseños desde la página de <strong>Catálogo</strong> en el menú principal. Usa los filtros por categoría o busca diseños específicos. Cada diseño muestra una vista previa y detalles del archivo.', en: 'You can explore our designs from the <strong>Catalog</strong> page in the main menu. Use category filters or search for specific designs. Each design shows a preview and file details.', pt: 'Você pode explorar nossos designs na página <strong>Catálogo</strong> no menu principal. Use filtros por categoria ou pesquise designs específicos. Cada design mostra uma prévia e detalhes do arquivo.' },
+
+            'faq.q2_purchase': { es: '¿Cómo compro un diseño?', en: 'How do I purchase a design?', pt: 'Como compro um design?' },
+            'faq.a2_purchase': { es: 'Haz clic en <strong>"Comprar"</strong> en cualquier diseño para agregarlo al carrito. Luego ve al carrito y completa el pago con PayPal. Una vez confirmado el pago, el diseño estará disponible en <strong>"Mis Diseños"</strong>.', en: 'Click <strong>"Buy"</strong> on any design to add it to your cart. Then go to cart and complete payment with PayPal. Once payment is confirmed, the design will be available in <strong>"My Designs"</strong>.', pt: 'Clique em <strong>"Comprar"</strong> em qualquer design para adicioná-lo ao carrinho. Em seguida, vá ao carrinho e complete o pagamento com PayPal. Após a confirmação do pagamento, o design estará disponível em <strong>"Meus Designs"</strong>.' },
+
+            'faq.q3_download': { es: '¿Cómo descargo mis diseños comprados?', en: 'How do I download my purchased designs?', pt: 'Como baixo meus designs comprados?' },
+            'faq.a3_download_intro': { es: 'Sigue estos pasos para descargar tus diseños:', en: 'Follow these steps to download your designs:', pt: 'Siga estes passos para baixar seus designs:' },
+            'faq.a3_download_step1': { es: 'Ve a <strong>"Mis Diseños"</strong> en el menú de usuario', en: 'Go to <strong>"My Designs"</strong> in the user menu', pt: 'Vá para <strong>"Meus Designs"</strong> no menu do usuário' },
+            'faq.a3_download_step2': { es: 'Encuentra el diseño que quieres descargar', en: 'Find the design you want to download', pt: 'Encontre o design que deseja baixar' },
+            'faq.a3_download_step3': { es: 'Haz clic en el botón <strong>"Descargar"</strong>', en: 'Click the <strong>"Download"</strong> button', pt: 'Clique no botão <strong>"Baixar"</strong>' },
+            'faq.a3_download_step4': { es: 'El archivo ZIP se guardará en tu carpeta de descargas', en: 'The ZIP file will be saved to your downloads folder', pt: 'O arquivo ZIP será salvo na sua pasta de downloads' },
+
+            'faq.q4_redownload': { es: '¿Puedo volver a descargar un diseño?', en: 'Can I re-download a design?', pt: 'Posso baixar novamente um design?' },
+            'faq.a4_redownload': { es: '¡Sí! Puedes descargar tus diseños comprados tantas veces como necesites. Solo ve a <strong>"Mis Diseños"</strong> y haz clic en descargar nuevamente.', en: 'Yes! You can download your purchased designs as many times as you need. Just go to <strong>"My Designs"</strong> and click download again.', pt: 'Sim! Você pode baixar seus designs comprados quantas vezes precisar. Basta ir para <strong>"Meus Designs"</strong> e clicar em baixar novamente.' },
+
+            'faq.q5_what_is_zip': { es: '¿Qué es un archivo ZIP?', en: 'What is a ZIP file?', pt: 'O que é um arquivo ZIP?' },
+            'faq.a5_what_is_zip': { es: 'Un archivo ZIP es un archivo comprimido que contiene tus diseños de bordado. Necesitas <strong>descomprimir</strong> (extraer) el archivo para acceder a los archivos de diseño individuales.', en: 'A ZIP file is a compressed file that contains your embroidery designs. You need to <strong>extract</strong> (unzip) the file to access the individual design files.', pt: 'Um arquivo ZIP é um arquivo compactado que contém seus designs de bordado. Você precisa <strong>extrair</strong> (descompactar) o arquivo para acessar os arquivos de design individuais.' },
+
+            'faq.q6_extract_windows': { es: '¿Cómo descomprimo en Windows?', en: 'How do I extract on Windows?', pt: 'Como extraio no Windows?' },
+            'faq.a6_extract_windows_intro': { es: 'En Windows:', en: 'On Windows:', pt: 'No Windows:' },
+            'faq.a6_extract_windows_step1': { es: 'Haz clic derecho en el archivo ZIP', en: 'Right-click on the ZIP file', pt: 'Clique com o botão direito no arquivo ZIP' },
+            'faq.a6_extract_windows_step2': { es: 'Selecciona <strong>"Extraer todo..."</strong>', en: 'Select <strong>"Extract All..."</strong>', pt: 'Selecione <strong>"Extrair Tudo..."</strong>' },
+            'faq.a6_extract_windows_step3': { es: 'Elige dónde guardar los archivos', en: 'Choose where to save the files', pt: 'Escolha onde salvar os arquivos' },
+            'faq.a6_extract_windows_step4': { es: 'Haz clic en <strong>"Extraer"</strong>', en: 'Click <strong>"Extract"</strong>', pt: 'Clique em <strong>"Extrair"</strong>' },
+
+            'faq.q7_extract_mac': { es: '¿Cómo descomprimo en Mac?', en: 'How do I extract on Mac?', pt: 'Como extraio no Mac?' },
+            'faq.a7_extract_mac': { es: 'En Mac, simplemente <strong>haz doble clic</strong> en el archivo ZIP y se extraerá automáticamente en la misma carpeta.', en: 'On Mac, simply <strong>double-click</strong> the ZIP file and it will automatically extract in the same folder.', pt: 'No Mac, simplesmente <strong>clique duas vezes</strong> no arquivo ZIP e ele será extraído automaticamente na mesma pasta.' },
+
+            'faq.q8_what_need': { es: '¿Qué necesito para usar estos diseños?', en: 'What do I need to use these designs?', pt: 'O que preciso para usar esses designs?' },
+            'faq.a8_equipment_title': { es: 'Equipo Necesario:', en: 'Required Equipment:', pt: 'Equipamento Necessário:' },
+            'faq.a8_equipment_machine': { es: '<strong>Máquina bordadora</strong> - Compatible con formatos de bordado digitales', en: '<strong>Embroidery machine</strong> - Compatible with digital embroidery formats', pt: '<strong>Máquina de bordar</strong> - Compatível com formatos de bordado digitais' },
+            'faq.a8_equipment_usb': { es: '<strong>USB / Pen Drive</strong> - Para transferir archivos a tu máquina', en: '<strong>USB / Flash Drive</strong> - To transfer files to your machine', pt: '<strong>USB / Pen Drive</strong> - Para transferir arquivos para sua máquina' },
+            'faq.a8_equipment_computer': { es: '<strong>Computadora</strong> - Para descargar y descomprimir archivos', en: '<strong>Computer</strong> - To download and extract files', pt: '<strong>Computador</strong> - Para baixar e extrair arquivos' },
+            'faq.a8_equipment_software': { es: '<strong>Software de descompresión</strong> - Ya incluido en Windows y Mac', en: '<strong>Unzip software</strong> - Already included in Windows and Mac', pt: '<strong>Software de descompactação</strong> - Já incluído no Windows e Mac' },
+
+            'faq.q9_formats': { es: '¿Qué formatos de archivo están disponibles?', en: 'What file formats are available?', pt: 'Quais formatos de arquivo estão disponíveis?' },
+            'faq.a9_formats': { es: 'Nuestros diseños están disponibles en los formatos más comunes de bordado. Verifica la compatibilidad con tu máquina bordadora antes de comprar. Los formatos típicos incluyen PES, DST, JEF, y otros.', en: 'Our designs are available in the most common embroidery formats. Check compatibility with your embroidery machine before purchasing. Typical formats include PES, DST, JEF, and others.', pt: 'Nossos designs estão disponíveis nos formatos de bordado mais comuns. Verifique a compatibilidade com sua máquina de bordar antes de comprar. Os formatos típicos incluem PES, DST, JEF e outros.' },
+
+            'faq.q10_contact': { es: '¿Cómo puedo contactar soporte?', en: 'How can I contact support?', pt: 'Como posso contatar o suporte?' },
+            'faq.a10_contact': { es: 'Si tienes alguna pregunta o problema, puedes contactarnos a través de nuestro formulario de contacto o enviando un email. Respondemos todas las consultas en un plazo de 24-48 horas.', en: 'If you have any questions or issues, you can contact us through our contact form or by sending an email. We respond to all inquiries within 24-48 hours.', pt: 'Se você tiver alguma dúvida ou problema, pode nos contatar através do nosso formulário de contato ou enviando um e-mail. Respondemos a todas as consultas em 24-48 horas.' }
         };
 
         // 1. Try to load from local storage first (Cache)
@@ -181,33 +235,18 @@ export const i18n = {
     },
 
     async updatePage() {
-        // Fetch translations if empty? (Already done in init)
-
         // Update elements with data-i18n
-        document.querySelectorAll('[data-i18n]').forEach(el => {
+        const elements = document.querySelectorAll('[data-i18n]');
+        elements.forEach(el => {
             const key = el.getAttribute('data-i18n');
             const translation = this.t(key);
-
-            // If the element has children (like icons), we try to find a text node or a span.
-            // Current strategy: If it has children, look for a text node to replace, OR assume simple text.
-            // Better: Use a helper to safely replace text content while keeping icons?
-            // Actually, for this site, most i18n elements will be simple text.
-            // For complex ones (like Navbar with icon + text), we should wrap text in a span with data-i18n.
-            // Exception: Hero Badge had an icon.
-
-            if (el.children.length === 0) {
-                el.textContent = translation;
-            } else {
-                // If it has children, we might be breaking layout if we just set textContent.
-                // Does it have a data-i18n-target? No.
-                // Let's assume if it has children, we should look for a specific child or APPEND/PREPEND?
-                // No, standard is: Developer wraps text in <span>.
-                // Let's warn in console if we are overwriting children.
-                // console.warn('i18n: Overwriting children for key', key, el);
-                // For now, let's just use textContent as it's safer for XSS than innerHTML, 
-                // but we might lose icons if they are not separated.
-                // FIX: We will refactor HTML to ensure text is isolated.
-                el.textContent = translation;
+            if (translation) {
+                // Use innerHTML if translation contains HTML tags
+                if (/<[^>]+>/.test(translation)) {
+                    el.innerHTML = translation;
+                } else {
+                    el.textContent = translation;
+                }
             }
         });
 

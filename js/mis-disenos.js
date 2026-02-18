@@ -2,7 +2,7 @@
 import { loadComponents, updateNavbarAuth, updateNavbarCartCount, createSkeletonCard } from './components.js';
 import { getUser, onAuthStateChange, fetchPurchasedProducts, downloadProductFile } from './api.js';
 import { loadCart, getCartCount } from './state.js';
-import { escapeHtml, sanitizeCssValue, showToast } from './utils.js';
+import { escapeHtml, sanitizeCssValue, showToast, InfiniteScrollManager } from './utils.js';
 import i18n from './i18n.js';
 
 async function init() {
@@ -54,6 +54,8 @@ async function loadAndRender() {
     }
 }
 
+let designsScrollManager = null;
+
 function renderDesigns(products) {
     const grid = document.getElementById('designs-grid');
 
@@ -69,7 +71,60 @@ function renderDesigns(products) {
         return;
     }
 
-    grid.innerHTML = products.map(product => `
+    // Initialize scroll manager
+    if (designsScrollManager) {
+        designsScrollManager.disconnect();
+    }
+    designsScrollManager = new InfiniteScrollManager(products, 24);
+
+    // Clear grid and load first page
+    grid.innerHTML = '';
+    const firstBatch = designsScrollManager.loadMore();
+    grid.innerHTML = firstBatch.map(product => renderDesignCard(product)).join('');
+
+    // Create or get sentinel and loading indicator
+    let sentinel = document.getElementById('designs-scroll-sentinel');
+    let loadingIndicator = document.getElementById('designs-loading-more');
+
+    if (!sentinel) {
+        sentinel = document.createElement('div');
+        sentinel.id = 'designs-scroll-sentinel';
+        sentinel.style.height = '1px';
+        grid.parentElement.appendChild(sentinel);
+    }
+
+    if (!loadingIndicator) {
+        loadingIndicator = document.createElement('div');
+        loadingIndicator.id = 'designs-loading-more';
+        loadingIndicator.style.cssText = 'display: none; text-align: center; padding: 20px;';
+        loadingIndicator.innerHTML = Array(4).fill(0).map(() => createSkeletonCard()).join('');
+        grid.parentElement.appendChild(loadingIndicator);
+    }
+
+    // Setup infinite scroll
+    designsScrollManager.setupObserver(sentinel, () => {
+        if (!designsScrollManager.hasMore()) return;
+
+        loadingIndicator.style.display = 'grid';
+        loadingIndicator.style.gridTemplateColumns = 'repeat(auto-fill, minmax(280px, 1fr))';
+        loadingIndicator.style.gap = '24px';
+
+        setTimeout(() => {
+            const newBatch = designsScrollManager.loadMore();
+            grid.insertAdjacentHTML('beforeend', newBatch.map(p => renderDesignCard(p)).join(''));
+            loadingIndicator.style.display = 'none';
+            if (window.lucide) window.lucide.createIcons();
+            attachDownloadListeners();
+        }, 300);
+    });
+
+    if (window.lucide) window.lucide.createIcons();
+    attachDownloadListeners();
+    handleScrollToProduct();
+}
+
+function renderDesignCard(product) {
+    return `
         <div class="product-card product-card--purchased" id="product-${parseInt(product.id)}" data-id="${parseInt(product.id)}">
             <a href="product.html?id=${product.id}" class="product-card__image" style="background: ${sanitizeCssValue(product.imageColor)}; display: block;">
                 ${product.mainImage ? `<img src="${escapeHtml(product.mainImage)}" alt="${escapeHtml(product.title)}" class="product-card__img" loading="lazy">` : ''}
@@ -89,11 +144,7 @@ function renderDesigns(products) {
                 </div>
             </div>
         </div>
-    `).join('');
-
-    if (window.lucide) window.lucide.createIcons();
-    attachDownloadListeners();
-    handleScrollToProduct();
+    `;
 }
 
 function attachDownloadListeners() {
