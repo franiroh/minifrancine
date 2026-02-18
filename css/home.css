@@ -100,7 +100,7 @@
     padding: 48px 80px;
     display: flex;
     flex-direction: column;
-    gap: 32px;
+    gap: 16px;
 }
 
 .catalog__header {
@@ -144,6 +144,21 @@
     background: #1A1A1A;
     color: #FFF;
     font-weight: 600;
+}
+
+/* --- Tag Sub-filters --- */
+.filter-chip--tag {
+    background: #FFF0F0;
+    color: #FF6B6B;
+}
+
+.filter-chip--tag:hover {
+    background: #FFE0E0;
+}
+
+.filter-chip--tag.filter-chip--active {
+    background: #FF6B6B;
+    color: #FFF;
 }
 
 /* --- Product Grid & Card --- */

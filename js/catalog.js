@@ -149,26 +149,89 @@ document.addEventListener('DOMContentLoaded', async () => {
     }
 
     // 6. Fetch Products
-    let products = await fetchProducts({
+    const sort = params.get('sort');
+
+    // Fetch products. If category is selected, we fetch all to extract tags, then filter.
+    // However, fetchProducts already handles search/tag/sort.
+    // For category view, we fetch all products to get the full tag list for that category.
+    let fetchedProducts = await fetchProducts({
         publishedOnly: true,
-        tag: tag,
-        search: search
+        // If NO category, we can use DB-level tag/search filtering
+        tag: category ? null : tag,
+        search: search,
+        sort: sort
     });
 
+    let displayProducts = fetchedProducts;
     if (category) {
-        products = products.filter(p => p.category === category);
+        displayProducts = fetchedProducts.filter(p => p.category === category);
+        // Render tag filters based on ALL products in this category
+        renderTagFilters(displayProducts, category, tag);
+
+        // Then apply the tag filter for the grid if present
+        if (tag) {
+            displayProducts = displayProducts.filter(p => p.tags && p.tags.includes(tag));
+        }
+    } else {
+        const tagContainer = document.getElementById('tag-filters');
+        if (tagContainer) tagContainer.style.display = 'none';
     }
 
     // Update count
     if (resultCount) {
-        resultCount.dataset.count = products.length;
-        const key = products.length === 1 ? 'catalog.result_single' : 'catalog.result_plural';
-        resultCount.textContent = `${products.length} ${i18n.t(key)}`;
+        resultCount.dataset.count = displayProducts.length;
+        const key = displayProducts.length === 1 ? 'catalog.result_single' : 'catalog.result_plural';
+        resultCount.textContent = `${displayProducts.length} ${i18n.t(key)}`;
     }
 
     // 7. Render Grid
-    renderGrid(grid, products);
+    renderGrid(grid, displayProducts);
 });
+
+function renderTagFilters(categoryProducts, categoryName, activeTag) {
+    const container = document.getElementById('tag-filters');
+    if (!container) return;
+
+    // Extract unique tags from products in this category
+    const allTags = new Set();
+    categoryProducts.forEach(p => {
+        if (p.tags && Array.isArray(p.tags)) {
+            p.tags.forEach(t => allTags.add(t));
+        }
+    });
+
+    if (allTags.size === 0) {
+        container.style.display = 'none';
+        return;
+    }
+
+    container.style.display = 'flex';
+
+    // "Todos" chip for the current category
+    let html = `
+        <a href="catalog.html?category=${encodeURIComponent(categoryName)}" 
+           class="filter-chip filter-chip--tag ${!activeTag ? 'filter-chip--active' : ''}" 
+           style="text-decoration: none;">
+           ${i18n.t('category.all') || 'Todos'}
+        </a>
+    `;
+
+    // Sort tags alphabetically
+    const sortedTags = Array.from(allTags).sort((a, b) => a.localeCompare(b));
+
+    html += sortedTags.map(t => {
+        const isActive = activeTag === t;
+        return `
+            <a href="catalog.html?category=${encodeURIComponent(categoryName)}&tag=${encodeURIComponent(t)}" 
+               class="filter-chip filter-chip--tag ${isActive ? 'filter-chip--active' : ''}" 
+               style="text-decoration: none;">
+               ${escapeHtml(t)}
+            </a>
+        `;
+    }).join('');
+
+    container.innerHTML = html;
+}
 
 function renderFilters(categories, activeCategory) {
     const container = document.getElementById('catalog-filters');

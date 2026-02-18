@@ -10,10 +10,11 @@ export async function fetchProducts({ publishedOnly = false, tag = null, search 
         .from('products')
         .select('*, categories(name)')
 
-    if (sort === 'newest') {
-        query = query.order('id', { ascending: false })
+    if (sort === 'oldest') {
+        query = query.order('created_at', { ascending: true })
     } else {
-        query = query.order('id', { ascending: true })
+        // Default: Newest first
+        query = query.order('created_at', { ascending: false })
     }
 
     if (publishedOnly) {
