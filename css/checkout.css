@@ -429,24 +429,28 @@
         order: 2;
     }
 
-    .info-box {
-        order: 4;
-    }
-
-    .checkout-form {
-        order: 5;
-    }
-
     .checkout-summary {
         order: 3;
     }
 
-    #paypal-button-container {
+    .coupon-section {
+        order: 4;
+    }
+
+    .info-box {
+        order: 5;
+    }
+
+    .checkout-form {
         order: 6;
     }
 
-    .checkout-secure {
+    #paypal-button-container {
         order: 7;
+    }
+
+    .checkout-secure {
+        order: 8;
     }
 
     .checkout-form__row {
