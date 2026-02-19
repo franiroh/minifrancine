@@ -461,6 +461,47 @@ export async function captureOrderSecure(orderID, dbOrderId) {
     return data;
 }
 
+// --- Coupons ---
+
+export async function fetchMyCoupons() {
+    const { data, error } = await supabase
+        .from('coupons')
+        .select('*')
+        .eq('is_used', false)
+        .order('created_at', { ascending: false });
+
+    if (error) {
+        console.error('Error fetching coupons:', error);
+        return [];
+    }
+    return data;
+}
+
+export async function validateCoupon(code) {
+    const { data, error } = await supabase
+        .from('coupons')
+        .select('*')
+        .eq('code', code)
+        .eq('is_used', false)
+        .single();
+
+    if (error) {
+        console.warn('Invalid or used coupon code:', code);
+        return { data: null, error };
+    }
+    return { data, error: null };
+}
+
+export async function markCouponAsUsed(couponId) {
+    const { error } = await supabase
+        .from('coupons')
+        .update({ is_used: true })
+        .eq('id', couponId);
+
+    if (error) console.error('Error marking coupon as used:', error);
+    return !error;
+}
+
 // --- Send Order Confirmation Email ---
 export async function sendOrderConfirmationEmail(orderId) {
     console.log('🔔 sendOrderConfirmationEmail called with orderId:', orderId);

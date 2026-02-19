@@ -106,8 +106,8 @@ input {
 }
 
 #footer-placeholder {
-    min-height: 400px;
-    /* Approximate footer height to prevent CLS */
+    margin-top: auto;
+    background: var(--color-foreground);
 }
 
 /* --- Preloader --- */

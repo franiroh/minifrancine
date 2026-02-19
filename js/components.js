@@ -144,8 +144,7 @@ export const loadComponents = async () => {
           <a href="terms.html" style="margin-left: 10px; color: inherit; text-decoration: none;" data-i18n="footer.terms">Términos y Condiciones</a>
         </span>
       </div>
-    </footer>
-        `;
+    </footer>`;
 
   }
 

@@ -433,7 +433,6 @@ svg.navbar__icon {
     background: var(--color-foreground);
     color: var(--color-surface);
     padding: 64px 80px 32px;
-    margin-top: auto;
 }
 
 .footer__top {

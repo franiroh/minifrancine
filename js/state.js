@@ -1,5 +1,5 @@
 
-import { fetchFavorites, addToFavorites, removeFromFavorites, fetchCart, addToCartDB, removeFromCartDB, clearCartDB, fetchPurchasedProductIds } from './api.js';
+import { fetchFavorites, addToFavorites, removeFromFavorites, fetchCart, addToCartDB, removeFromCartDB, clearCartDB, fetchPurchasedProductIds, fetchMyCoupons } from './api.js';
 import { showToast } from './utils.js';
 
 export const state = {
@@ -7,6 +7,8 @@ export const state = {
     favorites: new Set(),
     purchases: new Set(),
     user: null,
+    coupons: [],
+    appliedCoupon: null,
 };
 
 // --- Cart Logic (Hybrid) ---
@@ -174,4 +176,28 @@ export const loadPurchases = async (user) => {
 
 export const isPurchased = (productId) => {
     return state.purchases.has(parseInt(productId));
+};
+
+// --- Coupons Logic ---
+
+export const loadCoupons = async (user) => {
+    if (!user) {
+        state.coupons = [];
+        state.appliedCoupon = null;
+        return;
+    }
+    state.user = user;
+    const coupons = await fetchMyCoupons();
+    state.coupons = coupons;
+    window.dispatchEvent(new CustomEvent('coupons-updated'));
+};
+
+export const applyCoupon = (coupon) => {
+    state.appliedCoupon = coupon;
+    window.dispatchEvent(new CustomEvent('coupon-applied', { detail: coupon }));
+};
+
+export const removeCoupon = () => {
+    state.appliedCoupon = null;
+    window.dispatchEvent(new CustomEvent('coupon-applied', { detail: null }));
 };

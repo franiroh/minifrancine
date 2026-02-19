@@ -1,7 +1,8 @@
 
 import { loadComponents, updateNavbarAuth, updateNavbarCartCount } from './components.js';
 import { getUser, onAuthStateChange } from './api.js';
-import { state, loadCart, getCartCount, getCartTotal, removeFromCart, loadPurchases, isPurchased } from './state.js';
+import { state, loadCart, getCartCount, getCartTotal, removeFromCart, loadPurchases, isPurchased, loadCoupons, applyCoupon, removeCoupon } from './state.js';
+import { validateCoupon } from './api.js';
 import { escapeHtml, showToast } from './utils.js';
 import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js/+esm'
 import i18n from './i18n.js';
@@ -19,7 +20,7 @@ function loadPayPalScript(clientId) {
             return;
         }
         const script = document.createElement('script');
-        script.src = `https://www.paypal.com/sdk/js?client-id=${clientId}&currency=USD`;
+        script.src = `https://www.paypal.com/sdk/js?client-id=${clientId}&currency=USD&disable-funding=card`;
         script.onload = () => resolve();
         script.onerror = () => reject(new Error('Failed to load PayPal SDK'));
         document.head.appendChild(script);
@@ -34,6 +35,7 @@ async function init() {
 
     await loadCart(user);
     updateNavbarCartCount(getCartCount());
+    await loadCoupons(user);
 
     // Remove any already-purchased products from cart (safety net)
     await loadPurchases(user);
@@ -62,6 +64,10 @@ async function init() {
 
     renderCheckout();
 
+    // Listeners for coupons
+    window.addEventListener('coupons-updated', renderCheckout);
+    window.addEventListener('coupon-applied', renderCheckout);
+
     onAuthStateChange((event, session) => {
         updateNavbarAuth(session ? session.user : null);
     });
@@ -77,7 +83,23 @@ function renderCheckout() {
     const payBtn = document.getElementById('pay-btn');
 
     const cart = state.cart;
-    const total = getCartTotal();
+    const subtotal = getCartTotal();
+    let total = subtotal;
+    let discount = 0;
+
+    if (state.appliedCoupon) {
+        if (state.appliedCoupon.type === 'welcome_20') {
+            discount = subtotal * 0.20;
+        } else if (state.appliedCoupon.type === 'bulk_50') {
+            // Sort items by price ascending to apply discount to cheapest items (as per rule)
+            const sortedItems = [...cart].sort((a, b) => parseFloat(a.price) - parseFloat(b.price));
+            // Apply 50% discount to up to 10 items
+            for (let i = 0; i < Math.min(sortedItems.length, state.appliedCoupon.max_items || 10); i++) {
+                discount += parseFloat(sortedItems[i].price) * 0.50;
+            }
+        }
+        total = subtotal - discount;
+    }
 
     if (itemsContainer) {
         itemsContainer.innerHTML = cart.map(item => `
@@ -91,8 +113,32 @@ function renderCheckout() {
         `).join('');
     }
 
-    if (subtotalEl) subtotalEl.textContent = `USD ${total}`;
-    if (totalEl) totalEl.textContent = `USD ${total}`;
+    // Render Discount Row
+    const discountRow = document.getElementById('checkout-discount-row');
+    if (state.appliedCoupon) {
+        if (!discountRow) {
+            const row = document.createElement('div');
+            row.id = 'checkout-discount-row';
+            row.className = 'checkout-summary__row checkout-summary__row--discount';
+            row.style.color = 'var(--color-success)';
+            row.style.fontWeight = '600';
+            row.innerHTML = `
+                <span>${i18n.t('checkout.coupon_saved')}</span>
+                <span id="checkout-discount-val">-USD ${discount.toFixed(2)}</span>
+            `;
+            totalEl.parentElement.before(row);
+        } else {
+            document.getElementById('checkout-discount-val').textContent = `-USD ${discount.toFixed(2)}`;
+            discountRow.style.display = 'flex';
+        }
+    } else if (discountRow) {
+        discountRow.style.display = 'none';
+    }
+
+    if (subtotalEl) subtotalEl.textContent = `USD ${subtotal}`;
+    if (totalEl) totalEl.textContent = `USD ${total.toFixed(2)}`;
+
+    renderCouponUI();
 
     // PayPal Buttons
     if (window.paypal) {
@@ -161,6 +207,12 @@ function renderCheckout() {
                             const paymentId = result.data?.id || data.orderID;
                             showToast(`¡Pago exitoso! ID: ${paymentId}`, 'success');
 
+                            // 4. Mark coupon as used if applied
+                            if (state.appliedCoupon) {
+                                await import('./api.js').then(m => m.markCouponAsUsed(state.appliedCoupon.id));
+                                removeCoupon();
+                            }
+
                             // Send order confirmation email
                             // Don't block on email - send asynchronously
                             import('./api.js').then(m => {
@@ -185,6 +237,12 @@ function renderCheckout() {
                             console.warn('Unexpected capture result shape:', result);
                             showToast('Pago procesado. Verificá en "Mis Compras".', 'info');
 
+                            // Mark coupon as used anyway if we reached here
+                            if (state.appliedCoupon) {
+                                await import('./api.js').then(m => m.markCouponAsUsed(state.appliedCoupon.id));
+                                removeCoupon();
+                            }
+
                             // Try to send email anyway
                             import('./api.js').then(m => {
                                 m.sendOrderConfirmationEmail(window.currentDbOrderId)
@@ -205,13 +263,89 @@ function renderCheckout() {
                     showToast('Hubo un error con el pago de PayPal.', 'error');
                 }
             }).render('#paypal-button-container');
+
+            // Hide/Enable container based on checkbox
+            const checkbox = document.getElementById('digital-agreement');
+            const btnContainer = document.getElementById('paypal-button-container');
+            if (checkbox && btnContainer) {
+                btnContainer.style.opacity = '0.5';
+                btnContainer.style.pointerEvents = 'none';
+
+                checkbox.onchange = () => {
+                    if (checkbox.checked) {
+                        btnContainer.style.opacity = '1';
+                        btnContainer.style.pointerEvents = 'auto';
+                    } else {
+                        btnContainer.style.opacity = '0.5';
+                        btnContainer.style.pointerEvents = 'none';
+                    }
+                };
+            }
         }
     }
 
     if (payBtn) {
         if (window.paypal) payBtn.style.display = 'none';
-        payBtn.textContent = `Pagar con PayPal — USD ${total}`;
+        payBtn.textContent = `${i18n.t('checkout.payment_confirm')} — USD ${total.toFixed(2)}`;
     }
+}
+
+function renderCouponUI() {
+    const listContainer = document.getElementById('available-coupons');
+    const appliedInfo = document.getElementById('applied-coupon-info');
+    const appliedText = document.getElementById('applied-coupon-text');
+    const applyBtn = document.getElementById('apply-coupon-btn');
+    const couponInput = document.getElementById('coupon-code');
+    const removeBtn = document.getElementById('remove-coupon-btn');
+
+    if (!listContainer) return;
+
+    // Available coupons
+    if (state.coupons.length > 0) {
+        const availableTitle = `<p class="coupon-section__subtitle">${i18n.t('checkout.coupon_available')}:</p>`;
+        listContainer.innerHTML = availableTitle + state.coupons.map(c => `
+            <div class="coupon-tag" onclick="window.applySelectedCoupon('${c.code}')">
+                <i data-lucide="ticket" size="14"></i>
+                <span>${c.code} (${c.discount_percent}%)</span>
+            </div>
+        `).join('');
+        if (window.lucide) window.lucide.createIcons();
+    } else {
+        listContainer.innerHTML = '';
+    }
+
+    // Applied info
+    if (state.appliedCoupon) {
+        appliedInfo.style.display = 'flex';
+        const title = state.appliedCoupon.type === 'welcome_20' ? i18n.t('checkout.coupon_welcome_title') : i18n.t('checkout.coupon_bulk_title');
+        appliedText.innerHTML = `<strong>${i18n.t('checkout.coupon_applied')}</strong> ${state.appliedCoupon.code} (${title})`;
+        document.querySelector('.coupon-input').style.display = 'none';
+    } else {
+        appliedInfo.style.display = 'none';
+        document.querySelector('.coupon-input').style.display = 'flex';
+    }
+
+    // Handlers
+    applyBtn.onclick = async () => {
+        const code = couponInput.value.trim().toUpperCase();
+        if (!code) return;
+        const { data, error } = await validateCoupon(code);
+        if (error || !data) {
+            showToast(i18n.t('checkout.coupon_invalid'), 'error');
+        } else {
+            applyCoupon(data);
+            couponInput.value = '';
+        }
+    };
+
+    removeBtn.onclick = () => {
+        removeCoupon();
+    };
+
+    window.applySelectedCoupon = async (code) => {
+        const { data } = await validateCoupon(code);
+        if (data) applyCoupon(data);
+    };
 }
 
 document.addEventListener('DOMContentLoaded', init);

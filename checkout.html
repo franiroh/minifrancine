@@ -55,28 +55,45 @@
                     </div>
                 </div>
 
-                <h3 class="checkout-body__subtitle" data-i18n="checkout.billing">Información de Facturación</h3>
+                <div class="info-box">
+                    <i data-lucide="info" class="info-box__icon"></i>
+                    <div class="info-box__content">
+                        <span class="info-box__title" data-i18n="checkout.digital_warning_title">Información
+                            Importante</span>
+                        <p class="info-box__text" data-i18n="checkout.digital_warning_text">Estás comprando diseños de
+                            bordado digitales. No recibirás ningún producto físico por correo. Los archivos estarán
+                            disponibles para descargar inmediatamente después de completar el pago.</p>
+                    </div>
+                </div>
+
+                <div class="coupon-section">
+                    <h3 class="coupon-section__title" data-i18n="checkout.coupon_title">Cupones y Descuentos</h3>
+                    <div class="coupon-input">
+                        <input type="text" id="coupon-code" data-i18n="[placeholder]checkout.coupon_placeholder"
+                            placeholder="Ingresa código de cupón">
+                        <button class="btn btn--sm" id="apply-coupon-btn"
+                            data-i18n="checkout.coupon_apply">Aplicar</button>
+                    </div>
+                    <div id="available-coupons" class="available-coupons">
+                        <!-- Coupons will be listed here -->
+                    </div>
+                    <div id="applied-coupon-info" class="applied-coupon-info" style="display: none;">
+                        <span id="applied-coupon-text"></span>
+                        <button class="btn-link" id="remove-coupon-btn"
+                            data-i18n="checkout.coupon_remove">Quitar</button>
+                    </div>
+                </div>
 
                 <div class="checkout-form">
-                    <div class="checkout-form__row">
-                        <div class="form-field">
-                            <label data-i18n="checkout.name">Nombre completo</label>
-                            <div class="form-input"><input type="text" placeholder="Tu nombre"
-                                    data-i18n-placeholder="checkout.placeholder_name"></div>
-                        </div>
-                        <div class="form-field">
-                            <label data-i18n="checkout.email">Email</label>
-                            <div class="form-input"><input type="email" placeholder="tu@email.com"
-                                    data-i18n-placeholder="checkout.placeholder_email"></div>
-                        </div>
-                    </div>
                     <div class="form-field">
-                        <label data-i18n="checkout.country">País</label>
-                        <div class="form-input form-input--select">
-                            <span>Argentina</span>
-                            <i data-lucide="chevron-down" class="form-input__trail"></i>
-                        </div>
+                        <label class="form-checkbox">
+                            <input type="checkbox" id="digital-agreement">
+                            <span data-i18n="checkout.digital_warning_checkbox">Entiendo que estos son archivos
+                                digitales y no productos físicos para envío.</span>
+                        </label>
                     </div>
+
+
                 </div>
 
                 <div id="paypal-button-container"></div>
