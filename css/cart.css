@@ -193,6 +193,18 @@
     gap: 8px;
 }
 
+.cart-summary__notice {
+    font-size: 13px;
+    color: var(--color-gray-light);
+    text-align: center;
+    margin: 8px 0;
+    padding: 12px;
+    background: var(--color-gray-bg);
+    border-radius: 12px;
+    border: 1px dashed var(--border-color);
+    line-height: 1.4;
+}
+
 /* ============================================================
    Media Queries: Responsive Design
    ============================================================ */

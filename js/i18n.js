@@ -39,6 +39,8 @@ export const i18n = {
             'hero.title': { es: 'Diseños de Bordado Profesionales', en: 'Professional Embroidery Designs', pt: 'Desenhos de Bordado Profissionais' },
             'hero.description': { es: 'Archivos digitales listos para tu máquina. Formatos DST, PES, JEF, VP3 y más. Descarga instantánea.', en: 'Digital files ready for your embroidery machine. DST, PES, JEF, VP3 formats and more. Instant download.', pt: 'Arquivos digitais prontos para sua máquina. Formatos DST, PES, JEF, VP3 e mais. Download instantâneo.' },
 
+            'cart.coupon_notice': { es: 'Los cupones y descuentos se aplican en el checkout', en: 'Coupons and discounts are applied at checkout', pt: 'Cupons e descontos são aplicados no checkout' },
+
             // Favorites
             'favorites.title': { es: 'Mis Favoritos', en: 'My Favorites', pt: 'Meus Favoritos' },
             'favorites.subtitle': { es: 'Los diseños que más te gustan, guardados para ti.', en: 'The designs you love, saved for you.', pt: 'Os designs que você ama, salvos para você.' },
