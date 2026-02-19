@@ -2,8 +2,8 @@
    Product Detail Styles
    ============================================================ */
 
-/* --- Breadcrumb --- */
-.breadcrumb {
+/* --- Breadcrumbs --- */
+.breadcrumbs {
     display: flex;
     align-items: center;
     gap: 8px;
@@ -13,11 +13,11 @@
     color: #9CA3AF;
 }
 
-.breadcrumb__sep {
+.breadcrumbs__sep {
     color: #D1D5DB;
 }
 
-.breadcrumb__current {
+.breadcrumbs__current {
     color: #1A1A1A;
     font-weight: 500;
 }
@@ -47,7 +47,8 @@
     background-position: center;
     overflow: hidden;
     position: relative;
-    /* Ensure relative positioning for contained absolute elements */
+    display: flex;
+    /* Support for multiple images side-by-side on mobile */
 }
 
 .detail__image-wrapper {
@@ -95,6 +96,12 @@
     object-fit: cover;
     object-position: center;
     border-radius: 20px;
+    display: none;
+    /* Hidden by default on desktop, switched by .active */
+}
+
+.detail__main-img-el--active {
+    display: block;
 }
 
 .detail__thumb-img-el {
@@ -144,6 +151,8 @@
     font-family: 'Bricolage Grotesque', serif;
     font-size: 32px;
     font-weight: 800;
+    order: -1;
+    margin: 0;
 }
 
 .detail__badge {
@@ -155,8 +164,8 @@
     font-weight: 700;
     text-transform: uppercase;
     letter-spacing: 0.5px;
-    margin-top: 4px;
-    margin-bottom: 8px;
+    order: -3;
+    margin: 0;
     width: fit-content;
 }
 
@@ -213,7 +222,8 @@
 }
 
 .detail__price {
-    margin-bottom: 24px;
+    margin-bottom: 12px;
+    order: -2;
 }
 
 .detail__price-column {
@@ -291,12 +301,12 @@
 /* --- Action Buttons Row --- */
 .detail__actions {
     display: flex;
-    flex-direction: column;
+    flex-direction: row;
     gap: 12px;
 }
 
 .detail__actions .btn {
-    width: 100%;
+    flex: 1;
     justify-content: center;
 }
 
@@ -326,24 +336,67 @@
 /* --- Mobile Responsiveness --- */
 @media (max-width: 900px) {
     .detail {
-        padding: 0 24px 48px;
+        padding: 24px 20px 48px;
         flex-direction: column;
         gap: 32px;
     }
 
     .detail__main-img {
-        height: 350px;
+        height: auto;
+        aspect-ratio: 1 / 1;
+        width: 100%;
+        overflow-x: auto;
+        scroll-snap-type: x mandatory;
+        scrollbar-width: none;
+        -ms-overflow-style: none;
+    }
+
+    .detail__main-img::-webkit-scrollbar {
+        display: none;
+    }
+
+    .detail__main-img-el {
+        display: block;
+        flex: 0 0 100%;
+        scroll-snap-align: center;
+        border-radius: 20px;
     }
 
     .detail__thumbs {
-        overflow-x: auto;
+        display: none;
     }
 
-    .breadcrumb {
-        padding: 12px 24px;
+    .breadcrumbs {
+        padding: 12px 20px;
     }
 
     .navbar {
-        padding: 0 24px;
+        padding: 0 20px;
+    }
+
+    .detail__info {
+        display: flex;
+        flex-direction: column;
+        gap: 16px;
+    }
+
+    .detail__cat-badge {
+        display: none !important;
+    }
+
+    .detail__badge {
+        order: -3;
+        margin: 0;
+    }
+
+    .detail__price {
+        order: -2;
+        margin: 0;
+    }
+
+    .detail__title {
+        order: -1;
+        font-size: 28px;
+        margin: 0;
     }
 }

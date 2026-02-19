@@ -90,9 +90,11 @@ function renderCategories(products) {
             : (i18n.lang === 'es' ? 'diseños' : 'designs');
 
         return `
-            <a href="index.html?category=${encodeURIComponent(cat.name)}" class="category-card">
-                ${bgContent}
-                <div class="category-card__overlay">
+            <a href="catalog.html?category=${encodeURIComponent(cat.name)}" class="category-card">
+                <div class="category-card__image-wrapper">
+                    ${bgContent}
+                </div>
+                <div class="category-card__info">
                     <h3 class="category-card__name">${escapeHtml(displayName)}</h3>
                     <span class="category-card__count">${parseInt(cat.count)} ${countLabel}</span>
                 </div>

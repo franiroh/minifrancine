@@ -146,6 +146,25 @@
     font-weight: 600;
 }
 
+/* --- Category Header --- */
+.category-header {
+    display: none;
+    padding: 40px 80px;
+    background: linear-gradient(135deg, #FFF5F5 0%, #FFFFFF 100%);
+    text-align: center;
+}
+
+.category-title {
+    font-family: 'Bricolage Grotesque', serif;
+    font-size: 36px;
+    font-weight: 800;
+    margin-bottom: 8px;
+}
+
+.category-subtitle {
+    color: #6B7280;
+}
+
 /* --- Tag Sub-filters --- */
 .filter-chip--tag {
     background: #FFF0F0;
@@ -377,4 +396,150 @@
 .btn--purchased i {
     width: 14px;
     height: 14px;
+}
+
+/* ============================================================
+   Media Queries: Responsive Design
+   ============================================================ */
+
+/* Mobile & Tablet (up to 1024px) */
+@media (max-width: 1024px) {
+    .hero {
+        padding: 40px;
+        gap: 32px;
+        height: auto;
+    }
+
+    .hero__right,
+    .hero__image {
+        width: 400px;
+        height: 320px;
+    }
+
+    .trust-bar {
+        padding: 24px 40px;
+        gap: 32px;
+    }
+
+    .catalog {
+        padding: 48px 40px;
+    }
+}
+
+/* Mobile (up to 768px) */
+@media (max-width: 768px) {
+    .hero {
+        flex-direction: column-reverse;
+        padding: 40px 20px;
+        text-align: left;
+        /* Changed from center */
+        gap: 40px;
+    }
+
+    .hero__left {
+        align-items: flex-start;
+        /* Changed from center */
+    }
+
+    .hero__badge {
+        justify-content: flex-start;
+        /* Changed from center */
+    }
+
+    .hero__title {
+        font-size: 32px;
+    }
+
+    .hero__sub {
+        font-size: 16px;
+    }
+
+    .hero__ctas {
+        flex-direction: row;
+        width: 100%;
+        gap: 10px;
+        justify-content: center;
+    }
+
+    .hero__ctas .btn {
+        width: auto;
+        flex: 1;
+        padding: 10px 12px;
+        font-size: 13px;
+    }
+
+    .hero__right,
+    .hero__image {
+        width: 100%;
+        height: 240px;
+    }
+
+    .trust-bar {
+        flex-direction: row;
+        justify-content: center;
+        flex-wrap: nowrap;
+        padding: 20px 10px;
+        gap: 12px;
+        overflow-x: auto;
+        /* Allow horizontal scroll if they absolutely don't fit */
+        -webkit-overflow-scrolling: touch;
+    }
+
+    .trust-bar__item {
+        flex-direction: row;
+        text-align: left;
+        font-size: 11px;
+        gap: 8px;
+        min-width: fit-content;
+        flex: 1;
+        justify-content: center;
+    }
+
+    .trust-bar__item i {
+        font-size: 16px;
+    }
+
+    .catalog {
+        padding: 32px 20px;
+    }
+
+    .catalog__header {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 8px;
+    }
+
+    .catalog__title {
+        font-size: 26px;
+    }
+
+    .product-grid {
+        grid-template-columns: repeat(2, 1fr);
+        /* 2 columns on mobile */
+        gap: 12px;
+        /* Smaller gap for mobile */
+    }
+
+    /* Adjust product card for mobile readability */
+    .product-card__title {
+        font-size: 14px;
+        /* Slightly smaller title for 2-column layout */
+    }
+
+    .product-card__info {
+        padding: 12px;
+        gap: 4px;
+    }
+
+    .product-card__price {
+        font-size: 18px;
+    }
+
+    .category-header {
+        padding: 32px 20px;
+    }
+
+    .category-title {
+        font-size: 28px;
+    }
 }

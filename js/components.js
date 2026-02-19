@@ -19,8 +19,11 @@ export const loadComponents = async () => {
     ).join('');
 
     navbarPlaceholder.innerHTML = `
-    <header class="navbar">
+    <header class="navbar" id="main-navbar">
       <div class="navbar__left">
+        <button class="navbar__toggle" id="mobile-menu-toggle">
+            <i data-lucide="menu"></i>
+        </button>
         <i data-lucide="scissors" class="navbar__logo-icon"></i>
         <div class="navbar__brand-wrap">
             <a href="index.html" class="navbar__logo-text">MiniFrancine</a>
@@ -163,6 +166,40 @@ export const loadComponents = async () => {
   if (window.lucide) {
     window.lucide.createIcons();
   }
+
+  // Mobile Menu Logic
+  const navbar = document.getElementById('main-navbar');
+  const menuToggle = document.getElementById('mobile-menu-toggle');
+
+  if (navbar && menuToggle) {
+    menuToggle.addEventListener('click', () => {
+      navbar.classList.toggle('navbar--mobile-open');
+      const icon = menuToggle.querySelector('i');
+      if (icon) {
+        const isOpening = navbar.classList.contains('navbar--mobile-open');
+        icon.setAttribute('data-lucide', isOpening ? 'x' : 'menu');
+        if (window.lucide) window.lucide.createIcons();
+      }
+    });
+  }
+
+  // Mobile Accordion Logic
+  const menuItems = document.querySelectorAll('.navbar__menu-item');
+  menuItems.forEach(item => {
+    const link = item.querySelector('.navbar__link');
+    if (link) {
+      link.addEventListener('click', (e) => {
+        // Only apply on mobile (where toggle is visible)
+        if (window.innerWidth <= 768) {
+          const dropdown = item.querySelector('.navbar__dropdown');
+          if (dropdown) {
+            e.preventDefault(); // Prevent navigation on the parent link
+            item.classList.toggle('navbar__menu-item--open');
+          }
+        }
+      });
+    }
+  });
 };
 
 import { getProfile } from './api.js';

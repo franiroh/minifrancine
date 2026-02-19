@@ -223,12 +223,22 @@ svg.navbar__icon {
     pointer-events: none;
 }
 
-.navbar__account--open .navbar__dropdown,
-.navbar__account:hover .navbar__dropdown {
+.navbar__account--open .navbar__dropdown {
     display: block;
     opacity: 1;
     transform: translateY(0);
     pointer-events: auto;
+    z-index: 1001;
+    /* Ensure it stays above everything */
+}
+
+@media (min-width: 769px) {
+    .navbar__account:hover .navbar__dropdown {
+        display: block;
+        opacity: 1;
+        transform: translateY(0);
+        pointer-events: auto;
+    }
 }
 
 /* Bridge the gap so mouse doesn't leave hover area */
@@ -250,14 +260,16 @@ svg.navbar__icon {
     align-items: center;
 }
 
-.navbar__menu-item:hover .navbar__dropdown {
-    display: block;
-    opacity: 1;
-    transform: translateY(0);
-    pointer-events: auto;
-    /* Ensure it aligns correctly */
-    top: 100%;
-    left: 0;
+@media (min-width: 769px) {
+    .navbar__menu-item:hover .navbar__dropdown {
+        display: block;
+        opacity: 1;
+        transform: translateY(0);
+        pointer-events: auto;
+        /* Ensure it aligns correctly */
+        top: 100%;
+        left: 0;
+    }
 }
 
 .navbar__dropdown-item {
@@ -628,4 +640,163 @@ svg.navbar__icon {
     gap: 8px;
     align-items: center;
     width: 100%;
+    overflow-x: auto;
+    white-space: nowrap;
+    scrollbar-width: none;
+    /* Hide scrollbar for Chrome/Safari/Firefox */
+}
+
+.breadcrumbs::-webkit-scrollbar {
+    display: none;
+}
+
+/* ============================================================
+   Media Queries: Responsive Design
+   ============================================================ */
+
+/* Mobile & Tablet (up to 1024px) */
+@media (max-width: 1024px) {
+    .navbar {
+        padding: 0 40px;
+    }
+
+    .footer {
+        padding: 64px 40px 32px;
+    }
+}
+
+/* Mobile (up to 768px) */
+@media (max-width: 768px) {
+    .navbar {
+        padding: 0 20px;
+        height: 64px;
+        position: relative;
+        /* Add relative for absolute children */
+    }
+
+    .navbar__logo-text {
+        font-size: 20px;
+    }
+
+    .navbar__subtitle {
+        display: none;
+    }
+
+    .navbar__links {
+        display: none;
+        /* Hide desktop links */
+        position: absolute;
+        top: 64px;
+        left: 0;
+        width: 100%;
+        height: auto;
+        max-height: calc(100vh - 80px);
+        background: #FFFFFF;
+        flex-direction: column;
+        align-items: flex-start;
+        padding: 24px 20px;
+        gap: 16px;
+        z-index: 1000;
+        transform: translateY(-10px);
+        opacity: 0;
+        transition: all 0.3s ease;
+        overflow-y: auto;
+        border-bottom: 1px solid #E5E7EB;
+        box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+    }
+
+    .navbar--mobile-open .navbar__links {
+        display: flex;
+        transform: translateY(0);
+        opacity: 1;
+    }
+
+    .navbar__link {
+        font-size: 16px;
+        /* Slightly smaller font for mobile */
+        width: 100%;
+        padding: 8px 0;
+        /* Add vertical padding for easier tapping */
+    }
+
+    .navbar__menu-item {
+        width: 100%;
+        height: auto;
+        display: flex;
+        flex-direction: column;
+        align-items: flex-start;
+    }
+
+    .navbar__links .navbar__dropdown {
+        position: static;
+        width: 100%;
+        box-shadow: none;
+        border: none;
+        padding: 8px 0 8px 16px;
+        /* Indent sub-links */
+        opacity: 1;
+        transform: none;
+        pointer-events: auto;
+        display: none;
+        /* Hide by default on mobile, can be toggled if needed */
+        background: #F9FAFB;
+        border-radius: 8px;
+        margin-top: 8px;
+    }
+
+    /* On mobile, we use click instead of hover */
+    .navbar__menu-item--open .navbar__dropdown {
+        display: block;
+    }
+
+    /* Rotate icon when open */
+    .navbar__menu-item--open .navbar__link i[data-lucide="chevron-down"] {
+        transform: rotate(180deg);
+    }
+
+    .navbar__link i[data-lucide="chevron-down"] {
+        transition: transform 0.2s ease;
+    }
+
+    .navbar__search {
+        display: none;
+        /* Hide search bar from navbar on mobile, or move it to menu */
+    }
+
+    .navbar__right {
+        gap: 12px;
+    }
+
+    .navbar__toggle {
+        display: flex !important;
+        align-items: center;
+        justify-content: center;
+        width: 40px;
+        height: 40px;
+        background: none;
+        border: none;
+        color: #1A1A1A;
+        cursor: pointer;
+    }
+
+    .breadcrumbs {
+        padding: 12px 20px;
+        font-size: 12px;
+        /* Smaller font on mobile */
+        mask-image: linear-gradient(to right, black 85%, transparent 100%);
+        -webkit-mask-image: linear-gradient(to right, black 85%, transparent 100%);
+    }
+
+    .footer {
+        padding: 48px 20px 24px;
+    }
+
+    .footer__top {
+        flex-direction: column;
+    }
+}
+
+/* Base styles for the hidden toggle */
+.navbar__toggle {
+    display: none;
 }

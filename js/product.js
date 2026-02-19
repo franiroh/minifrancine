@@ -103,7 +103,9 @@ async function renderProduct() {
     if (img) {
         img.style.background = p.imageColor;
         if (images.length > 0) {
-            img.innerHTML = `<img src="${images[0]}" alt="${p.title}" class="detail__main-img-el">`;
+            img.innerHTML = images.map((url, i) =>
+                `<img src="${url}" alt="${p.title}" class="detail__main-img-el ${i === 0 ? 'detail__main-img-el--active' : ''}" data-index="${i}">`
+            ).join('');
         }
     }
 
@@ -118,7 +120,13 @@ async function renderProduct() {
             const thumb = e.target.closest('.detail__thumb');
             if (!thumb) return;
             const index = Number(thumb.dataset.index);
-            img.innerHTML = `<img src="${images[index]}" alt="${p.title}" class="detail__main-img-el">`;
+
+            // Update Main Image (Desktop logic: hide/show)
+            const mainImages = img.querySelectorAll('.detail__main-img-el');
+            mainImages.forEach(mi => mi.classList.remove('detail__main-img-el--active'));
+            if (mainImages[index]) mainImages[index].classList.add('detail__main-img-el--active');
+
+            // Update Thumbs
             thumbsContainer.querySelectorAll('.detail__thumb').forEach(t => t.classList.remove('detail__thumb--active'));
             thumb.classList.add('detail__thumb--active');
         });
