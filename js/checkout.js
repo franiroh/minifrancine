@@ -83,7 +83,7 @@ function renderCheckout() {
     const payBtn = document.getElementById('pay-btn');
 
     const cart = state.cart;
-    const subtotal = getCartTotal();
+    const subtotal = parseFloat(getCartTotal());
     let total = subtotal;
     let discount = 0;
 
@@ -135,7 +135,7 @@ function renderCheckout() {
         discountRow.style.display = 'none';
     }
 
-    if (subtotalEl) subtotalEl.textContent = `USD ${subtotal}`;
+    if (subtotalEl) subtotalEl.textContent = `USD ${subtotal.toFixed(2)}`;
     if (totalEl) totalEl.textContent = `USD ${total.toFixed(2)}`;
 
     renderCouponUI();

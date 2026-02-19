@@ -68,6 +68,7 @@ export const i18n = {
             'checkout.order_summary': { es: 'Tu Pedido', en: 'Your Order', pt: 'Seu Pedido' },
             'checkout.placeholder_name': { es: 'Tu nombre', en: 'Your name', pt: 'Seu nome' },
             'checkout.placeholder_email': { es: 'tu@email.com', en: 'you@email.com', pt: 'seu@email.com' },
+            'checkout.payment_confirm': { es: 'Confirmar Pago', en: 'Confirm Payment', pt: 'Confirmar Pagamento' },
             'checkout.coupon_title': { es: 'Cupones y Descuentos', en: 'Coupons and Discounts', pt: 'Cupons e Descontos' },
             'checkout.coupon_placeholder': { es: 'Ingresa código de cupón', en: 'Enter coupon code', pt: 'Insira o código do cupom' },
             'checkout.coupon_apply': { es: 'Aplicar', en: 'Apply', pt: 'Aplicar' },
