@@ -100,12 +100,45 @@ async function renderProduct() {
         ? galleryImages.map(gi => gi.public_url)
         : (p.mainImage ? [p.mainImage] : []);
 
+    const dotsContainer = document.getElementById('detail-slider-dots');
     if (img) {
         img.style.background = p.imageColor;
         if (images.length > 0) {
             img.innerHTML = images.map((url, i) =>
                 `<img src="${url}" alt="${p.title}" class="detail__main-img-el ${i === 0 ? 'detail__main-img-el--active' : ''}" data-index="${i}">`
             ).join('');
+        }
+
+        // Setup dots for mobile/tablet slider
+        if (dotsContainer) {
+            if (images.length > 1) {
+                dotsContainer.innerHTML = images.map((_, i) =>
+                    `<div class="detail__slider-dot ${i === 0 ? 'detail__slider-dot--active' : ''}" data-index="${i}"></div>`
+                ).join('');
+
+                // Sync scroll with dots
+                img.onscroll = () => {
+                    const scrollPos = img.scrollLeft;
+                    const width = img.offsetWidth;
+                    const index = Math.round(scrollPos / width);
+                    const dots = dotsContainer.querySelectorAll('.detail__slider-dot');
+                    dots.forEach((dot, i) => {
+                        dot.classList.toggle('detail__slider-dot--active', i === index);
+                    });
+                };
+
+                // Click to scroll
+                dotsContainer.onclick = (e) => {
+                    const dot = e.target.closest('.detail__slider-dot');
+                    if (dot) {
+                        const index = parseInt(dot.dataset.index);
+                        const width = img.offsetWidth;
+                        img.scrollTo({ left: index * width, behavior: 'smooth' });
+                    }
+                };
+            } else {
+                dotsContainer.innerHTML = '';
+            }
         }
     }
 
