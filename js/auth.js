@@ -9,11 +9,16 @@ import i18n from './i18n.js';
 async function init() {
     await loadComponents();
 
-    loadCart();
-    updateNavbarCartCount(getCartCount());
-
     const user = await getUser();
     updateNavbarAuth(user);
+
+    // Listen for state updates
+    window.addEventListener('cart-updated', () => {
+        updateNavbarCartCount(getCartCount());
+    });
+
+    await loadCart(user);
+    updateNavbarCartCount(getCartCount());
 
     // If already logged in, maybe redirect to home?
     if (user) {

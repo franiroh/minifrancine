@@ -26,7 +26,6 @@ async function init() {
     updateNavbarAuth(user);
     await loadCart(user);
     updateNavbarCartCount(getCartCount());
-    updateNavbarCartCount(getCartCount());
     await loadFavorites(user);
     await loadPurchases(user); // Load purchases to update button states (e.g. "Comprado")
 

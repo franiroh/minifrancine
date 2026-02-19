@@ -28,11 +28,14 @@ async function init() {
         updateNavbarAuth(null);
     }
 
-    // 3. Init Cart Count
-    updateNavbarCartCount(getCartCount());
+    // Listen for state updates from other components
+    window.addEventListener('cart-updated', () => {
+        updateNavbarCartCount(getCartCount());
+    });
 
     // 4. Load State (Cart, Favorites, Purchases)
     await loadCart(user);
+    updateNavbarCartCount(getCartCount());
     await loadFavorites(user);
     await loadPurchases(user);
 
@@ -98,10 +101,7 @@ async function init() {
     }
 
 
-    // Listen for state updates from other components
-    window.addEventListener('cart-updated', () => {
-        updateNavbarCartCount(getCartCount());
-    });
+
 
     window.addEventListener('favorites-updated', () => {
         filterProducts(currentCategory);

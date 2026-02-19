@@ -1,6 +1,6 @@
 import { fetchProducts, getUser, fetchCategories } from './api.js';
-import { loadComponents, createProductCard, createSkeletonCard } from './components.js';
-import { loadFavorites, loadPurchases, addToCart, toggleFavorite } from './state.js';
+import { loadComponents, createProductCard, createSkeletonCard, updateNavbarCartCount } from './components.js';
+import { loadFavorites, loadPurchases, addToCart, toggleFavorite, loadCart, getCartCount } from './state.js';
 import { renderBreadcrumbs, escapeHtml, InfiniteScrollManager } from './utils.js';
 import i18n from './i18n.js';
 
@@ -131,12 +131,22 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     // 3. Init User State
     const user = await getUser();
+
+    // Listen for state updates
+    window.addEventListener('cart-updated', () => {
+        updateNavbarCartCount(getCartCount());
+    });
+
     if (user) {
         await Promise.all([
+            loadCart(user),
             loadFavorites(user),
             loadPurchases(user)
         ]);
+    } else {
+        await loadCart(null);
     }
+    updateNavbarCartCount(getCartCount());
 
     // 4. Initial Breadcrumbs State
     renderBreadcrumbs([]); // Placeholder UI

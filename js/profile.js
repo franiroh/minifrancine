@@ -14,6 +14,18 @@ async function init() {
     }
 
     updateNavbarAuth(user);
+
+    // Listen for state updates
+    window.addEventListener('cart-updated', () => {
+        updateNavbarCartCount(getCartCount());
+    });
+
+    const { loadCart, getCartCount } = await import('./state.js');
+    const { updateNavbarCartCount } = await import('./components.js');
+
+    await loadCart(user);
+    updateNavbarCartCount(getCartCount());
+
     loadUserProfile(user.id, user.email);
 
     document.getElementById('profile-form').addEventListener('submit', async (e) => {

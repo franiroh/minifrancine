@@ -10,8 +10,6 @@ let conversations = [];
 
 async function init() {
     await loadComponents();
-    loadCart();
-    updateNavbarCartCount(getCartCount());
 
     currentUser = await getUser();
     if (!currentUser) {
@@ -19,6 +17,14 @@ async function init() {
         return;
     }
     updateNavbarAuth(currentUser);
+
+    // Listen for state updates
+    window.addEventListener('cart-updated', () => {
+        updateNavbarCartCount(getCartCount());
+    });
+
+    await loadCart(currentUser);
+    updateNavbarCartCount(getCartCount());
 
     loadConversations();
     setupEventListeners();

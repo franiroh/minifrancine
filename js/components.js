@@ -18,6 +18,8 @@ export const loadComponents = async () => {
       `<a href="catalog.html?category=${encodeURIComponent(c.name)}" class="navbar__dropdown-item" data-i18n="category.${c.id}">${i18n.t(`category.${c.id}`) || escapeHtml(c.name)}</a>`
     ).join('');
 
+    const lastCount = localStorage.getItem('patchfiles_last_count') || '0';
+
     navbarPlaceholder.innerHTML = `
     <header class="navbar" id="main-navbar">
       <div class="navbar__left">
@@ -86,7 +88,7 @@ export const loadComponents = async () => {
         </div>
         <div class="navbar__cart-wrap" onclick="window.location.href='cart.html'">
           <i data-lucide="shopping-cart" class="navbar__icon"></i>
-          <span class="navbar__cart-badge">0</span>
+          <span class="navbar__cart-badge">${lastCount}</span>
         </div>
         <div class="navbar__account" id="navbar-account">
           <button class="navbar__user-btn" id="navbar-user-btn" onclick="window.location.href='login.html'">
@@ -356,6 +358,7 @@ export const updateNavbarAuth = async (user) => {
 
 
 export const updateNavbarCartCount = (count) => {
+  localStorage.setItem('patchfiles_last_count', count);
   const badges = document.querySelectorAll('.navbar__cart-badge');
   badges.forEach(b => b.textContent = count);
 };
