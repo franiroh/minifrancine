@@ -31,6 +31,14 @@ export const loadComponents = async () => {
         </div>
       </div>
       <div class="navbar__links">
+        <div class="navbar__search navbar__search--mobile">
+            <form class="navbar__search-form" id="mobile-search-form">
+                <i data-lucide="search" class="navbar__search-icon" style="width:16px;height:16px;color:#9CA3AF;margin-right:8px;"></i>
+                <input type="text" class="navbar__search-input" placeholder="Buscar..." id="mobile-search-input" data-i18n-placeholder="nav.search_placeholder">
+                <button type="submit" class="hidden"></button>
+            </form>
+        </div>
+
         <a href="index.html" class="navbar__link ${window.location.pathname.includes('index.html') || window.location.pathname === '/' ? 'navbar__link--active' : ''}" data-i18n="nav.home">Inicio</a>
         
         <div class="navbar__menu-item">
@@ -53,14 +61,19 @@ export const loadComponents = async () => {
         <!-- Language Switcher -->
         <div class="navbar__menu-item" id="lang-menu" style="margin-right:8px;">
             <button class="navbar__link" style="display:flex;align-items:center;gap:6px;background:none;border:none;cursor:pointer;padding:0;">
-                <i data-lucide="globe" style="width:18px;height:18px;"></i>
-                <span style="font-weight:600; font-size:14px; color:#374151;">${{ es: 'Español', en: 'English', pt: 'Português' }[i18n.lang] || 'Español'}</span>
+                <img src="https://flagcdn.com/w20/${i18n.lang === 'en' ? 'us' : i18n.lang}.png" class="navbar__flag" alt="${i18n.lang}">
                 <i data-lucide="chevron-down" style="width:14px;height:14px;opacity:0.5;"></i>
             </button>
             <div class="navbar__dropdown" style="min-width:140px; right:0; left:auto;">
-                <button class="navbar__dropdown-item lang-btn" data-lang="es" style="width:100%;text-align:left;">Español</button>
-                <button class="navbar__dropdown-item lang-btn" data-lang="en" style="width:100%;text-align:left;">English</button>
-                <button class="navbar__dropdown-item lang-btn" data-lang="pt" style="width:100%;text-align:left;">Português</button>
+                <button class="navbar__dropdown-item lang-btn" data-lang="es" style="width:100%;text-align:left;">
+                    <img src="https://flagcdn.com/w20/es.png" class="navbar__flag" alt="ES" style="margin-right:8px;"> Español
+                </button>
+                <button class="navbar__dropdown-item lang-btn" data-lang="en" style="width:100%;text-align:left;">
+                    <img src="https://flagcdn.com/w20/us.png" class="navbar__flag" alt="EN" style="margin-right:8px;"> English
+                </button>
+                <button class="navbar__dropdown-item lang-btn" data-lang="pt" style="width:100%;text-align:left;">
+                    <img src="https://flagcdn.com/w20/br.png" class="navbar__flag" alt="PT" style="margin-right:8px;"> Português
+                </button>
             </div>
         </div>
 
@@ -149,15 +162,23 @@ export const loadComponents = async () => {
   const searchForm = document.getElementById('nav-search-form');
   const searchInput = document.getElementById('nav-search-input');
 
-  if (searchForm && searchInput) {
-    searchForm.onsubmit = (e) => {
-      e.preventDefault();
-      const query = searchInput.value.trim();
-      if (query) {
-        window.location.href = `catalog.html?search=${encodeURIComponent(query)}`;
-      }
-    };
-  }
+  // Handle Search Logic (Desktop and Mobile)
+  const setupSearch = (formId, inputId) => {
+    const form = document.getElementById(formId);
+    const input = document.getElementById(inputId);
+    if (form && input) {
+      form.onsubmit = (e) => {
+        e.preventDefault();
+        const query = input.value.trim();
+        if (query) {
+          window.location.href = `catalog.html?search=${encodeURIComponent(query)}`;
+        }
+      };
+    }
+  };
+
+  setupSearch('nav-search-form', 'nav-search-input');
+  setupSearch('mobile-search-form', 'mobile-search-input');
 
   // Ensure translations are applied to the newly injected HTML
   await i18n.updatePage();
@@ -183,17 +204,59 @@ export const loadComponents = async () => {
     });
   }
 
-  // Mobile Accordion Logic
-  const menuItems = document.querySelectorAll('.navbar__menu-item');
+  // Dropdown Toggle Logic (Mobile & Desktop Click)
+  const setupToggle = (buttonId, wrapperId, openClass) => {
+    const btn = document.getElementById(buttonId);
+    const wrapper = document.getElementById(wrapperId);
+    if (btn && wrapper) {
+      btn.onclick = (e) => {
+        e.stopPropagation();
+        // Close other top-bar menus first
+        const accountWrap = document.getElementById('navbar-account');
+        if (wrapperId !== 'navbar-account' && accountWrap) accountWrap.classList.remove('navbar__account--open');
+        const langMenu = document.getElementById('lang-menu');
+        if (wrapperId !== 'lang-menu' && langMenu) langMenu.classList.remove('navbar__menu-item--open');
+
+        wrapper.classList.toggle(openClass);
+      };
+    }
+  };
+
+  setupToggle('navbar-user-btn', 'navbar-account', 'navbar__account--open');
+  // Special handling for language menu button which is a child of the menu-item
+  const langMenu = document.getElementById('lang-menu');
+  if (langMenu) {
+    const langBtn = langMenu.querySelector('.navbar__link');
+    if (langBtn) {
+      langBtn.onclick = (e) => {
+        e.stopPropagation();
+        // Close account menu if open
+        const accountWrap = document.getElementById('navbar-account');
+        if (accountWrap) accountWrap.classList.remove('navbar__account--open');
+
+        langMenu.classList.toggle('navbar__menu-item--open');
+      };
+    }
+  }
+
+  // Close menus when clicking outside
+  document.addEventListener('click', (e) => {
+    const langMenu = document.getElementById('lang-menu');
+    const accountWrap = document.getElementById('navbar-account');
+    if (langMenu && !langMenu.contains(e.target)) langMenu.classList.remove('navbar__menu-item--open');
+    if (accountWrap && !accountWrap.contains(e.target)) accountWrap.classList.remove('navbar__account--open');
+  });
+
+  // Mobile Accordion Logic (Only for categories menu in the hamburger menu)
+  const menuItems = document.querySelectorAll('.navbar__links .navbar__menu-item');
   menuItems.forEach(item => {
     const link = item.querySelector('.navbar__link');
     if (link) {
       link.addEventListener('click', (e) => {
-        // Only apply on mobile (where toggle is visible)
         if (window.innerWidth <= 768) {
           const dropdown = item.querySelector('.navbar__dropdown');
           if (dropdown) {
-            e.preventDefault(); // Prevent navigation on the parent link
+            e.preventDefault();
             item.classList.toggle('navbar__menu-item--open');
           }
         }
@@ -229,9 +292,13 @@ export const updateNavbarAuth = async (user) => {
       const arrow = document.getElementById('navbar-user-arrow');
       if (arrow) arrow.style.display = 'block';
 
-      // Toggle dropdown on click
+      // Toggle dropdown on click (Consistently handles other menus)
       userBtn.onclick = (e) => {
         e.stopPropagation();
+        // Close Language menu if open
+        const langMenu = document.getElementById('lang-menu');
+        if (langMenu) langMenu.classList.remove('navbar__menu-item--open');
+
         accountWrap.classList.toggle('navbar__account--open');
       };
 

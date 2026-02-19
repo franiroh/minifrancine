@@ -137,6 +137,12 @@ svg.navbar__icon {
     margin-right: 12px;
 }
 
+.navbar__search--mobile {
+    display: none;
+    width: 100%;
+    margin-bottom: 8px;
+}
+
 .navbar__search-form {
     display: flex;
     align-items: center;
@@ -200,6 +206,14 @@ svg.navbar__icon {
     font-size: 18px;
 }
 
+.navbar__flag {
+    width: 20px;
+    height: auto;
+    border-radius: 2px;
+    box-shadow: 0 0 1px rgba(0, 0, 0, 0.2);
+    display: block;
+}
+
 /* --- Account Dropdown --- */
 .navbar__account {
     position: relative;
@@ -232,14 +246,7 @@ svg.navbar__icon {
     /* Ensure it stays above everything */
 }
 
-@media (min-width: 769px) {
-    .navbar__account:hover .navbar__dropdown {
-        display: block;
-        opacity: 1;
-        transform: translateY(0);
-        pointer-events: auto;
-    }
-}
+/* Account dropdown is now click-based across all devices */
 
 /* Bridge the gap so mouse doesn't leave hover area */
 .navbar__dropdown::before {
@@ -260,17 +267,7 @@ svg.navbar__icon {
     align-items: center;
 }
 
-@media (min-width: 769px) {
-    .navbar__menu-item:hover .navbar__dropdown {
-        display: block;
-        opacity: 1;
-        transform: translateY(0);
-        pointer-events: auto;
-        /* Ensure it aligns correctly */
-        top: 100%;
-        left: 0;
-    }
-}
+/* Navbar menu items (Categories, etc) in desktop are still hover, unless specified otherwise */
 
 .navbar__dropdown-item {
     display: flex;
@@ -719,7 +716,8 @@ svg.navbar__icon {
         /* Add vertical padding for easier tapping */
     }
 
-    .navbar__menu-item {
+    /* Only apply accordion behavior to links inside the hamburger menu */
+    .navbar__links .navbar__menu-item {
         width: 100%;
         height: auto;
         display: flex;
@@ -733,20 +731,37 @@ svg.navbar__icon {
         box-shadow: none;
         border: none;
         padding: 8px 0 8px 16px;
-        /* Indent sub-links */
         opacity: 1;
         transform: none;
         pointer-events: auto;
         display: none;
-        /* Hide by default on mobile, can be toggled if needed */
         background: #F9FAFB;
         border-radius: 8px;
         margin-top: 8px;
     }
 
-    /* On mobile, we use click instead of hover */
-    .navbar__menu-item--open .navbar__dropdown {
+    .navbar__links .navbar__menu-item--open .navbar__dropdown {
         display: block;
+    }
+
+    /* Keep top-bar dropdowns (Language/Account) as popups on mobile */
+    .navbar__right .navbar__dropdown {
+        top: calc(100% + 8px);
+        opacity: 0;
+        transform: translateY(-4px);
+        pointer-events: none;
+        display: none;
+        /* Controlled by JS or CSS open class */
+    }
+
+    /* Fixed visibility for top-bar dropdowns when toggled */
+    #lang-menu.navbar__menu-item--open .navbar__dropdown,
+    .navbar__account--open .navbar__dropdown {
+        display: block;
+        opacity: 1;
+        transform: translateY(0);
+        pointer-events: auto;
+        z-index: 2000;
     }
 
     /* Rotate icon when open */
@@ -760,11 +775,29 @@ svg.navbar__icon {
 
     .navbar__search {
         display: none;
-        /* Hide search bar from navbar on mobile, or move it to menu */
+        /* Hide regular search bar from navbar on mobile */
+    }
+
+    .navbar__search--mobile {
+        display: flex;
+        width: 100%;
+        margin-right: 0;
+    }
+
+    .navbar__search--mobile .navbar__search-form {
+        width: 100%;
+        background: #F3F4F6;
+        border: 1px solid #E5E7EB;
+        border-radius: 12px;
     }
 
     .navbar__right {
-        gap: 12px;
+        gap: 8px;
+        /* Compact gaps on mobile */
+    }
+
+    .navbar__user-btn {
+        padding: 8px 12px;
     }
 
     .navbar__toggle {
