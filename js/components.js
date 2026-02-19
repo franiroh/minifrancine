@@ -321,25 +321,25 @@ export const createProductCard = (product) => {
       </div>
       <div class="product-card__info">
         <span class="product-card__category">${escapeHtml(i18n.t(`category.${product.categoryId}`) || product.category)}</span>
+        
+        <div class="product-card__price-wrap">
+            <span class="product-card__price">USD ${price.toFixed(2)}</span>
+            ${hasDiscount ? `<span class="product-card__old-price">USD ${oldPrice.toFixed(2)}</span>` : ''}
+        </div>
+
         <h3 class="product-card__title">${escapeHtml(product.title)}</h3>
 
-        <div class="product-card__price-row">
-            <div class="product-card__price-wrap" style="display: flex; flex-direction: column; align-items: flex-start; gap: 0;">
-                <span class="product-card__price">USD ${price.toFixed(2)}</span>
-                ${hasDiscount ? `<span class="product-card__old-price" style="font-size: 12px; color: #EF4444; text-decoration: line-through;">USD ${oldPrice.toFixed(2)}</span>` : ''}
-            </div>
-          <div class="product-card__btns">
-            ${purchased
-      ? `<a href="mis-disenos.html#product-${parseInt(product.id)}" class="btn btn--sm btn--purchased">
-                   <i data-lucide="download"></i> ${i18n.t('btn.my_designs')}
-                 </a>`
+        <div class="product-card__btns">
+          ${purchased
+      ? `<a href="mis-disenos.html#product-${parseInt(product.id)}" class="btn btn--sm btn--purchased" style="width: 100%;">
+                 <i data-lucide="download"></i> ${i18n.t('btn.my_designs')}
+               </a>`
       : `<button class="btn btn--sm btn--outline btn-add-cart" data-id="${parseInt(product.id)}" style="flex:1;">
-                   ${i18n.t('btn.add_to_cart')}
-                 </button>
-                 <button class="btn btn--sm btn--primary btn-buy-now" data-id="${parseInt(product.id)}" style="flex:1;">
-                    ${i18n.t('btn.buy_now')}
-                 </button>`}
-          </div>
+                 ${i18n.t('btn.add_to_cart')}
+               </button>
+               <button class="btn btn--sm btn--primary btn-buy-now" data-id="${parseInt(product.id)}" style="flex:1;">
+                  ${i18n.t('btn.buy_now')}
+               </button>`}
         </div>
       </div>
     </div>

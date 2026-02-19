@@ -321,25 +321,25 @@
     color: #6B7280;
 }
 
-.product-card__price-row {
+.product-card__info {
+    padding: 20px;
     display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-top: auto;
+    flex-direction: column;
+    gap: 8px;
+    flex: 1;
 }
 
 .product-card__price {
     font-family: 'Bricolage Grotesque', serif;
     font-size: 22px;
     font-weight: 800;
-    white-space: nowrap;
-    margin-right: 0;
+    color: var(--primary-color);
 }
 
 .product-card__price-wrap {
     display: flex;
-    flex-direction: column;
-    gap: 0;
+    align-items: baseline;
+    gap: 8px;
 }
 
 .product-card__old-price {
@@ -350,13 +350,10 @@
 
 .product-card__btns {
     display: flex;
-    flex-direction: column;
+    flex-direction: row;
     gap: 8px;
-    align-items: stretch;
-    width: auto;
-    /* Allow buttons to size to content, preventing price squeeze */
-    min-width: 100px;
-    /* But ensure they aren't too tiny */
+    margin-top: auto;
+    width: 100%;
 }
 
 .product-card__btns .btn--outline {
@@ -528,15 +525,16 @@
 
     .product-card__info {
         padding: 12px;
-        gap: 4px;
+        gap: 6px;
     }
 
     .product-card__price {
-        font-size: 18px;
+        font-size: 16px;
     }
 
-    .category-header {
-        padding: 32px 20px;
+    .product-card__btns .btn {
+        padding: 8px 4px;
+        font-size: 11px;
     }
 
     .category-title {
