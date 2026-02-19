@@ -376,12 +376,22 @@ export async function fetchCart(userId) {
     }
 
     // Transform to flat structure expected by state
-    return data.map(item => ({
-        ...item.product,
-        category: item.product.categories?.name || 'Sin categoría',
-        cart_item_id: item.id,
-        quantity: item.quantity
-    }))
+    return data.map(item => {
+        const p = item.product;
+        return {
+            id: p.id,
+            title: p.title,
+            category: p.categories?.name || 'Sin categoría',
+            categoryId: p.category_id,
+            price: p.price,
+            oldPrice: p.old_price,
+            imageColor: p.image_color,
+            mainImage: p.main_image,
+            size: p.size,
+            cart_item_id: item.id,
+            quantity: item.quantity
+        };
+    });
 }
 
 export async function addToCartDB(userId, productId, quantity = 1) {

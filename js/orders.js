@@ -154,15 +154,16 @@ function renderOrderCard(order, reviewsMap = {}) {
                 </div>
                 <div class="order-item__info">
                     <div class="order-item__title">${escapeHtml(title)}</div>
-                    <div class="order-item__qty">Cant: ${parseInt(item.quantity)}</div>
                 </div>
                 
-                <div class="order-item__col-download">
-                    ${downloadBtn}
-                </div>
-                
-                <div class="order-item__col-rating">
-                    ${rateUi}
+                <div class="order-item__actions-row">
+                    <div class="order-item__col-rating">
+                        ${rateUi}
+                    </div>
+
+                    <div class="order-item__col-download">
+                        ${downloadBtn}
+                    </div>
                 </div>
                 
                 <div class="order-item__col-price">
@@ -178,11 +179,11 @@ function renderOrderCard(order, reviewsMap = {}) {
             <div class="order-card__header">
                 <div class="order-card__meta">
                     <span class="order-card__id">#${order.id.slice(0, 8).toUpperCase()}</span>
-                    <span class="order-card__date">
-                        <i data-lucide="calendar"></i> ${date}
-                    </span>
+                    <span class="order-card__status ${statusClass}">${statusText}</span>
                 </div>
-                <span class="order-card__status ${statusClass}">${statusText}</span>
+                <span class="order-card__date">
+                    <i data-lucide="calendar"></i> ${date}
+                </span>
             </div>
 
             <div class="order-card__items">

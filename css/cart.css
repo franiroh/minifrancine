@@ -54,6 +54,7 @@
     height: 100px;
     border-radius: 12px;
     flex-shrink: 0;
+    object-fit: cover;
 }
 
 .cart-item__info {
@@ -164,4 +165,73 @@
 .cart-summary__coupon {
     display: flex;
     gap: 8px;
+}
+
+/* ============================================================
+   Media Queries: Responsive Design
+   ============================================================ */
+
+/* Tablet & Smaller Desktop (up to 1024px) */
+@media (max-width: 1024px) {
+    .cart-body {
+        padding: 32px 40px;
+        gap: 32px;
+    }
+
+    .cart-summary {
+        width: 320px;
+        padding: 24px;
+    }
+}
+
+/* Mobile (up to 768px) */
+@media (max-width: 768px) {
+    .cart-body {
+        flex-direction: column;
+        padding: 24px 20px;
+        gap: 40px;
+    }
+
+    .cart-body__title {
+        font-size: 24px;
+    }
+
+    .cart-items {
+        gap: 12px;
+    }
+
+    .cart-item {
+        padding: 12px;
+        gap: 12px;
+    }
+
+    .cart-item__img {
+        width: 80px;
+        height: 80px;
+    }
+
+    .cart-item__name {
+        font-size: 14px;
+    }
+
+    .cart-item__price {
+        font-size: 16px;
+    }
+
+    .cart-summary {
+        width: 100%;
+        padding: 24px 20px;
+    }
+
+    .cart-summary__total-val {
+        font-size: 24px;
+    }
+
+    .cart-summary__coupon {
+        flex-direction: column;
+    }
+
+    .cart-summary__coupon .btn {
+        width: 100%;
+    }
 }

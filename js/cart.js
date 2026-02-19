@@ -46,17 +46,23 @@ function renderCart() {
         subtotalEl.textContent = 'USD 0.00';
         totalEl.textContent = 'USD 0.00';
     } else {
-        container.innerHTML = cart.map((item, index) => `
-        <div class="cart-item">
-          <div class="cart-item__img" style="background: ${sanitizeCssValue(item.imageColor)};"></div>
-          <div class="cart-item__info">
-            <span class="cart-item__name">${escapeHtml(item.title)}</span>
-            <span class="cart-item__meta">${escapeHtml(item.category)} · ${escapeHtml(item.size || 'Standard')}</span>
-            <span class="cart-item__price">USD ${parseFloat(item.price).toFixed(2)}</span>
-          </div>
-          <button class="cart-item__delete" data-index="${index}"><i data-lucide="trash-2"></i></button>
-        </div>
-      `).join('');
+        container.innerHTML = cart.map((item, index) => {
+            const imgHtml = item.mainImage
+                ? `<img src="${escapeHtml(item.mainImage)}" class="cart-item__img" alt="${escapeHtml(item.title)}" style="object-fit: cover;">`
+                : `<div class="cart-item__img" style="background: ${sanitizeCssValue(item.imageColor || '#F3F4F6')};"></div>`;
+
+            return `
+                <div class="cart-item">
+                  ${imgHtml}
+                  <div class="cart-item__info">
+                    <span class="cart-item__name">${escapeHtml(item.title)}</span>
+                    <span class="cart-item__meta">${escapeHtml(item.category)} · ${escapeHtml(item.size || 'Standard')}</span>
+                    <span class="cart-item__price">USD ${parseFloat(item.price).toFixed(2)}</span>
+                  </div>
+                  <button class="cart-item__delete" data-index="${index}"><i data-lucide="trash-2"></i></button>
+                </div>
+            `;
+        }).join('');
 
         // Listeners for delete
         container.querySelectorAll('.cart-item__delete').forEach(btn => {

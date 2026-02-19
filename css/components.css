@@ -630,7 +630,7 @@ svg.navbar__icon {
 }
 
 .breadcrumbs {
-    padding: 16px 80px;
+    padding: 12px 80px;
     font-size: 14px;
     color: #6B7280;
     display: flex;
@@ -640,7 +640,27 @@ svg.navbar__icon {
     overflow-x: auto;
     white-space: nowrap;
     scrollbar-width: none;
-    /* Hide scrollbar for Chrome/Safari/Firefox */
+    background: transparent;
+}
+
+.breadcrumbs__sep {
+    color: #D1D5DB;
+    font-size: 14px;
+}
+
+.breadcrumbs__link {
+    color: inherit;
+    text-decoration: none;
+    transition: color 0.2s;
+}
+
+.breadcrumbs__link:hover {
+    color: #1A1A1A;
+}
+
+.breadcrumbs__current {
+    color: #1A1A1A;
+    font-weight: 500;
 }
 
 .breadcrumbs::-webkit-scrollbar {

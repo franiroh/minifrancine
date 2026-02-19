@@ -78,7 +78,7 @@
     align-items: center;
     justify-content: center;
     gap: 48px;
-    padding: 24px 80px;
+    padding: 16px 80px;
     background: #F6F7F8;
 }
 
@@ -97,7 +97,7 @@
 
 /* --- Catalog --- */
 .catalog {
-    padding: 48px 80px;
+    padding: 32px 80px 48px;
     display: flex;
     flex-direction: column;
     gap: 16px;
@@ -148,8 +148,7 @@
 
 /* --- Category Header --- */
 .category-header {
-    display: none;
-    padding: 40px 80px;
+    padding: 32px 80px;
     background: linear-gradient(135deg, #FFF5F5 0%, #FFFFFF 100%);
     text-align: center;
 }

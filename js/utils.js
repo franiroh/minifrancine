@@ -42,10 +42,10 @@ export const renderBreadcrumbs = (items) => {
     return `
         <nav class="breadcrumbs">
             ${items.map((item, index) => `
-                ${index > 0 ? '<span style="color:#d1d5db;">/</span>' : ''}
+                ${index > 0 ? '<span class="breadcrumbs__sep">/</span>' : ''}
                 ${item.href
-            ? `<a href="${escapeHtml(item.href)}" style="color: inherit; text-decoration: none; transition: color 0.2s;" onmouseover="this.style.color='#1A1A1A'" onmouseout="this.style.color='inherit'">${escapeHtml(item.label)}</a>`
-            : `<span style="color: #1A1A1A; font-weight: 500;">${escapeHtml(item.label)}</span>`
+            ? `<a href="${escapeHtml(item.href)}" class="breadcrumbs__link">${escapeHtml(item.label)}</a>`
+            : `<span class="breadcrumbs__current">${escapeHtml(item.label)}</span>`
         }
             `).join('')}
         </nav>
