@@ -29,8 +29,14 @@
 }
 
 .cart-body__clear {
-    color: #FF6B6B;
+    color: var(--primary-color);
     font-size: 14px;
+    font-weight: 500;
+}
+
+.summary-discount {
+    font-size: 13px;
+    color: var(--color-success);
     font-weight: 500;
 }
 
@@ -41,12 +47,13 @@
 }
 
 .cart-item {
-    display: flex;
-    align-items: center;
-    gap: 16px;
-    padding: 16px;
+    display: grid;
+    grid-template-columns: 100px 1fr auto;
+    gap: 20px;
+    padding: 24px;
+    background: var(--color-gray-bg);
     border-radius: 16px;
-    background: #F6F7F8;
+    margin-bottom: 16px;
 }
 
 .cart-item__img {
@@ -71,7 +78,7 @@
 
 .cart-item__meta {
     font-size: 13px;
-    color: #9CA3AF;
+    color: var(--color-gray-light);
 }
 
 .cart-item__price {
@@ -80,11 +87,22 @@
     font-weight: 700;
 }
 
+.cart-empty-icon {
+    width: 80px;
+    height: 80px;
+    border-radius: 40px;
+    background: var(--primary-bg);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 24px;
+}
+
 .cart-item__delete {
     width: 36px;
     height: 36px;
     border-radius: 18px;
-    background: #FFF0F0;
+    background: var(--primary-bg);
     display: flex;
     align-items: center;
     justify-content: center;
@@ -94,24 +112,33 @@
 }
 
 .cart-item__delete:hover {
-    background: #ffe4e4;
+    background: var(--primary-bg);
+    /* I'll keep this specific tint for now as I don't have a hover-light variable */
 }
 
 .cart-item__delete i {
     font-size: 16px;
-    color: #FF6B6B;
+    color: var(--color-danger);
+}
+
+.cart-empty-icon i {
+    font-size: 32px;
+    color: var(--primary-color);
 }
 
 /* Cart Summary */
 .cart-summary {
+    position: sticky;
+    top: 100px;
     width: 400px;
     flex-shrink: 0;
     padding: 32px;
     border-radius: 20px;
-    background: #F6F7F8;
+    background: var(--color-surface);
+    border: 1px solid var(--border-color);
     display: flex;
     flex-direction: column;
-    gap: 24px;
+    gap: 20px;
     height: fit-content;
 }
 
@@ -124,23 +151,23 @@
 .cart-summary__divider {
     border: none;
     height: 1px;
-    background: #E5E7EB;
+    background: var(--border-color);
 }
 
 .cart-summary__row {
     display: flex;
     justify-content: space-between;
     font-size: 14px;
-    color: #6B7280;
+    color: var(--color-gray);
 }
 
 .cart-summary__val {
     font-weight: 600;
-    color: #1A1A1A;
+    color: var(--color-foreground);
 }
 
 .cart-summary__val--green {
-    color: #22C55E;
+    color: var(--color-success);
 }
 
 .cart-summary__total {
@@ -159,7 +186,7 @@
     font-family: 'Bricolage Grotesque', serif;
     font-size: 28px;
     font-weight: 800;
-    color: #FF6B6B;
+    color: var(--color-danger);
 }
 
 .cart-summary__coupon {

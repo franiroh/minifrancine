@@ -190,6 +190,7 @@ async function renderProduct() {
     };
 
     setText('detail-title', p.title);
+    const purchased = isPurchased(p.id);
 
     // Badge logic
     const titleEl = document.getElementById('detail-title');
@@ -200,13 +201,23 @@ async function renderProduct() {
             existingBadge.remove();
         }
 
-        if (p.badge) {
+        if (purchased || p.badge) {
             const badgeEl = document.createElement('div');
             badgeEl.className = 'detail__badge';
-            const bKey = 'badge.' + getBadgeKey(p.badge);
-            const bTrans = i18n.t(bKey);
-            badgeEl.textContent = bTrans;
-            badgeEl.style.backgroundColor = p.badgeColor || '#000';
+
+            if (purchased) {
+                badgeEl.textContent = i18n.t('btn.purchased');
+                badgeEl.style.backgroundColor = 'var(--color-foreground)';
+                badgeEl.style.color = 'var(--color-surface)';
+                badgeEl.style.boxShadow = '0 4px 12px rgba(0, 0, 0, 0.1)';
+            } else {
+                const bKey = 'badge.' + getBadgeKey(p.badge);
+                badgeEl.textContent = i18n.t(bKey);
+                // Normalize "green" to our token, others fallback to DB color or surface
+                const bColor = (p.badgeColor === 'green' || !p.badgeColor) ? 'var(--color-success)' : p.badgeColor;
+                badgeEl.style.backgroundColor = bColor;
+            }
+
             titleEl.insertAdjacentElement('afterend', badgeEl);
         }
     }
@@ -229,17 +240,17 @@ async function renderProduct() {
     }
 
     // Discount Logic
-    const price = parseFloat(p.price);
+    const price = purchased ? 0 : parseFloat(p.price);
     const oldPrice = parseFloat(p.oldPrice || p.old_price);
-    const hasDiscount = oldPrice > price;
+    const hasDiscount = !purchased && oldPrice > price;
     const discountPerc = hasDiscount ? Math.round(((oldPrice - price) / oldPrice) * 100) : 0;
 
     const priceHtml = hasDiscount
         ? `<div class="detail__price-column">
              <span class="detail__price-current">USD ${price.toFixed(2)}</span>
              <div class="detail__discount-row">
-                <span class="detail__price-old" style="text-decoration: line-through; color: #9CA3AF; margin-right: 8px;">USD ${oldPrice.toFixed(2)}</span>
-                <span class="detail__discount-badge" style="background: #FEE2E2; color: #EF4444; padding: 2px 8px; border-radius: 4px; font-weight: 600; font-size: 14px;">-${discountPerc}%</span>
+                <span class="detail__price-old" style="text-decoration: line-through; color: var(--color-danger); margin-right: 8px;">USD ${oldPrice.toFixed(2)}</span>
+                <span class="detail__discount-badge" style="background: var(--color-danger-bg); color: var(--color-danger); padding: 2px 8px; border-radius: 4px; font-weight: 600; font-size: 14px;">-${discountPerc}%</span>
              </div>
            </div>`
         : `<span id="detail-price" class="detail__price-current">USD ${price.toFixed(2)}</span>`;
@@ -266,9 +277,9 @@ async function renderProduct() {
         let starsHtml = '';
         for (let i = 1; i <= 5; i++) {
             if (i <= Math.round(rating)) {
-                starsHtml += `<i data-lucide="star" class="detail__star detail__star--filled" style="fill: #F59E0B; color: #F59E0B;"></i>`;
+                starsHtml += `<i data-lucide="star" class="detail__star detail__star--filled" style="fill: var(--color-warning); color: var(--color-warning);"></i>`;
             } else {
-                starsHtml += `<i data-lucide="star" class="detail__star" style="color: #D1D5DB;"></i>`;
+                starsHtml += `<i data-lucide="star" class="detail__star" style="color: var(--color-gray-lighter);"></i>`;
             }
         }
         const reviewText = reviewCount === 1 ? i18n.t('product.review') : i18n.t('product.reviews');
@@ -279,7 +290,6 @@ async function renderProduct() {
     }
 
     // Buttons — conditional rendering based on purchased state
-    const purchased = isPurchased(p.id);
     const addBtn = document.getElementById('detail-add-btn');
     const buyBtn = document.getElementById('detail-buy-btn');
 
@@ -361,16 +371,16 @@ function updateFavoriteButton() {
     if (isFavorite(currentProduct.id)) {
         btn.classList.add('detail__heart--active');
         if (icon) {
-            icon.setAttribute('fill', '#FF6B6B');
-            icon.style.fill = '#FF6B6B';
-            icon.style.color = '#FF6B6B';
+            icon.setAttribute('fill', 'var(--primary-color)');
+            icon.style.fill = 'var(--primary-color)';
+            icon.style.color = 'var(--primary-color)';
         }
     } else {
         btn.classList.remove('detail__heart--active');
         if (icon) {
             icon.setAttribute('fill', 'none');
             icon.style.fill = 'none';
-            icon.style.color = '#FF6B6B'; // Keep outline red
+            icon.style.color = 'var(--primary-color)'; // Keep outline red
         }
     }
 }
@@ -434,7 +444,7 @@ async function loadAndRenderReviews(productId) {
             const myReview = currentUser ? await fetchUserReview(currentUser.id, productId) : null;
             if (!myReview) {
                 ctaHtml = `
-                    <div style="background: #F9FAFB; padding: 20px; border-radius: 8px; margin-bottom: 24px; text-align: center;">
+                    <div style="background: var(--color-gray-bg); padding: 20px; border-radius: 8px; margin-bottom: 24px; text-align: center;">
                         <p style="margin-bottom: 12px; font-weight: 500;">${i18n.t('product.reviews.purchased_question') || '¿Compraste este producto?'}</p>
                         <a href="orders.html" class="btn btn--white btn--sm">
                            <i data-lucide="star"></i> ${i18n.t('product.reviews.write')}
@@ -443,7 +453,7 @@ async function loadAndRenderReviews(productId) {
                  `;
             } else {
                 ctaHtml = `
-                    <div style="background: #F9FAFB; padding: 20px; border-radius: 8px; margin-bottom: 24px; text-align: center;">
+                    <div style="background: var(--color-gray-bg); padding: 20px; border-radius: 8px; margin-bottom: 24px; text-align: center;">
                         <p style="margin-bottom: 12px; font-weight: 500;">${i18n.t('product.reviews.already_rated') || 'Ya calificaste este producto.'}</p>
                         <a href="orders.html" class="btn btn--white btn--sm">
                            ${i18n.t('product.reviews.view_my_review') || 'Ver mi reseña en Mis Compras'}
@@ -465,20 +475,20 @@ async function loadAndRenderReviews(productId) {
                 let startHtml = '';
                 for (let i = 1; i <= 5; i++) {
                     if (i <= review.rating) {
-                        startHtml += `<i data-lucide="star" style="width: 16px; height: 16px; fill: #F59E0B; color: #F59E0B;"></i>`;
+                        startHtml += `<i data-lucide="star" style="width: 16px; height: 16px; fill: var(--color-warning); color: var(--color-warning);"></i>`;
                     } else {
-                        startHtml += `<i data-lucide="star" style="width: 16px; height: 16px; color: #E5E7EB;"></i>`;
+                        startHtml += `<i data-lucide="star" style="width: 16px; height: 16px; color: var(--border-color);"></i>`;
                     }
                 }
 
                 return `
-                    <div class="review-item" style="border-bottom: 1px solid #E5E7EB; padding: 16px 0;">
+                    <div class="review-item" style="border-bottom: 1px solid var(--border-color); padding: 16px 0;">
                         <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 8px;">
                             <span style="font-weight: 600; font-size: 14px;">${escapeHtml(author)}</span>
-                            <span style="color: #9CA3AF; font-size: 12px;">${date}</span>
+                            <span style="color: var(--color-gray-light); font-size: 12px;">${date}</span>
                         </div>
                         <div style="display: flex; margin-bottom: 8px;">${startHtml}</div>
-                        <p style="color: #4B5563; line-height: 1.5;">${escapeHtml(review.comment || '')}</p>
+                        <p style="color: var(--color-gray-dark); line-height: 1.5;">${escapeHtml(review.comment || '')}</p>
                     </div>
                 `;
             }).join('');

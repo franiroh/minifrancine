@@ -14,8 +14,8 @@
     width: 440px;
     padding: 40px;
     border-radius: 24px;
-    background: #FFFFFF;
-    border: 1px solid #F3F4F6;
+    background: var(--color-surface);
+    border: 1px solid var(--color-gray-soft);
     display: flex;
     flex-direction: column;
     gap: 28px;
@@ -50,7 +50,7 @@
 }
 
 .login-card__header p {
-    color: #9CA3AF;
+    color: var(--color-gray-light);
     font-size: 14px;
 }
 
@@ -59,7 +59,7 @@
     height: 44px;
     padding: 4px;
     border-radius: 22px;
-    background: #F6F7F8;
+    background: var(--color-gray-bg);
 }
 
 .login-card__tab {
@@ -67,15 +67,15 @@
     border-radius: 18px;
     font-size: 13px;
     font-weight: 500;
-    color: #9CA3AF;
+    color: var(--color-gray-light);
     display: flex;
     align-items: center;
     justify-content: center;
 }
 
 .login-card__tab--active {
-    background: #FFFFFF;
-    color: #1A1A1A;
+    background: var(--color-surface);
+    color: var(--color-foreground);
     font-weight: 600;
 }
 
@@ -104,7 +104,7 @@
 
 .form-field__link {
     font-size: 12px;
-    color: #FF6B6B;
+    color: var(--primary-color);
     font-weight: 500;
 }
 
@@ -115,12 +115,12 @@
     height: 48px;
     padding: 0 16px;
     border-radius: 12px;
-    border: 1px solid #E5E7EB;
+    border: 1px solid var(--border-color);
 }
 
 .form-input i {
     font-size: 18px;
-    color: #9CA3AF;
+    color: var(--color-gray-light);
     flex-shrink: 0;
 }
 
@@ -129,7 +129,7 @@
 }
 
 .form-input input::placeholder {
-    color: #D1D5DB;
+    color: var(--color-gray-lighter);
 }
 
 .form-input__trail {
@@ -154,12 +154,12 @@
     flex: 1;
     border: none;
     height: 1px;
-    background: #E5E7EB;
+    background: var(--border-color);
 }
 
 .login-card__divider span {
     font-size: 12px;
-    color: #9CA3AF;
+    color: var(--color-gray-light);
     white-space: nowrap;
 }
 
@@ -210,9 +210,9 @@
     position: relative;
     width: 100%;
     max-width: 440px;
-    background: #FFFFFF;
+    background: var(--color-surface);
     border-radius: 24px;
-    border: 1px solid #F3F4F6;
+    border: 1px solid var(--color-gray-soft);
     box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
     animation: modalSlideIn 0.2s ease-out;
 }
@@ -234,7 +234,7 @@
     align-items: center;
     justify-content: space-between;
     padding: 24px 32px;
-    border-bottom: 1px solid #F3F4F6;
+    border-bottom: 1px solid var(--color-gray-soft);
 }
 
 .modal__header h3 {
@@ -250,13 +250,13 @@
     display: flex;
     align-items: center;
     justify-content: center;
-    color: #9CA3AF;
+    color: var(--color-gray-light);
     transition: all 0.2s;
 }
 
 .modal__close:hover {
-    background: #F3F4F6;
-    color: #1A1A1A;
+    background: var(--color-gray-soft);
+    color: var(--color-foreground);
 }
 
 .modal__close i {
@@ -271,7 +271,7 @@
 }
 
 .modal__body p {
-    color: #6B7280;
+    color: var(--color-gray);
     font-size: 14px;
     line-height: 1.6;
 }
@@ -288,13 +288,13 @@
 }
 
 #reset-message.success {
-    background: #ECFDF5;
-    color: #065F46;
-    border: 1px solid #A7F3D0;
+    background: var(--color-success-bg);
+    color: var(--color-success-hover);
+    border: 1px solid var(--color-success);
 }
 
 #reset-message.error {
-    background: #FEF2F2;
-    color: #991B1B;
-    border: 1px solid #FECACA;
+    background: var(--color-danger-bg);
+    color: var(--color-danger-hover);
+    border: 1px solid var(--color-danger);
 }

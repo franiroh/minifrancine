@@ -129,7 +129,7 @@ function renderDesignCard(product) {
             <a href="product.html?id=${product.id}" class="product-card__image" style="background: ${sanitizeCssValue(product.imageColor)}; display: block;">
                 ${product.mainImage ? `<img src="${escapeHtml(product.mainImage)}" alt="${escapeHtml(product.title)}" class="product-card__img" loading="lazy">` : ''}
                 <span class="product-card__badge product-card__badge--purchased">
-                    <i data-lucide="check-circle"></i> ${i18n.t('designs.purchased')}
+                    ${i18n.t('designs.purchased')}
                 </span>
             </a>
             <div class="product-card__info">

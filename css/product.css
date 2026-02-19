@@ -23,7 +23,7 @@
     width: 100%;
     aspect-ratio: 1 / 1;
     border-radius: 20px;
-    border: 1px solid #E5E7EB;
+    border: 1px solid var(--border-color);
     background-size: cover;
     background-position: center;
     overflow: hidden;
@@ -56,19 +56,19 @@
 }
 
 .detail__heart:hover {
-    background: #fff;
+    background: var(--color-surface);
     transform: scale(1.1);
 }
 
 .detail__heart--active i {
-    fill: #FF6B6B;
-    color: #FF6B6B;
+    fill: var(--primary-color);
+    color: var(--primary-color);
 }
 
 .detail__heart i {
     font-size: 24px;
     /* Larger than simple card */
-    color: #FF6B6B;
+    color: var(--primary-color);
 }
 
 .detail__main-img-el {
@@ -106,7 +106,7 @@
 }
 
 .detail__thumb--active {
-    border: 2px solid #FF6B6B;
+    border: 2px solid var(--primary-color);
 }
 
 .detail__slider-dots {
@@ -123,14 +123,14 @@
     width: 6px;
     height: 6px;
     border-radius: 50%;
-    background: #D1D5DB;
+    background: var(--color-gray-soft);
     /* Darker grey for visibility on white */
     cursor: pointer;
     transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
 }
 
 .detail__slider-dot--active {
-    background: #FF6B6B;
+    background: var(--primary-color);
     transform: scale(1.6);
     box-shadow: 0 2px 6px rgba(255, 107, 107, 0.4);
 }
@@ -147,8 +147,8 @@
     display: inline-block;
     padding: 4px 12px;
     border-radius: 12px;
-    background: #FFF0F0;
-    color: #FF6B6B;
+    background: var(--primary-bg);
+    color: var(--primary-color);
     font-size: 12px;
     font-weight: 600;
     width: fit-content;
@@ -166,7 +166,8 @@
     display: inline-block;
     padding: 6px 12px;
     border-radius: 6px;
-    color: #FFF;
+    background: var(--color-success);
+    color: var(--color-surface);
     font-size: 13px;
     font-weight: 700;
     text-transform: uppercase;
@@ -184,21 +185,21 @@
 
 .detail__star {
     font-size: 18px;
-    color: #E5E7EB;
+    color: var(--color-gray-lighter);
 }
 
 .detail__star--filled {
-    color: #FCD34D;
+    color: var(--color-warning);
 }
 
 .detail__rating-text {
     font-size: 14px;
-    color: #6B7280;
+    color: var(--color-gray);
 }
 
 .detail__desc {
     font-size: 15px;
-    color: #6B7280;
+    color: var(--color-gray);
     line-height: 1.6;
 }
 
@@ -213,8 +214,8 @@
     display: inline-block;
     padding: 4px 10px;
     border-radius: 4px;
-    background: #F3F4F6;
-    color: #4B5563;
+    background: var(--color-gray-soft);
+    color: var(--color-gray-dark);
     font-size: 12px;
     font-weight: 500;
     text-transform: capitalize;
@@ -224,8 +225,8 @@
 }
 
 .detail__tag:hover {
-    background: #E5E7EB;
-    color: #111827;
+    background: var(--color-gray-lighter);
+    color: var(--color-foreground);
 }
 
 .detail__price {
@@ -242,25 +243,26 @@
 .detail__price-old {
     font-size: 16px;
     text-decoration: line-through;
-    color: #EF4444;
+    color: var(--color-danger);
 }
 
 .detail__price-current {
     font-family: 'Bricolage Grotesque', serif;
     font-size: 36px;
     font-weight: 800;
+    color: var(--color-foreground);
 }
 
 .detail__price-old {
     font-size: 18px;
-    color: #D1D5DB;
+    color: var(--color-danger);
     text-decoration: line-through;
 }
 
 .detail__divider {
     border: none;
     height: 1px;
-    background: #F3F4F6;
+    background: var(--color-gray-soft);
 }
 
 .detail__specs {
@@ -287,7 +289,7 @@
     gap: 4px;
     padding: 14px;
     border-radius: 12px;
-    background: #F6F7F8;
+    background: var(--color-gray-bg);
 }
 
 .detail__spec-item--full {
@@ -297,7 +299,7 @@
 .detail__spec-label {
     font-size: 12px;
     font-weight: 500;
-    color: #9CA3AF;
+    color: var(--color-gray-light);
 }
 
 .detail__spec-value {
@@ -321,17 +323,17 @@
 
 /* --- Purchased State (Detail) --- */
 .btn--purchased-download {
-    background: #22C55E;
-    color: #FFF;
+    background: var(--color-success);
+    color: var(--color-surface);
 }
 
 .btn--purchased-download:hover {
-    background: #16A34A;
+    background: var(--color-success-hover);
 }
 
 .btn--purchased-indicator {
-    border: 2px solid #22C55E;
-    color: #22C55E;
+    border: 2px solid var(--color-success);
+    color: var(--color-success);
     cursor: default;
     opacity: 0.8;
 }

@@ -10,7 +10,7 @@
     /* Add gap between left and right */
     height: 480px;
     padding: 0 80px;
-    background: linear-gradient(135deg, #FFF5F5 0%, #FFFFFF 60%, #FFF0F5 100%);
+    background: linear-gradient(135deg, var(--primary-bg) 0%, var(--color-surface) 60%, var(--primary-bg) 100%);
 }
 
 .hero__left {
@@ -27,8 +27,8 @@
     gap: 6px;
     padding: 6px 14px;
     border-radius: 20px;
-    background: #FFF0F0;
-    color: #FF6B6B;
+    background: var(--primary-bg);
+    color: var(--primary-color);
     font-size: 13px;
     font-weight: 600;
     width: fit-content;
@@ -49,7 +49,7 @@
 
 .hero__sub {
     font-size: 18px;
-    color: #6B7280;
+    color: var(--color-gray);
     line-height: 1.5;
     max-width: 100%;
     /* Allow full width */
@@ -69,7 +69,15 @@
     width: 500px;
     height: 400px;
     border-radius: 24px;
-    background: linear-gradient(135deg, #fecdd3, #fda4af, #fed7aa);
+    border: 1px solid var(--color-gray-soft);
+    background: var(--color-surface);
+}
+
+.hero__gradient {
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(135deg, var(--primary-bg) 0%, var(--primary-color) 50%, var(--primary-bg) 100%);
+    opacity: 0.1;
 }
 
 /* --- Trust Bar --- */
@@ -79,7 +87,7 @@
     justify-content: center;
     gap: 48px;
     padding: 16px 80px;
-    background: #F6F7F8;
+    background: var(--color-gray-bg);
 }
 
 .trust-bar__item {
@@ -92,7 +100,7 @@
 
 .trust-bar__item i {
     font-size: 20px;
-    color: #FF6B6B;
+    color: var(--primary-color);
 }
 
 /* --- Catalog --- */
@@ -116,7 +124,7 @@
 }
 
 .catalog__count {
-    color: #9CA3AF;
+    color: var(--color-gray-light);
     font-size: 14px;
 }
 
@@ -131,25 +139,25 @@
     border-radius: 20px;
     font-size: 13px;
     font-weight: 500;
-    color: #6B7280;
-    background: #F6F7F8;
+    color: var(--color-gray);
+    background: var(--color-gray-bg);
     transition: all 0.2s;
 }
 
 .filter-chip:hover {
-    background: #E5E7EB;
+    background: var(--color-gray-lighter);
 }
 
 .filter-chip--active {
-    background: #1A1A1A;
-    color: #FFF;
+    background: var(--color-foreground);
+    color: var(--color-surface);
     font-weight: 600;
 }
 
 /* --- Category Header --- */
 .category-header {
     padding: 32px 80px;
-    background: linear-gradient(135deg, #FFF5F5 0%, #FFFFFF 100%);
+    background: linear-gradient(135deg, var(--primary-bg) 0%, var(--color-surface) 100%);
     text-align: center;
 }
 
@@ -161,22 +169,22 @@
 }
 
 .category-subtitle {
-    color: #6B7280;
+    color: var(--color-gray);
 }
 
 /* --- Tag Sub-filters --- */
 .filter-chip--tag {
-    background: #FFF0F0;
-    color: #FF6B6B;
+    background: var(--primary-bg);
+    color: var(--primary-color);
 }
 
 .filter-chip--tag:hover {
-    background: #FFE0E0;
+    background: var(--primary-bg);
 }
 
 .filter-chip--tag.filter-chip--active {
-    background: #FF6B6B;
-    color: #FFF;
+    background: var(--primary-color);
+    color: var(--color-surface);
 }
 
 /* --- Product Grid & Card --- */
@@ -194,8 +202,8 @@
     /* max-width kept to avoid super wide cards on large screens if desired, 
        but usually let grid handle it. Let's remove fixed width. */
     border-radius: 16px;
-    border: 1px solid #F3F4F6;
-    background: #FFFFFF;
+    border: 1px solid var(--color-gray-soft);
+    background: var(--color-surface);
     overflow: hidden;
     display: flex;
     flex-direction: column;
@@ -221,7 +229,7 @@
     height: 100%;
     object-fit: cover;
     object-position: center;
-    border-bottom: 1px solid #E5E7EB;
+    border-bottom: 1px solid var(--border-color);
 }
 
 .product-card__badge {
@@ -230,8 +238,8 @@
     left: 0;
     padding: 8px 18px;
     border-radius: 0 8px 8px 0;
-    background: #FF6B6B;
-    color: #FFF;
+    background: var(--primary-color);
+    color: var(--color-surface);
     font-size: 13px;
     font-weight: 800;
     text-transform: uppercase;
@@ -246,7 +254,7 @@
 }
 
 .product-card__badge--green {
-    background: #10B981;
+    background: var(--color-success);
 }
 
 .product-card__heart {
@@ -265,24 +273,24 @@
 }
 
 .product-card__heart:hover {
-    background: #fff;
+    background: var(--color-surface);
     transform: scale(1.1);
 }
 
 .product-card__heart--active {
-    background: #fff;
+    background: var(--color-surface);
 }
 
 .product-card__heart--active i,
 .product-card__heart--active svg {
-    fill: #FF6B6B;
-    color: #FF6B6B;
+    fill: var(--primary-color);
+    color: var(--primary-color);
 }
 
 .product-card__heart i,
 .product-card__heart svg {
     font-size: 16px;
-    color: #FF6B6B;
+    color: var(--color-danger);
 }
 
 .product-card__info {
@@ -296,7 +304,7 @@
 .product-card__category {
     font-size: 12px;
     font-weight: 500;
-    color: #FF6B6B;
+    color: var(--primary-color);
 }
 
 .product-card__title {
@@ -314,10 +322,10 @@
 .tag {
     padding: 3px 8px;
     border-radius: 8px;
-    background: #F6F7F8;
+    background: var(--color-gray-bg);
     font-size: 11px;
     font-weight: 500;
-    color: #6B7280;
+    color: var(--color-gray);
 }
 
 .product-card__info {
@@ -332,7 +340,7 @@
     font-family: 'Bricolage Grotesque', serif;
     font-size: 22px;
     font-weight: 800;
-    color: var(--primary-color);
+    color: var(--color-foreground);
 }
 
 .product-card__price-wrap {
@@ -344,7 +352,7 @@
 .product-card__old-price {
     font-size: 12px;
     text-decoration: line-through;
-    color: #EF4444;
+    color: var(--color-danger);
 }
 
 .product-card__btns {
@@ -366,32 +374,26 @@
 
 /* --- Purchased Product State --- */
 .product-card__badge--purchased {
-    background: #059669;
-    /* Slightly darker emerald */
-    border: 1px solid rgba(255, 255, 255, 0.3);
-    display: inline-flex;
-    align-items: center;
-    gap: 4px;
-}
-
-.product-card__badge--purchased i {
-    width: 12px;
-    height: 12px;
+    background: var(--color-foreground);
+    color: var(--color-surface);
+    border: none;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
 }
 
 .btn--purchased {
-    border: 1px solid #22C55E;
-    color: #22C55E;
+    background: var(--color-success);
+    color: var(--color-surface);
+    border: none;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
     text-decoration: none;
+    font-weight: 700;
 }
 
 .btn--purchased:hover {
-    background: #F0FDF4;
-}
-
-.btn--purchased i {
-    width: 14px;
-    height: 14px;
+    background: var(--color-success-hover);
+    color: var(--color-surface);
+    transform: translateY(-1px);
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
 }
 
 /* ============================================================
@@ -532,11 +534,25 @@
     }
 
     .product-card__btns .btn {
-        padding: 8px 4px;
+        padding: 0 4px;
         font-size: 11px;
+        height: 34px;
     }
 
     .category-title {
         font-size: 28px;
+    }
+
+    /* Compact badges for mobile */
+    .product-card__badge {
+        padding: 4px 10px;
+        font-size: 11px;
+        top: 12px;
+    }
+
+    .btn--purchased {
+        padding: 0 10px;
+        font-size: 11px;
+        height: 34px;
     }
 }

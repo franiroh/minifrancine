@@ -145,17 +145,6 @@ export const loadComponents = async () => {
     </footer>
         `;
 
-    // Add language switcher listener
-    // Add language switcher listener
-    const langBtns = document.querySelectorAll('.lang-btn');
-    langBtns.forEach(btn => {
-      btn.addEventListener('click', (e) => {
-        const lang = e.target.dataset.lang;
-        // setLanguage likely reloads or updates, assuming it exists on i18n object or we do it manually
-        localStorage.setItem('minifrancine_lang', lang);
-        window.location.reload();
-      });
-    });
   }
 
   // Handle Search Logic
@@ -245,6 +234,19 @@ export const loadComponents = async () => {
     const accountWrap = document.getElementById('navbar-account');
     if (langMenu && !langMenu.contains(e.target)) langMenu.classList.remove('navbar__menu-item--open');
     if (accountWrap && !accountWrap.contains(e.target)) accountWrap.classList.remove('navbar__account--open');
+  });
+
+  // Language Switcher Logic
+  const langBtns = document.querySelectorAll('.lang-btn');
+  langBtns.forEach(btn => {
+    btn.onclick = (e) => {
+      e.preventDefault();
+      const lang = e.currentTarget.dataset.lang || e.target.closest('.lang-btn').dataset.lang;
+      if (lang) {
+        localStorage.setItem('minifrancine_lang', lang);
+        window.location.reload();
+      }
+    };
   });
 
   // Mobile Accordion Logic (Only for categories menu in the hamburger menu)
@@ -366,9 +368,10 @@ export const createProductCard = (product) => {
   const favorite = isFavorite(product.id);
 
   // Discount Calculation
-  const price = parseFloat(product.price);
-  const oldPrice = parseFloat(product.oldPrice || product.old_price); // Handle both camelCase and snake_case if needed
-  const hasDiscount = oldPrice > price;
+  const isProdPurchased = purchased; // already defined above
+  const price = isProdPurchased ? 0 : parseFloat(product.price);
+  const oldPrice = parseFloat(product.oldPrice || product.old_price);
+  const hasDiscount = !isProdPurchased && oldPrice > price;
   const discountPerc = hasDiscount ? Math.round(((oldPrice - price) / oldPrice) * 100) : 0;
 
   return `
@@ -376,7 +379,7 @@ export const createProductCard = (product) => {
       <div class="product-card__image" style="background: ${sanitizeCssValue(product.imageColor)};">
         ${product.mainImage ? `<img src="${escapeHtml(product.mainImage)}" alt="${escapeHtml(product.title)}" class="product-card__img" loading="lazy">` : ''}
         ${purchased
-      ? `<span class="product-card__badge product-card__badge--purchased"><i data-lucide="check-circle"></i> ${i18n.t('btn.purchased')}</span>`
+      ? `<span class="product-card__badge product-card__badge--purchased">${i18n.t('btn.purchased')}</span>`
       : (product.badge ? (() => {
         const bKey = 'badge.' + getBadgeKey(product.badge);
         const bTrans = i18n.t(bKey);

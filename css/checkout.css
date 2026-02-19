@@ -9,7 +9,7 @@
     justify-content: center;
     gap: 24px;
     padding: 16px 80px;
-    background: #F6F7F8;
+    background: var(--color-gray-bg);
 }
 
 .checkout-steps__item {
@@ -18,15 +18,15 @@
     gap: 8px;
     font-size: 13px;
     font-weight: 500;
-    color: #9CA3AF;
+    color: var(--color-gray-light);
 }
 
 .checkout-steps__item--done {
-    color: #22C55E;
+    color: var(--color-success);
 }
 
 .checkout-steps__item--active {
-    color: #1A1A1A;
+    color: var(--color-foreground);
     font-weight: 600;
 }
 
@@ -34,18 +34,18 @@
     width: 28px;
     height: 28px;
     border-radius: 14px;
-    background: #E5E7EB;
+    background: var(--color-gray-lighter);
     display: flex;
     align-items: center;
     justify-content: center;
     font-size: 13px;
     font-weight: 600;
-    color: #9CA3AF;
+    color: var(--color-gray-light);
 }
 
 .checkout-steps__num--done {
-    background: #22C55E;
-    color: #FFF;
+    background: var(--color-success);
+    color: var(--color-surface);
 }
 
 .checkout-steps__num--done i {
@@ -53,14 +53,14 @@
 }
 
 .checkout-steps__num--active {
-    background: #FF6B6B;
-    color: #FFF;
+    background: var(--primary-color);
+    color: var(--color-surface);
 }
 
 .checkout-steps__line {
     width: 40px;
     height: 2px;
-    background: #E5E7EB;
+    background: var(--color-gray-lighter);
 }
 
 /* --- Checkout Body --- */
@@ -102,22 +102,22 @@
     gap: 16px;
     padding: 16px 20px;
     border-radius: 16px;
-    border: 1px solid #E5E7EB;
+    border: 1px solid var(--border-color);
     font-size: 14px;
     font-weight: 500;
     cursor: pointer;
 }
 
 .pay-method--active {
-    border: 2px solid #FF6B6B;
-    background: #FFF5F5;
+    border: 2px solid var(--primary-color);
+    background: var(--primary-bg);
 }
 
 .pay-method__radio {
     width: 20px;
     height: 20px;
     border-radius: 10px;
-    border: 2px solid #E5E7EB;
+    border: 2px solid var(--border-color);
     display: flex;
     align-items: center;
     justify-content: center;
@@ -125,14 +125,14 @@
 }
 
 .pay-method__radio--active {
-    border-color: #FF6B6B;
+    border-color: var(--primary-color);
 }
 
 .pay-method__dot {
     width: 10px;
     height: 10px;
     border-radius: 5px;
-    background: #FF6B6B;
+    background: var(--primary-color);
 }
 
 .pay-method__logo {
@@ -168,7 +168,7 @@
     justify-content: center;
     gap: 8px;
     font-size: 12px;
-    color: #9CA3AF;
+    color: var(--color-gray-light);
 }
 
 .checkout-secure i {
@@ -181,7 +181,7 @@
     flex-shrink: 0;
     padding: 32px;
     border-radius: 20px;
-    background: #F6F7F8;
+    background: var(--color-gray-bg);
     display: flex;
     flex-direction: column;
     gap: 20px;
@@ -197,7 +197,7 @@
 .checkout-summary__divider {
     border: none;
     height: 1px;
-    background: #E5E7EB;
+    background: var(--border-color);
 }
 
 .checkout-summary__row {
@@ -226,5 +226,5 @@
     font-family: 'Bricolage Grotesque', serif;
     font-size: 28px;
     font-weight: 800;
-    color: #FF6B6B;
+    color: var(--primary-color);
 }

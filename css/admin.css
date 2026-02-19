@@ -3,15 +3,15 @@
    ============================================================ */
 
 :root {
-    --admin-primary: #FF6B6B;
+    --admin-primary: var(--primary-color);
     --admin-secondary: #4ECDC4;
-    --admin-dark: #1A1A1A;
+    --admin-dark: var(--color-foreground);
     --admin-sidebar: #111827;
-    --admin-bg: #F9FAFB;
-    --admin-card-bg: #FFFFFF;
-    --admin-border: #E5E7EB;
-    --admin-text: #1F2937;
-    --admin-text-light: #6B7280;
+    --admin-bg: var(--color-gray-bg);
+    --admin-card-bg: var(--color-surface);
+    --admin-border: var(--border-color);
+    --admin-text: var(--color-gray-dark);
+    --admin-text-light: var(--color-gray);
     --admin-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
     --admin-glass: rgba(255, 255, 255, 0.7);
 }
@@ -27,7 +27,7 @@
 .sidebar {
     width: 280px;
     background-color: var(--admin-sidebar);
-    color: #FFFFFF;
+    color: var(--color-surface);
     display: flex;
     flex-direction: column;
     padding: 32px 20px;
@@ -70,7 +70,7 @@
     border-radius: 12px;
     cursor: pointer;
     transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
-    color: #9CA3AF;
+    color: var(--color-gray-light);
     font-weight: 500;
     border: none;
     background: transparent;
@@ -83,14 +83,18 @@
 }
 
 .nav-item:hover {
-    color: #FFFFFF;
-    background-color: rgba(255, 255, 255, 0.05);
+    color: var(--color-surface);
+    background-color: var(--color-gray-soft);
 }
 
 .nav-item.active {
-    background-color: var(--admin-primary);
-    color: #FFFFFF;
+    background: var(--primary-color);
+    color: var(--color-surface);
     box-shadow: 0 10px 15px -3px rgba(255, 107, 107, 0.3);
+}
+
+.nav-item.active i {
+    color: var(--color-surface);
 }
 
 .nav-item#exit-admin-btn {
@@ -182,14 +186,14 @@
     box-shadow: var(--admin-shadow);
     display: flex;
     gap: 0;
-    background-color: #fff;
+    background-color: var(--color-surface);
     overflow: hidden;
 }
 
 #view-messages .messages-sidebar {
     width: 320px;
     flex-shrink: 0;
-    background: #fff;
+    background: var(--color-surface);
     border-right: 1px solid var(--admin-border);
     display: flex;
     flex-direction: column;
@@ -203,9 +207,9 @@
 }
 
 #view-messages .conversation-item.active {
-    background-color: #FEF2F2;
+    background-color: var(--color-red-100);
     /* Light red */
-    border-color: #FECACA;
+    border-color: var(--color-red-200);
 }
 
 #view-messages .chat-header {
@@ -216,12 +220,12 @@
     align-items: center;
     justify-content: space-between;
     border-bottom: 1px solid var(--admin-border);
-    background-color: #fff;
+    background-color: var(--color-surface);
 }
 
 #view-messages .chat-messages {
     flex: 1;
-    background-color: #F9FAFB;
+    background-color: var(--color-gray-soft);
     overflow-y: auto;
     padding: 24px;
     display: flex;
@@ -232,7 +236,7 @@
 #view-messages .chat-input-area {
     flex-shrink: 0;
     padding: 24px;
-    background: #fff;
+    background: var(--color-surface);
     border-top: 1px solid var(--admin-border);
 }
 
@@ -256,7 +260,7 @@
 
 #view-messages .message-received {
     align-self: flex-start;
-    background-color: #fff;
+    background-color: var(--color-surface);
     color: var(--admin-text);
     border: 1px solid var(--admin-border);
     border-bottom-left-radius: 2px;
@@ -274,14 +278,14 @@
     display: inline-block;
     width: 8px;
     height: 8px;
-    background-color: #EF4444;
+    background-color: var(--color-danger);
     border-radius: 50%;
     margin-left: 6px;
 }
 
 .conversation-item.unread .conversation-subject {
     font-weight: 800;
-    color: #111827;
+    color: var(--color-foreground);
 }
 
 
@@ -339,7 +343,7 @@
 .toggle-switch .slider {
     position: absolute;
     inset: 0;
-    background: #EF4444;
+    background: var(--color-danger);
     border-radius: 999px;
     transition: background 0.2s;
 }
@@ -351,13 +355,13 @@
     height: 16px;
     left: 3px;
     bottom: 3px;
-    background: #fff;
+    background: var(--color-surface);
     border-radius: 50%;
     transition: transform 0.2s;
 }
 
 .toggle-switch input:checked+.slider {
-    background: #22C55E;
+    background-color: var(--primary-color);
 }
 
 .toggle-switch input:checked+.slider::before {
@@ -373,7 +377,7 @@
 }
 
 .product-row--archived {
-    background-color: #F9FAFB !important;
+    background-color: var(--color-gray-soft) !important;
 }
 
 .product-row--archived td {
@@ -409,7 +413,7 @@
     font-size: 12px;
     font-weight: 600;
     color: var(--admin-text-light);
-    background: #F3F4F6;
+    background: var(--color-gray-100);
     padding: 2px 8px;
     border-radius: 999px;
 }
@@ -436,7 +440,7 @@
 }
 
 .data-table th {
-    background-color: #F9FAFB;
+    background-color: var(--color-gray-soft);
     padding: 16px 24px;
     text-align: left;
     font-size: 13px;
@@ -459,7 +463,7 @@
 }
 
 .data-table tr:hover {
-    background-color: #F9FAFB;
+    background-color: var(--color-gray-soft);
 }
 
 .img-preview {
@@ -478,13 +482,13 @@
 }
 
 .status-paid {
-    background-color: #DCFCE7;
-    color: #166534;
+    background-color: var(--color-green-100);
+    color: var(--color-green-700);
 }
 
 .status-pending {
-    background-color: #FEF3C7;
-    color: #92400E;
+    background-color: var(--color-yellow-100);
+    color: var(--color-yellow-700);
 }
 
 /* --- Modal --- */
@@ -542,7 +546,7 @@
 }
 
 .btn-icon:hover {
-    background-color: #F3F4F6;
+    background-color: var(--color-gray-100);
 }
 
 .form-row {
@@ -629,7 +633,7 @@
     overflow: hidden;
     aspect-ratio: 1;
     border: 1px solid var(--admin-border);
-    background: #F9FAFB;
+    background: var(--color-gray-soft);
 }
 
 .gallery-item img {
@@ -655,15 +659,27 @@
     align-items: center;
     justify-content: center;
     cursor: pointer;
-    color: #EF4444;
+    color: var(--color-danger);
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
     transition: all 0.2s;
     z-index: 10;
 }
 
+.pagination__btn {
+    width: 36px;
+    height: 36px;
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: var(--color-gray-bg);
+    color: var(--admin-text);
+    transition: all 0.2s;
+}
+
 .gallery-item .remove-btn:hover {
-    background: #EF4444;
-    color: #FFF;
+    background: var(--color-danger);
+    color: var(--color-surface);
     transform: scale(1.1);
 }
 
@@ -674,7 +690,7 @@
     text-align: center;
     cursor: pointer;
     transition: all 0.2s;
-    background: #F9FAFB;
+    background: var(--color-gray-bg);
     display: flex;
     flex-direction: column;
     align-items: center;
@@ -684,8 +700,13 @@
 
 .drop-zone:hover {
     border-color: var(--admin-primary);
-    background: #FFF5F5;
+    background: var(--primary-bg);
     color: var(--admin-primary);
+}
+
+.pagination__btn:hover {
+    background: var(--primary-bg);
+    color: var(--primary-color);
 }
 
 .drop-zone i {
@@ -694,7 +715,7 @@
 
 .file-status-box {
     padding: 16px;
-    background: #F3F4F6;
+    background: var(--color-gray-soft);
     border-radius: 12px;
     margin-top: 8px;
     display: flex;
@@ -703,8 +724,12 @@
     border: 1px solid var(--admin-border);
 }
 
+.bulk-actions__btn--danger {
+    color: var(--color-danger);
+}
+
 .text-red {
-    color: #EF4444;
+    color: var(--color-danger);
 }
 
 .text-gray {
