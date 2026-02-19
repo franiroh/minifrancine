@@ -81,7 +81,13 @@ function renderCheckout() {
 
     if (itemsContainer) {
         itemsContainer.innerHTML = cart.map(item => `
-            <div class="checkout-summary__row"><span>${escapeHtml(item.title)}</span><span>USD ${parseFloat(item.price).toFixed(2)}</span></div>
+            <div class="checkout-summary__row">
+                <div class="checkout-summary__item-info">
+                    <span class="badge-digital">${i18n.t('msg.digital_download')}</span>
+                    <span class="checkout-summary__item-name">${escapeHtml(item.title)}</span>
+                </div>
+                <span class="checkout-summary__item-price">USD ${parseFloat(item.price).toFixed(2)}</span>
+            </div>
         `).join('');
     }
 

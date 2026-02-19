@@ -55,6 +55,7 @@ function renderCart() {
                 <div class="cart-item">
                   ${imgHtml}
                   <div class="cart-item__info">
+                    <span class="badge-digital">${i18n.t('msg.digital_download')}</span>
                     <span class="cart-item__name">${escapeHtml(item.title)}</span>
                     <span class="cart-item__meta">${escapeHtml(item.category)} · ${escapeHtml(item.size || 'Standard')}</span>
                     <span class="cart-item__price">USD ${parseFloat(item.price).toFixed(2)}</span>

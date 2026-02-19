@@ -114,6 +114,7 @@ export const i18n = {
             'terms.contact_title': { es: '5. Contacto', en: '5. Contact', pt: '5. Contato' },
             'terms.contact_text': { es: 'Si tiene alguna pregunta sobre estos términos, contáctenos en minifrancine@gmail.com.', en: 'If you have any questions about these terms, please contact us at minifrancine@gmail.com.', pt: 'Se você tiver alguma dúvida sobre estes termos, entre em contato conosco em minifrancine@gmail.com.' },
             'msg.login_required': { es: 'Debes iniciar sesión', en: 'You must log in', pt: 'Você deve fazer login' },
+            'msg.digital_download': { es: 'Solo descarga digital', en: 'Digital Download Only', pt: 'Apenas download digital' },
             'designs.purchased': { es: 'Comprado', en: 'Purchased', pt: 'Comprado' },
             'btn.download': { es: 'Descargar', en: 'Download', pt: 'Baixar' },
             'btn.downloading': { es: 'Descargando...', en: 'Downloading...', pt: 'Baixando...' },
