@@ -181,6 +181,19 @@
     font-weight: 700;
 }
 
+.cart-item__price-container {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.cart-item__price--old {
+    text-decoration: line-through;
+    color: #EF4444;
+    font-size: 0.85em;
+    font-weight: 500;
+}
+
 .cart-summary__total-val {
     font-family: 'Bricolage Grotesque', serif;
     font-size: 28px;

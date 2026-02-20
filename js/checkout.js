@@ -108,7 +108,10 @@ function renderCheckout() {
                     <span class="badge-digital">${i18n.t('msg.digital_download')}</span>
                     <span class="checkout-summary__item-name">${escapeHtml(item.title)}</span>
                 </div>
-                <span class="checkout-summary__item-price">USD ${parseFloat(item.price).toFixed(2)}</span>
+                <div class="checkout-summary__price-container">
+                    ${item.oldPrice ? `<span class="checkout-summary__item-price checkout-summary__item-price--old">USD ${parseFloat(item.oldPrice).toFixed(2)}</span>` : ''}
+                    <span class="checkout-summary__item-price">USD ${parseFloat(item.price).toFixed(2)}</span>
+                </div>
             </div>
         `).join('');
     }

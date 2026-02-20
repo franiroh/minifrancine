@@ -58,7 +58,10 @@ function renderCart() {
                     <span class="badge-digital">${i18n.t('msg.digital_download')}</span>
                     <span class="cart-item__name">${escapeHtml(item.title)}</span>
                     <span class="cart-item__meta">${escapeHtml(item.category)} · ${escapeHtml(item.size || 'Standard')}</span>
-                    <span class="cart-item__price">USD ${parseFloat(item.price).toFixed(2)}</span>
+                    <div class="cart-item__price-container">
+                        ${item.oldPrice ? `<span class="cart-item__price cart-item__price--old">USD ${parseFloat(item.oldPrice).toFixed(2)}</span>` : ''}
+                        <span class="cart-item__price">USD ${parseFloat(item.price).toFixed(2)}</span>
+                    </div>
                   </div>
                   <button class="cart-item__delete" data-index="${index}"><i data-lucide="trash-2"></i></button>
                 </div>

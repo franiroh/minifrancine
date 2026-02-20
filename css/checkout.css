@@ -365,10 +365,23 @@
     line-height: 1.4;
 }
 
+.checkout-summary__price-container {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+}
+
 .checkout-summary__item-price {
     font-weight: 600;
     white-space: nowrap;
     flex-shrink: 0;
+}
+
+.checkout-summary__item-price--old {
+    text-decoration: line-through;
+    color: #EF4444;
+    font-size: 0.85em;
+    font-weight: 500;
 }
 
 .checkout-summary__total {
