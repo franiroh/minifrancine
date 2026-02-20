@@ -44,6 +44,9 @@
                 <button class="nav-item" data-tab="messages">
                     <i data-lucide="message-square"></i> Mensajes
                 </button>
+                <button class="nav-item" data-tab="coupons">
+                    <i data-lucide="ticket"></i> Cupones
+                </button>
                 <button class="nav-item" data-tab="content">
                     <i data-lucide="layout-template"></i> Contenido Home
                 </button>
@@ -57,10 +60,20 @@
             <header class="topbar">
                 <h1 id="page-title">Dashboard</h1>
                 <div class="dashboard-controls" style="display:flex;gap:10px;align-items:center;">
+                    <select id="date-presets" class="form-input" style="width: auto;">
+                        <option value="custom">Personalizado</option>
+                        <option value="today">Hoy</option>
+                        <option value="yesterday">Ayer</option>
+                        <option value="this-month">Este mes</option>
+                        <option value="last-month">El mes pasado</option>
+                        <option value="this-year">Este año</option>
+                        <option value="all-time">Todo el periodo</option>
+                    </select>
                     <input type="date" id="date-start" class="form-input" style="width: auto;">
                     <input type="date" id="date-end" class="form-input" style="width: auto;">
-                    <button id="btn-filter-date" class="btn-primary" style="padding: 8px 16px;">
-                        <i data-lucide="filter" style="width:16px;height:16px;margin-right:4px;"></i> Filtrar
+                    <button id="btn-filter-date" class="btn btn--primary"
+                        style="padding: 10px 24px; font-weight: 600; font-family: inherit; cursor: pointer; border: none; border-radius: 8px;">
+                        <i data-lucide="filter" style="width:16px;height:16px;margin-right:6px;"></i> Filtrar
                     </button>
                 </div>
                 <div class="user-info" id="admin-email">Cargando...</div>
@@ -69,26 +82,62 @@
             <div id="content-area">
                 <!-- Dashboard View -->
                 <div id="view-dashboard" class="view active">
-                    <div class="stats-grid">
-                        <div class="stat-card">
-                            <h3>Ventas Totales</h3>
-                            <p class="stat-value" id="stat-total-sales">$0.00</p>
+                    <!-- Sales Group -->
+                    <div class="dashboard-group">
+                        <h2 class="dashboard-section-title">
+                            <i data-lucide="trending-up"></i> Ventas y Pedidos
+                        </h2>
+                        <div class="stats-grid">
+                            <div class="stat-card">
+                                <h3>Ventas Totales</h3>
+                                <p class="stat-value" id="stat-total-sales">$0.00</p>
+                            </div>
+                            <div class="stat-card">
+                                <h3>Pedidos Totales</h3>
+                                <p class="stat-value" id="stat-total-orders">0</p>
+                            </div>
+                            <div class="stat-card" style="border-left: 4px solid var(--admin-secondary);">
+                                <h3>Pagados</h3>
+                                <p class="stat-value" id="stat-paid-orders">0</p>
+                            </div>
+                            <div class="stat-card" style="border-left: 4px solid #F59E0B;">
+                                <h3>Pendientes</h3>
+                                <p class="stat-value" id="stat-pending-orders">0</p>
+                            </div>
                         </div>
-                        <div class="stat-card">
-                            <h3>Pedidos Totales</h3>
-                            <p class="stat-value" id="stat-total-orders">0</p>
+                    </div>
+
+                    <!-- Products Group -->
+                    <div class="dashboard-group">
+                        <h2 class="dashboard-section-title">
+                            <i data-lucide="package"></i> Productos e Inventario
+                        </h2>
+                        <div class="stats-grid" style="grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));">
+                            <div class="stat-card">
+                                <h3>Productos Totales</h3>
+                                <p class="stat-value" id="stat-total-products">0</p>
+                            </div>
                         </div>
-                        <div class="stat-card" style="border-left: 4px solid var(--admin-secondary);">
-                            <h3>Pagados</h3>
-                            <p class="stat-value" id="stat-paid-orders">0</p>
-                        </div>
-                        <div class="stat-card" style="border-left: 4px solid #F59E0B;">
-                            <h3>Pendientes</h3>
-                            <p class="stat-value" id="stat-pending-orders">0</p>
-                        </div>
-                        <div class="stat-card">
-                            <h3>Productos</h3>
-                            <p class="stat-value" id="stat-total-products">0</p>
+                    </div>
+
+                    <!-- Coupons Group -->
+                    <div class="dashboard-group">
+                        <h2 class="dashboard-section-title">
+                            <i data-lucide="ticket"></i> Cupones y Promociones
+                        </h2>
+                        <div class="stats-grid">
+                            <div class="stat-card" style="border-left: 4px solid var(--primary-color);">
+                                <h3>Cupones Totales</h3>
+                                <p class="stat-value" id="stat-total-coupons">0</p>
+                            </div>
+                            <div class="stat-card" style="border-left: 4px solid #10B981;">
+                                <h3>Disponibles</h3>
+                                <p class="stat-value" id="stat-available-coupons">0</p>
+                            </div>
+                            <div class="stat-card" style="border-left: 4px solid #6B7280;">
+                                <h3>Usados</h3>
+                                <p class="stat-value" id="stat-used-coupons">0</p>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -97,7 +146,15 @@
                 <div id="view-products" class="view">
                     <div class="view-header">
                         <h2>Catálogo de Productos</h2>
-                        <div style="display: flex; gap: 12px; align-items: center;">
+                        <div style="display: flex; gap: 12px; align-items: center; flex-wrap: wrap;">
+                            <div class="search-box">
+                                <div style="position: relative; display: flex; align-items: center;">
+                                    <i data-lucide="search"
+                                        style="position: absolute; left: 12px; width: 16px; height: 16px; color: var(--admin-text-light);"></i>
+                                    <input type="text" id="product-search" placeholder="Buscar por título..."
+                                        class="form-input" style="width: 240px; padding-left: 38px;">
+                                </div>
+                            </div>
                             <select id="category-filter" class="form-input" style="width: 220px;">
                                 <option value="">Todas las categorías</option>
                                 <!-- Dynamic categories -->
@@ -130,6 +187,27 @@
                                 <!-- Dynamic -->
                             </tbody>
                         </table>
+                    </div>
+                    <!-- Pagination Controls -->
+                    <div id="products-pagination" class="pagination-container"
+                        style="display: flex; justify-content: space-between; align-items: center; margin-top: 20px; padding: 0 10px;">
+                        <div class="pagination-info" id="products-page-info"
+                            style="color: var(--admin-text-light); font-size: 0.9rem;">
+                            Mostrando 0-0 de 0 productos
+                        </div>
+                        <div class="pagination-buttons" style="display: flex; gap: 8px;">
+                            <button id="btn-prev-page" class="btn btn--secondary"
+                                style="padding: 6px 12px; display: flex; align-items: center; gap: 4px;">
+                                <i data-lucide="chevron-left" style="width: 16px; height: 16px;"></i> Anterior
+                            </button>
+                            <div id="page-numbers" style="display: flex; gap: 4px; align-items: center;">
+                                <!-- Dynamic page numbers -->
+                            </div>
+                            <button id="btn-next-page" class="btn btn--secondary"
+                                style="padding: 6px 12px; display: flex; align-items: center; gap: 4px;">
+                                Siguiente <i data-lucide="chevron-right" style="width: 16px; height: 16px;"></i>
+                            </button>
+                        </div>
                     </div>
                 </div>
 
@@ -195,6 +273,101 @@
                                 <p>Selecciona una conversación.</p>
                             </div>
                         </main>
+                    </div>
+                </div>
+
+                <!-- Coupons View -->
+                <div id="view-coupons" class="view">
+                    <div class="view-header">
+                        <h2>Gestión de Cupones</h2>
+                        <button class="btn btn--primary" id="btn-show-coupon-form">
+                            <i data-lucide="plus"></i> Crear Cupón
+                        </button>
+                    </div>
+
+                    <div class="view-filters"
+                        style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px; border-bottom: 1px solid var(--admin-border); padding-bottom: 12px;">
+                        <div class="filter-tabs"
+                            style="display: flex; gap: 12px; margin-bottom: 0; border-bottom: none; padding-bottom: 0;">
+                            <button class="filter-tab active" data-filter="all">Todos</button>
+                            <button class="filter-tab" data-filter="manual">Manuales (Admin)</button>
+                            <button class="filter-tab" data-filter="welcome">Bienvenida (20%)</button>
+                            <button class="filter-tab" data-filter="bulk">Volumen (Bulk)</button>
+                        </div>
+                        <div class="search-box">
+                            <div style="position: relative; display: flex; align-items: center;">
+                                <i data-lucide="search"
+                                    style="position: absolute; left: 12px; width: 16px; height: 16px; color: var(--admin-text-light);"></i>
+                                <input type="text" id="coupon-search" placeholder="Buscar código..." class="form-input"
+                                    style="width: 240px; padding-left: 38px;">
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Create Coupon Form (Hidden by default) -->
+                    <div id="coupon-form-container" class="card"
+                        style="display: none; max-width: 600px; margin: 0 auto 32px auto;">
+                        <form id="coupon-form">
+                            <div class="form-group">
+                                <label>Código del Cupón</label>
+                                <input type="text" id="coupon-create-code" placeholder="Ej: VERANO2026" required>
+                                <small class="text-gray">Se sugiere usar mayúsculas.</small>
+                            </div>
+                            <div class="form-row-group">
+                                <div class="form-group">
+                                    <label>Descuento (%)</label>
+                                    <input type="number" id="coupon-create-discount" value="20" min="1" max="100"
+                                        required>
+                                </div>
+                                <div class="form-group">
+                                    <label>Máx Items (0 = sin límite)</label>
+                                    <input type="number" id="coupon-create-max-items" value="10">
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label>Asignar a:</label>
+                                <select id="coupon-user-selection" class="form-input"
+                                    style="height: auto; min-height: 40px;">
+                                    <option value="all">-- Todos los Usuarios --</option>
+                                    <!-- Dynamic users -->
+                                </select>
+                            </div>
+                            <div style="display: flex; gap: 12px; margin-top: 20px;">
+                                <button type="submit" class="btn btn--primary" style="flex: 1;">Crear Cupón(es)</button>
+                                <button type="button" class="btn btn--outline" id="btn-cancel-coupon"
+                                    style="flex: 1;">Cancelar</button>
+                            </div>
+                        </form>
+                    </div>
+
+                    <div id="coupons-batch-actions" class="card"
+                        style="display: none; padding: 12px 20px; margin-bottom: 24px; background-color: var(--primary-bg); border: 1px solid var(--primary-color); border-radius: 8px; justify-content: space-between; align-items: center;">
+                        <span id="batch-selection-count" style="font-weight: 600; color: var(--primary-color);">0
+                            cupones seleccionados</span>
+                        <button class="btn btn--danger" id="btn-delete-batch-coupons"
+                            style="background-color: #DC2626; color: white; padding: 8px 16px; font-size: 14px;">
+                            <i data-lucide="trash-2" style="width:16px;height:16px;margin-right:6px;"></i> Eliminar
+                            seleccionados
+                        </button>
+                    </div>
+
+                    <div class="table-container">
+                        <table class="data-table" id="coupons-table">
+                            <thead>
+                                <tr>
+                                    <th style="width: 40px;"><input type="checkbox" id="coupon-select-all"></th>
+                                    <th>Código</th>
+                                    <th>Usuario</th>
+                                    <th>Descuento</th>
+                                    <th>Estado</th>
+                                    <th>Creado</th>
+                                    <th>Acciones</th>
+                                </tr>
+                            </thead>
+                            <tbody id="coupons-table-body">
+                                <!-- Dynamic -->
+                            </tbody>
+                        </table>
                     </div>
                 </div>
 

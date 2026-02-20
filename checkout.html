@@ -68,6 +68,14 @@
 
                 <div class="coupon-section">
                     <h3 class="coupon-section__title" data-i18n="checkout.coupon_title">Cupones y Descuentos</h3>
+
+                    <div id="applied-coupon-info" class="applied-coupon-info"
+                        style="display: none; margin-bottom: 16px;">
+                        <span id="applied-coupon-text"></span>
+                        <button class="btn-link" id="remove-coupon-btn"
+                            data-i18n="checkout.coupon_remove">Quitar</button>
+                    </div>
+
                     <div class="coupon-input">
                         <input type="text" id="coupon-code" data-i18n="[placeholder]checkout.coupon_placeholder"
                             placeholder="Ingresa código de cupón">
@@ -76,11 +84,6 @@
                     </div>
                     <div id="available-coupons" class="available-coupons">
                         <!-- Coupons will be listed here -->
-                    </div>
-                    <div id="applied-coupon-info" class="applied-coupon-info" style="display: none;">
-                        <span id="applied-coupon-text"></span>
-                        <button class="btn-link" id="remove-coupon-btn"
-                            data-i18n="checkout.coupon_remove">Quitar</button>
                     </div>
                 </div>
 

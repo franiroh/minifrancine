@@ -107,7 +107,7 @@ export const loadComponents = async () => {
               <i data-lucide="palette"></i> <span data-i18n="nav.my_designs">Mis Diseños</span>
             </a>
             <a href="orders.html" class="navbar__dropdown-item">
-              <i data-lucide="receipt"></i> <span data-i18n="nav.my_orders">Mis Compras</span>
+              <i data-lucide="receipt"></i> <span data-i18n="nav.my_orders">Mis Pedidos</span>
             </a>
             <a href="messages.html" class="navbar__dropdown-item">
               <i data-lucide="message-circle"></i> <span data-i18n="nav.messages">Mensajes</span>

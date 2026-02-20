@@ -24,7 +24,12 @@
     --color-danger-bg: #FEF2F2;
 
     --color-warning: #F59E0B;
+    --color-warning-hover: #D97706;
+    --color-warning-bg: #FFFBEB;
+
     --color-info: #3B82F6;
+    --color-info-hover: #2563EB;
+    --color-info-bg: #EFF6FF;
 
     /* Grays & Borders */
     --color-gray-dark: #374151;

@@ -128,6 +128,12 @@
     background: var(--primary-bg);
 }
 
+.coupon-tag--active {
+    border-color: var(--primary-color);
+    background: var(--primary-color);
+    color: #FFF;
+}
+
 .applied-coupon-info {
     display: flex;
     justify-content: space-between;

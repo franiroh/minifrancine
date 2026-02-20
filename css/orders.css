@@ -97,9 +97,18 @@
 }
 
 .order-card__status--pending {
-    background: var(--color-warning);
-    /* Or a lighter variant if needed, but let's use warning */
-    color: var(--color-warning);
+    background: var(--color-warning-bg);
+    color: var(--color-warning-hover);
+}
+
+.order-card__status--sent {
+    background: var(--color-info-bg);
+    color: var(--color-info-hover);
+}
+
+.order-card__status--cancelled {
+    background: var(--color-danger-bg);
+    color: var(--color-danger-hover);
 }
 
 /* Card Items */

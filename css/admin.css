@@ -84,7 +84,7 @@
 
 .nav-item:hover {
     color: var(--color-surface);
-    background-color: var(--color-gray-soft);
+    background-color: rgba(255, 255, 255, 0.1);
 }
 
 .nav-item.active {
@@ -169,6 +169,27 @@
         opacity: 1;
         transform: translateY(0);
     }
+}
+
+.filter-tab {
+    padding: 8px 16px;
+    border-radius: 8px;
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--admin-text-light);
+    background: transparent;
+    border: 1px solid transparent;
+    transition: all 0.2s;
+}
+
+.filter-tab:hover {
+    background: var(--color-gray-soft);
+}
+
+.filter-tab.active {
+    color: var(--primary-color);
+    background: var(--primary-bg);
+    border-color: var(--primary-color);
 }
 
 /* Messages View */
@@ -575,6 +596,28 @@
 .form-group textarea:focus {
     outline: none;
     border-color: var(--admin-primary);
+}
+
+/* Dashboard Sections Styling */
+.dashboard-group {
+    margin-bottom: 40px;
+}
+
+.dashboard-section-title {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    font-size: 1.25rem;
+    font-weight: 700;
+    color: var(--admin-text);
+    margin-bottom: 24px;
+    padding-bottom: 12px;
+    border-bottom: 1px solid var(--admin-border);
+}
+
+.dashboard-section-title i {
+    color: var(--admin-primary);
+    font-size: 1.5rem;
 }
 
 

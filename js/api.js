@@ -1,5 +1,7 @@
-
 import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js/+esm'
+
+// Add helper for batching if needed
+const BATCH_SIZE = 100;
 
 const supabaseUrl = 'https://dxqsdzktytehycpnrbtn.supabase.co'
 const supabaseKey = 'sb_publishable_crjG8THHPXfnLrtQityLWg_7pLdQPhG'
@@ -464,9 +466,13 @@ export async function captureOrderSecure(orderID, dbOrderId) {
 // --- Coupons ---
 
 export async function fetchMyCoupons() {
+    const user = await getUser();
+    if (!user) return [];
+
     const { data, error } = await supabase
         .from('coupons')
         .select('*')
+        .eq('user_id', user.id)
         .eq('is_used', false)
         .order('created_at', { ascending: false });
 
@@ -478,10 +484,14 @@ export async function fetchMyCoupons() {
 }
 
 export async function validateCoupon(code) {
+    const user = await getUser();
+    if (!user) return { data: null, error: { message: 'User not logged in' } };
+
     const { data, error } = await supabase
         .from('coupons')
         .select('*')
         .eq('code', code)
+        .eq('user_id', user.id)
         .eq('is_used', false)
         .single();
 
@@ -681,6 +691,74 @@ export async function downloadProductFile(productId) {
 
 // --- Admin ---
 
+export async function fetchProfiles() {
+    const { data, error } = await supabase
+        .from('profiles')
+        .select('id, full_name')
+        .order('full_name', { ascending: true });
+
+    if (error) console.error('Error fetching profiles:', error);
+    return data || [];
+}
+
+export async function fetchAllCoupons() {
+    const { data, error } = await supabase
+        .from('coupons')
+        .select(`*`)
+        .order('created_at', { ascending: false });
+
+    if (error) {
+        console.error('Error fetching all coupons:', error);
+        return [];
+    }
+    return data;
+}
+
+export async function createCouponsBatch(baseCoupon, userIds) {
+    // baseCoupon: { code, type, discount_percent, max_items }
+    const rows = userIds.map(uid => ({
+        ...baseCoupon,
+        user_id: uid,
+        is_used: false,
+        created_at: new Date()
+    }));
+
+    // Split into chunks if there are many users
+    const results = [];
+    for (let i = 0; i < rows.length; i += BATCH_SIZE) {
+        const chunk = rows.slice(i, i + BATCH_SIZE);
+        const { data, error } = await supabase
+            .from('coupons')
+            .insert(chunk)
+            .select();
+
+        if (error) {
+            console.error('Error in coupon batch insertion:', error);
+            return { error };
+        }
+        results.push(...(data || []));
+    }
+
+    return { data: results, error: null };
+}
+
+export async function deleteCoupon(id) {
+    const { error } = await supabase
+        .from('coupons')
+        .delete()
+        .eq('id', id);
+    return { error };
+}
+
+export async function deleteCouponsBatch(ids) {
+    if (!ids || ids.length === 0) return { error: null };
+    const { error } = await supabase
+        .from('coupons')
+        .delete()
+        .in('id', ids);
+    return { error };
+}
+
 export async function fetchAllOrders() {
     const { data, error } = await supabase
         .rpc('get_admin_orders')
@@ -706,12 +784,10 @@ export async function fetchAdminStats(startDate, endDate) {
     orderQuery = applyDates(orderQuery);
     const { count: orderCount } = await orderQuery;
 
-    // Products Count (Usually not filtered by date in this context, but let's keep it total)
-    // Actually, dashboard usually shows current total products. 
-    // Let's NOT filter products by date unless asked (usually inventory doesn't depend on sales date range).
-    const { count: productCount } = await supabase
-        .from('products')
-        .select('*', { count: 'exact', head: true })
+    // Products Count
+    let productQuery = supabase.from('products').select('*', { count: 'exact', head: true });
+    productQuery = applyDates(productQuery);
+    const { count: productCount } = await productQuery;
 
     // Total Revenue
     let salesQuery = supabase.from('orders').select('total').eq('status', 'paid');
@@ -733,13 +809,32 @@ export async function fetchAdminStats(startDate, endDate) {
     pendingQuery = applyDates(pendingQuery);
     const { count: pendingCount } = await pendingQuery;
 
+    // --- Coupons Stats ---
+    // Total Coupons Count
+    let totalCouponsQuery = supabase.from('coupons').select('*', { count: 'exact', head: true });
+    totalCouponsQuery = applyDates(totalCouponsQuery);
+    const { count: totalCoupons } = await totalCouponsQuery;
+
+    // Used Coupons Count
+    let usedCouponsQuery = supabase.from('coupons').select('*', { count: 'exact', head: true }).eq('is_used', true);
+    usedCouponsQuery = applyDates(usedCouponsQuery);
+    const { count: usedCoupons } = await usedCouponsQuery;
+
+    // Available Coupons Count
+    let availableCouponsQuery = supabase.from('coupons').select('*', { count: 'exact', head: true }).eq('is_used', false);
+    availableCouponsQuery = applyDates(availableCouponsQuery);
+    const { count: availableCoupons } = await availableCouponsQuery;
+
     return {
         totalOrders: orderCount || 0,
         paidOrders: paidCount || 0,
         pendingOrders: pendingCount || 0,
         totalProducts: productCount || 0,
-        totalSales: totalSales
-    }
+        totalSales: totalSales,
+        totalCoupons: totalCoupons || 0,
+        usedCoupons: usedCoupons || 0,
+        availableCoupons: availableCoupons || 0
+    };
 }
 
 

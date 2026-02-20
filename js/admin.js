@@ -5,10 +5,13 @@ import { fetchAllOrders, fetchAdminStats, deleteProduct, archiveProduct, unarchi
 import { loadAdminMessages } from './admin-messages.js';
 import { initContent } from './admin-content.js';
 import { initI18nEditor } from './admin-i18n.js';
+import { initAdminCoupons } from './admin-coupons.js';
 import i18n from './i18n.js';
 import { escapeHtml, sanitizeCssValue, getBadgeKey } from './utils.js';
 
 let currentView = 'dashboard';
+let currentProductPage = 1;
+const itemsPerProductPage = 25;
 
 async function init() {
     // 0. Init i18n
@@ -36,7 +39,7 @@ async function init() {
 
     // 3. Load Initial View (Hash Routing)
     const hash = window.location.hash.replace('#', '');
-    if (hash && ['dashboard', 'products', 'orders', 'categories', 'messages', 'translations', 'content'].includes(hash)) {
+    if (hash && ['dashboard', 'products', 'orders', 'categories', 'messages', 'translations', 'content', 'coupons'].includes(hash)) {
         const navItem = document.querySelector(`.nav-item[data-tab="${hash}"]`);
         if (navItem) navItem.click();
     } else {
@@ -49,11 +52,72 @@ async function init() {
     // 5. Date Filter Logic
     const dateStartEl = document.getElementById('date-start');
     const dateEndEl = document.getElementById('date-end');
+    const datePresetsEl = document.getElementById('date-presets');
     const btnFilter = document.getElementById('btn-filter-date');
 
-    // Set defaults (First day of current month to Today)
+    const formatDate = (date) => {
+        return date.toISOString().split('T')[0];
+    };
+
+    const updateFromPreset = (preset) => {
+        const today = new Date();
+        let start, end = today;
+
+        switch (preset) {
+            case 'today':
+                start = today;
+                break;
+            case 'yesterday':
+                const yesterday = new Date();
+                yesterday.setDate(today.getDate() - 1);
+                start = yesterday;
+                end = yesterday;
+                break;
+            case 'this-month':
+                start = new Date(today.getFullYear(), today.getMonth(), 1);
+                break;
+            case 'last-month':
+                start = new Date(today.getFullYear(), today.getMonth() - 1, 1);
+                end = new Date(today.getFullYear(), today.getMonth(), 0);
+                break;
+            case 'this-year':
+                start = new Date(today.getFullYear(), 0, 1);
+                break;
+            case 'all-time':
+                start = null;
+                end = null;
+                break;
+            default:
+                return;
+        }
+
+        dateStartEl.value = start ? formatDate(start) : '';
+        dateEndEl.value = end ? formatDate(end) : '';
+
+        // Trigger filter
+        if (currentView === 'dashboard') loadDashboard();
+        if (currentView === 'orders') loadOrders();
+    };
+
+    // Set defaults (This month)
     const today = new Date();
     const firstDay = new Date(today.getFullYear(), today.getMonth(), 1);
+
+    if (datePresetsEl) {
+        datePresetsEl.value = 'this-month';
+
+        datePresetsEl.onchange = (e) => {
+            updateFromPreset(e.target.value);
+        };
+
+        [dateStartEl, dateEndEl].forEach(el => {
+            if (el) {
+                el.onchange = () => {
+                    datePresetsEl.value = 'custom';
+                };
+            }
+        });
+    }
 
     if (dateStartEl && dateEndEl) {
         dateStartEl.valueAsDate = firstDay;
@@ -98,9 +162,9 @@ function setupNavigation() {
         // 1. Update Title
         if (pageTitle) pageTitle.textContent = title;
 
-        // 2. Toggle Controls (Only show for Orders)
+        // 2. Toggle Controls (Only show for Orders and Dashboard)
         if (controls) {
-            controls.style.display = (viewId === 'orders') ? 'flex' : 'none';
+            controls.style.display = (viewId === 'orders' || viewId === 'dashboard') ? 'flex' : 'none';
         }
 
         // 3. Nav Active State
@@ -128,12 +192,13 @@ function setupNavigation() {
             if (viewId === 'messages') loadAdminMessages();
             if (viewId === 'content') initContent();
             if (viewId === 'translations') initI18nEditor();
+            if (viewId === 'coupons') initAdminCoupons();
         };
     });
 
     // Handle Initial State (for hash loading)
     const hash = window.location.hash.replace('#', '');
-    if (hash && ['dashboard', 'products', 'orders', 'categories', 'messages', 'translations', 'content'].includes(hash)) {
+    if (hash && ['dashboard', 'products', 'orders', 'categories', 'messages', 'translations', 'content', 'coupons'].includes(hash)) {
         const navItem = document.querySelector(`.nav-item[data-tab="${hash}"]`);
         if (navItem) navItem.click(); // This triggers onclick logic
     } else {
@@ -155,6 +220,9 @@ async function loadDashboard() {
     document.getElementById('stat-paid-orders').textContent = stats.paidOrders;
     document.getElementById('stat-pending-orders').textContent = stats.pendingOrders;
     document.getElementById('stat-total-products').textContent = stats.totalProducts;
+    document.getElementById('stat-total-coupons').textContent = stats.totalCoupons;
+    document.getElementById('stat-available-coupons').textContent = stats.availableCoupons;
+    document.getElementById('stat-used-coupons').textContent = stats.usedCoupons;
 }
 
 async function loadProducts() {
@@ -163,6 +231,13 @@ async function loadProducts() {
     const tbody = document.querySelector('#products-table tbody');
     const categoryFilter = document.getElementById('category-filter');
     const archiveFilter = document.getElementById('archive-filter');
+    const searchInput = document.getElementById('product-search');
+
+    const getFilters = () => ({
+        categoryId: categoryFilter?.value || '',
+        archiveStatus: archiveFilter?.value || 'active',
+        searchTerm: searchInput?.value.trim().toLowerCase() || ''
+    });
 
     // Populate category filter dropdown
     if (categoryFilter) {
@@ -177,7 +252,11 @@ async function loadProducts() {
         categoryFilter.value = currentValue; // Preserve selection
 
         // Add filter event listener
-        categoryFilter.onchange = () => renderProductsTable(products, categoryFilter.value, archiveFilter?.value || 'active');
+        categoryFilter.onchange = () => {
+            currentProductPage = 1;
+            const { categoryId, archiveStatus, searchTerm } = getFilters();
+            renderProductsTable(products, categoryId, archiveStatus, searchTerm);
+        };
     }
 
     // Populate archive filter dropdown
@@ -191,15 +270,32 @@ async function loadProducts() {
         archiveFilter.value = currentArchiveValue;
 
         // Add filter event listener
-        archiveFilter.onchange = () => renderProductsTable(products, categoryFilter?.value || '', archiveFilter.value);
+        archiveFilter.onchange = () => {
+            currentProductPage = 1;
+            const { categoryId, archiveStatus, searchTerm } = getFilters();
+            renderProductsTable(products, categoryId, archiveStatus, searchTerm);
+        };
+    }
+
+    if (searchInput) {
+        searchInput.oninput = () => {
+            currentProductPage = 1;
+            const { categoryId, archiveStatus, searchTerm } = getFilters();
+            renderProductsTable(products, categoryId, archiveStatus, searchTerm);
+        };
     }
 
     // Initial render
-    renderProductsTable(products, categoryFilter?.value || '', archiveFilter?.value || 'active');
+    const { categoryId, archiveStatus, searchTerm } = getFilters();
+    renderProductsTable(products, categoryId, archiveStatus, searchTerm);
 }
 
-function renderProductsTable(allProducts, selectedCategoryId, archiveStatus = 'active') {
+function renderProductsTable(allProducts, selectedCategoryId, archiveStatus = 'active', searchTerm = '') {
     const tbody = document.querySelector('#products-table tbody');
+    const pageInfo = document.getElementById('products-page-info');
+    const btnPrev = document.getElementById('btn-prev-page');
+    const btnNext = document.getElementById('btn-next-page');
+    const pageNumbersEl = document.getElementById('page-numbers');
 
     // Filter products by category
     let filteredProducts = selectedCategoryId
@@ -212,15 +308,93 @@ function renderProductsTable(allProducts, selectedCategoryId, archiveStatus = 'a
     } else if (archiveStatus === 'archived') {
         filteredProducts = filteredProducts.filter(p => p.archived);
     }
-    // 'all' shows everything, no additional filter needed
 
-    if (filteredProducts.length === 0) {
-        tbody.innerHTML = '<tr><td colspan="7" style="text-align:center; padding: 20px;">No hay productos en esta categoría.</td></tr>';
+    // Filter by search term
+    if (searchTerm) {
+        filteredProducts = filteredProducts.filter(p =>
+            p.title.toLowerCase().includes(searchTerm)
+        );
+    }
+
+    // Pagination Calculation
+    const totalItems = filteredProducts.length;
+    const totalPages = Math.ceil(totalItems / itemsPerProductPage);
+
+    const paginationContainer = document.getElementById('products-pagination');
+    if (paginationContainer) {
+        paginationContainer.style.display = totalPages > 1 ? 'flex' : 'none';
+    }
+
+    // Ensure current page is valid
+    if (currentProductPage > totalPages && totalPages > 0) currentProductPage = totalPages;
+    if (currentProductPage < 1) currentProductPage = 1;
+
+    const startIdx = (currentProductPage - 1) * itemsPerProductPage;
+    const endIdx = Math.min(startIdx + itemsPerProductPage, totalItems);
+    const paginatedProducts = filteredProducts.slice(startIdx, endIdx);
+
+    // Update Pagination UI
+    if (pageInfo) {
+        pageInfo.innerHTML = totalItems > 0
+            ? `Mostrando <strong>${startIdx + 1}-${endIdx}</strong> de <strong>${totalItems}</strong> productos`
+            : 'No hay productos que mostrar';
+    }
+
+    if (btnPrev) btnPrev.disabled = currentProductPage === 1;
+    if (btnNext) btnNext.disabled = currentProductPage === totalPages || totalPages === 0;
+
+    // Render Page Numbers
+    if (pageNumbersEl) {
+        let pagesHtml = '';
+        const maxVisiblePages = 5;
+        let startPage = Math.max(1, currentProductPage - Math.floor(maxVisiblePages / 2));
+        let endPage = Math.min(totalPages, startPage + maxVisiblePages - 1);
+
+        if (endPage - startPage + 1 < maxVisiblePages) {
+            startPage = Math.max(1, endPage - maxVisiblePages + 1);
+        }
+
+        for (let i = startPage; i <= endPage; i++) {
+            pagesHtml += `
+                <button class="btn ${i === currentProductPage ? 'btn--primary' : 'btn--secondary'}" 
+                    style="padding: 4px 10px; min-width: 32px;"
+                    onclick="changeProductPage(${i})">${i}</button>
+            `;
+        }
+        pageNumbersEl.innerHTML = pagesHtml;
+    }
+
+    // Attach button listeners (one-time or check if already attached)
+    if (btnPrev) {
+        btnPrev.onclick = () => {
+            if (currentProductPage > 1) {
+                currentProductPage--;
+                renderProductsTable(allProducts, selectedCategoryId, archiveStatus, searchTerm);
+            }
+        };
+    }
+    if (btnNext) {
+        btnNext.onclick = () => {
+            if (currentProductPage < totalPages) {
+                currentProductPage++;
+                renderProductsTable(allProducts, selectedCategoryId, archiveStatus, searchTerm);
+            }
+        };
+    }
+
+    // Expose jump function to window for onclick handlers
+    window.changeProductPage = (page) => {
+        currentProductPage = page;
+        renderProductsTable(allProducts, selectedCategoryId, archiveStatus, searchTerm);
+    };
+
+    if (paginatedProducts.length === 0) {
+        tbody.innerHTML = '<tr><td colspan="7" style="text-align:center; padding: 20px;">No hay productos que mostrar.</td></tr>';
         if (window.lucide) window.lucide.createIcons();
         return;
     }
 
-    tbody.innerHTML = filteredProducts.map(p => `
+    tbody.innerHTML = paginatedProducts.map(p => `
         <tr class="${p.published === false ? 'product-row--unpublished' : ''} ${p.archived ? 'product-row--archived' : ''}">
             <td>
                 ${(p.mainImage)

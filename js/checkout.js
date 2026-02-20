@@ -214,6 +214,8 @@ function renderCheckout() {
                             if (state.appliedCoupon) {
                                 await import('./api.js').then(m => m.markCouponAsUsed(state.appliedCoupon.id));
                                 removeCoupon();
+                                // Refresh coupons list so used one disappears
+                                await loadCoupons(state.user);
                             }
 
                             // Send order confirmation email
@@ -244,6 +246,8 @@ function renderCheckout() {
                             if (state.appliedCoupon) {
                                 await import('./api.js').then(m => m.markCouponAsUsed(state.appliedCoupon.id));
                                 removeCoupon();
+                                // Refresh coupons list
+                                await loadCoupons(state.user);
                             }
 
                             // Try to send email anyway
@@ -304,9 +308,11 @@ function renderCouponUI() {
     if (!listContainer) return;
 
     // Available coupons
-    if (state.coupons.length > 0) {
+    const otherCoupons = state.coupons.filter(c => state.appliedCoupon?.code !== c.code);
+
+    if (otherCoupons.length > 0) {
         const availableTitle = `<p class="coupon-section__subtitle">${i18n.t('checkout.coupon_available')}:</p>`;
-        listContainer.innerHTML = availableTitle + state.coupons.map(c => `
+        listContainer.innerHTML = availableTitle + otherCoupons.map(c => `
             <div class="coupon-tag" onclick="window.applySelectedCoupon('${c.code}')">
                 <i data-lucide="ticket" size="14"></i>
                 <span>${c.code} (${c.discount_percent}%)</span>
@@ -322,10 +328,8 @@ function renderCouponUI() {
         appliedInfo.style.display = 'flex';
         const title = state.appliedCoupon.type === 'welcome_20' ? i18n.t('checkout.coupon_welcome_title') : i18n.t('checkout.coupon_bulk_title');
         appliedText.innerHTML = `<strong>${i18n.t('checkout.coupon_applied')}</strong> ${state.appliedCoupon.code} (${title})`;
-        document.querySelector('.coupon-input').style.display = 'none';
     } else {
         appliedInfo.style.display = 'none';
-        document.querySelector('.coupon-input').style.display = 'flex';
     }
 
     // Handlers

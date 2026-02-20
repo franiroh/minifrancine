@@ -83,7 +83,7 @@ export const i18n = {
             'checkout.coupon_bulk_title': { es: 'Descuento por Volumen (50% en 10 items)', en: 'Bulk Discount (50% on 10 items)', pt: 'Desconto por Volume (50% em 10 itens)' },
 
             // Orders
-            'orders.title': { es: 'Mis Compras', en: 'My Purchases', pt: 'Minhas Compras' },
+            'orders.title': { es: 'Mis Pedidos', en: 'My Orders', pt: 'Meus Pedidos' },
             'orders.subtitle': { es: 'Historial de pedidos y descargas', en: 'Order history and downloads', pt: 'Histórico de pedidos e downloads' },
             'orders.loading': { es: 'Cargando tus compras...', en: 'Loading your purchases...', pt: 'Carregando suas compras...' },
             'orders.empty': { es: 'No has realizado ninguna compra.', en: 'You haven\'t made any purchases.', pt: 'Você ainda não fez nenhuma compra.' },
@@ -110,9 +110,9 @@ export const i18n = {
             'msg.profile_saved': { es: 'Perfil actualizado correctamente.', en: 'Profile updated successfully.', pt: 'Perfil atualizado com sucesso.' },
             'msg.no_products_category': { es: 'No se encontraron productos en esta categoría.', en: 'No products found in this category.', pt: 'Nenhum produto encontrado nesta categoria.' },
 
-            // JS Updates
+            'nav.my_orders': { es: 'Mis Pedidos', en: 'My Orders', pt: 'Meus Pedidos' },
             'error.designs_load': { es: 'Hubo un error al cargar tus diseños.', en: 'There was an error loading your designs.', pt: 'Houve um erro ao carregar seus designs.' },
-            'error.orders_load': { es: 'Hubo un error al cargar tus compras.', en: 'There was an error loading your purchases.', pt: 'Houve um erro ao carregar suas compras.' },
+            'error.orders_load': { es: 'Hubo un error al cargar tus pedidos.', en: 'There was an error loading your orders.', pt: 'Houve um erro ao carregar seus pedidos.' },
             'error.file_unavailable': { es: 'El archivo digital para este producto no está disponible todavía.', en: 'The digital file for this product is not available yet.', pt: 'O arquivo digital para este produto ainda não está disponível.' },
             'msg.purchased_removed': { es: 'producto(s) en tu carrito ya fueron comprados. Se han removido.', en: 'product(s) in your cart were already purchased and have been removed.', pt: 'produto(s) no seu carrinho já foram comprados. Foram removidos.' },
 
