@@ -42,12 +42,12 @@ export const i18n = {
             'home.promos.welcome_title': { es: '20% dcto. Primera Compra', en: '20% OFF First Order', pt: '20% desc. Primeira Compra' },
             'home.promos.welcome_desc': { es: 'Usa el código <b>WELCOME20</b> en tu primer pedido.', en: 'Use code <b>WELCOME20</b> on your first purchase.', pt: 'Use o código <b>WELCOME20</b> no seu primeiro pedido.' },
             'home.promos.bulk_title': { es: '50% dcto. por Volumen', en: '50% Bulk Discount', pt: '50% desc. por Volume' },
-            'home.promos.bulk_desc': { es: 'Lleva 10 o más diseños y obtén un 50% de descuento. Usa el código <b>BULK50</b>.', en: 'Get 50% OFF when you buy 10 or more designs. Use code <b>BULK50</b>.', pt: 'Leve 10 ou mais designs e ganhe 50% de desconto. Use o código <b>BULK50</b>.' },
+            'home.promos.bulk_desc': { es: 'Al llevar 4 o más diseños, obtén un 50% de descuento en tu próximo pedido (máximo 10 diseños). Usa el código <b>BULK50</b>.', en: 'When buying 4 or more designs, get 50% OFF your next order (up to 10 designs). Use code <b>BULK50</b>.', pt: 'Ao levar 4 ou mais desenhos, ganhe 50% de desconto no seu próximo pedido (até 10 desenhos). Use o código <b>BULK50</b>.' },
             'home.promos.copy_code': { es: 'Copiar Código', en: 'Copy Code', pt: 'Copiar Código' },
             'home.promos.bar_text': {
-                es: '<b>WELCOME20</b>: 20% dcto en tu 1ra compra &nbsp;&nbsp;&nbsp;&nbsp; | &nbsp;&nbsp;&nbsp;&nbsp; <b>BULK50</b>: 50% dcto llevando 10+ diseños',
-                en: '<b>WELCOME20</b>: 20% OFF 1st order &nbsp;&nbsp;&nbsp;&nbsp; | &nbsp;&nbsp;&nbsp;&nbsp; <b>BULK50</b>: 50% OFF on 10+ designs',
-                pt: '<b>WELCOME20</b>: 20% desc na 1ª compra &nbsp;&nbsp;&nbsp;&nbsp; | &nbsp;&nbsp;&nbsp;&nbsp; <b>BULK50</b>: 50% desc em 10+ designs'
+                es: '<span class="promo-bar__code"><b>WELCOME20</b>: </span>20% dcto en tu 1ra compra &nbsp;&nbsp;&nbsp;&nbsp; | &nbsp;&nbsp;&nbsp;&nbsp; <span class="promo-bar__code"><b>BULK50</b>: </span>4+ diseños: 50% OFF en tu próximo pedido',
+                en: '<span class="promo-bar__code"><b>WELCOME20</b>: </span>20% OFF 1st order &nbsp;&nbsp;&nbsp;&nbsp; | &nbsp;&nbsp;&nbsp;&nbsp; <span class="promo-bar__code"><b>BULK50</b>: </span>4+ items: 50% OFF your next order',
+                pt: '<span class="promo-bar__code"><b>WELCOME20</b>: </span>20% desc na 1ª compra &nbsp;&nbsp;&nbsp;&nbsp; | &nbsp;&nbsp;&nbsp;&nbsp; <span class="promo-bar__code"><b>BULK50</b>: </span>4+ desenhos: 50% OFF no seu próximo pedido'
             },
 
             'cart.coupon_notice': { es: 'Los cupones y descuentos se aplican en el checkout', en: 'Coupons and discounts are applied at checkout', pt: 'Cupons e descontos são aplicados no checkout' },

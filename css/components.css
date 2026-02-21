@@ -942,6 +942,15 @@ svg.navbar__icon {
         cursor: pointer;
     }
 
+    .promo-bar__code {
+        display: none;
+    }
+
+    .promo-bar {
+        font-size: 12px;
+        padding: 8px 20px;
+    }
+
     .breadcrumbs {
         padding: 12px 20px;
         font-size: 12px;
