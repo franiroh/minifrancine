@@ -191,8 +191,25 @@ function renderOrderCard(order, reviewsMap = {}) {
             </div>
 
             <div class="order-card__footer">
-                <span class="order-card__total-label">Total</span>
-                <span class="order-card__total">USD ${parseFloat(order.total).toFixed(2)}</span>
+                <div class="order-summary-row">
+                    <span class="order-summary-label">Subtotal</span>
+                    <span class="order-summary-value">USD ${(parseFloat(order.total) + parseFloat(order.discount_amount || 0)).toFixed(2)}</span>
+                </div>
+
+                ${order.applied_coupon_code ? `
+                <div class="order-summary-row order-summary-discount">
+                    <span class="order-summary-label order-summary-discount">
+                        <i data-lucide="tag" style="width: 12px; height: 12px; vertical-align: middle; margin-right: 4px;"></i>
+                        Cupón: <strong>${escapeHtml(order.applied_coupon_code)}</strong>
+                    </span>
+                    <span class="order-summary-value order-summary-discount">-USD ${parseFloat(order.discount_amount).toFixed(2)}</span>
+                </div>
+                ` : ''}
+
+                <div class="order-summary-row order-summary-total">
+                    <span class="order-summary-label">Total</span>
+                    <span class="order-summary-value">USD ${parseFloat(order.total).toFixed(2)}</span>
+                </div>
             </div>
         </div>
     `;

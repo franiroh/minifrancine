@@ -175,7 +175,8 @@ function renderCheckout() {
 
                         // 2. Call Edge Function to Create Order
                         // Returns { orderID: 'PAYPAL-ID', dbOrderId: 'UUID' }
-                        const result = await import('./api.js').then(m => m.createOrderSecure(rpcItems));
+                        const couponCode = state.appliedCoupon ? state.appliedCoupon.code : null;
+                        const result = await import('./api.js').then(m => m.createOrderSecure(rpcItems, couponCode));
 
                         // Store dbOrderId needed for capture later
                         // We can store it in a variable accessible to onApprove, 
@@ -210,11 +211,10 @@ function renderCheckout() {
                             const paymentId = result.data?.id || data.orderID;
                             showToast(`¡Pago exitoso! ID: ${paymentId}`, 'success');
 
-                            // 4. Mark coupon as used if applied
+                            // 4. Reset coupon state (it's marked as used on the server)
                             if (state.appliedCoupon) {
-                                await import('./api.js').then(m => m.markCouponAsUsed(state.appliedCoupon.id));
                                 removeCoupon();
-                                // Refresh coupons list so used one disappears
+                                // Refresh coupons list
                                 await loadCoupons(state.user);
                             }
 
@@ -275,8 +275,10 @@ function renderCheckout() {
             const checkbox = document.getElementById('digital-agreement');
             const btnContainer = document.getElementById('paypal-button-container');
             if (checkbox && btnContainer) {
-                btnContainer.style.opacity = '0.5';
-                btnContainer.style.pointerEvents = 'none';
+                // Initialize state based on current checkbox value
+                const isChecked = checkbox.checked;
+                btnContainer.style.opacity = isChecked ? '1' : '0.5';
+                btnContainer.style.pointerEvents = isChecked ? 'auto' : 'none';
 
                 checkbox.onchange = () => {
                     if (checkbox.checked) {

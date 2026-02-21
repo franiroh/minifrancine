@@ -427,7 +427,7 @@ export async function clearCartDB(userId) {
 // --- Orders ---
 
 // --- Secure Payment (Edge Function) ---
-export async function createOrderSecure(items) {
+export async function createOrderSecure(items, couponCode = null) {
     const user = await getUser();
     if (!user) throw new Error("User must be logged in");
 
@@ -436,7 +436,8 @@ export async function createOrderSecure(items) {
     const { data, error } = await supabase.functions.invoke('paypal-order', {
         body: {
             action: 'create',
-            items: items
+            items: items,
+            couponCode: couponCode
         }
     });
 
@@ -638,6 +639,8 @@ export async function fetchMyOrders(userId) {
             status,
             created_at,
             payment_id,
+            applied_coupon_code,
+            discount_amount,
             order_items (
                 product_id,
                 quantity,

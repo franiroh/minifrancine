@@ -252,22 +252,49 @@
 /* Card Footer / Total */
 .order-card__footer {
     display: flex;
-    justify-content: flex-end;
-    align-items: center;
-    padding: 16px 24px;
+    flex-direction: column;
+    padding: 20px 24px;
     background: var(--color-gray-bg);
     border-top: 1px solid var(--border-color);
     gap: 8px;
 }
 
-.order-card__total-label {
+.order-summary-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.order-summary-label {
     font-size: 14px;
     color: var(--color-gray);
     font-weight: 500;
 }
 
-.order-card__total {
-    font-size: 18px;
+.order-summary-value {
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--color-foreground);
+}
+
+.order-summary-discount {
+    color: var(--color-success);
+}
+
+.order-summary-total {
+    margin-top: 12px;
+    padding-top: 12px;
+    border-top: 1px solid var(--color-gray-lighter);
+}
+
+.order-summary-total .order-summary-label {
+    font-size: 15px;
+    font-weight: 700;
+    color: var(--color-foreground);
+}
+
+.order-summary-total .order-summary-value {
+    font-size: 20px;
     font-weight: 800;
     color: var(--color-foreground);
     font-family: 'Bricolage Grotesque', serif;
