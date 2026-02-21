@@ -80,6 +80,18 @@
                             style="font-size:13px;font-weight:600;color:#22C55E;">Publicado</span>
                         <button type="button" class="btn btn--secondary"
                             onclick="window.location.href='admin.html#products'">Cancelar</button>
+
+                        <div
+                            style="display: flex; align-items: center; gap: 8px; margin-right: 8px; border: 1px solid #e5e7eb; padding: 6px 12px; border-radius: 8px;">
+                            <label class="toggle-switch toggle-switch--gray" title="Indexado por buscadores"
+                                style="flex-shrink:0;">
+                                <input type="checkbox" id="prod-indexed" checked>
+                                <span class="slider"></span>
+                            </label>
+                            <span id="prod-indexed-label"
+                                style="font-size:13px;font-weight:600;color:#22C55E;">Indexar</span>
+                        </div>
+
                         <button type="button" class="btn btn--outline hidden" id="btn-view-product" target="_blank">
                             <i data-lucide="external-link" style="width:16px;"></i> Ver en Tienda
                         </button>

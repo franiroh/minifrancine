@@ -168,6 +168,20 @@ async function renderProduct() {
     // Info
     document.title = `${p.title} — MiniFrancine`;
 
+    // No-Index Meta Tag
+    let metaRobots = document.querySelector('meta[name="robots"]');
+    if (p.indexed === false) {
+        if (!metaRobots) {
+            metaRobots = document.createElement('meta');
+            metaRobots.name = 'robots';
+            document.head.appendChild(metaRobots);
+        }
+        metaRobots.content = 'noindex';
+    } else if (metaRobots) {
+        // If it was added but then we navigated to an indexed product (if SPA-like, but let's be safe)
+        metaRobots.content = 'index, follow'; // or remove it
+    }
+
     // Make category clickable
     const catEl = document.getElementById('detail-category');
     if (catEl) {

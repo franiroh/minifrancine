@@ -69,7 +69,22 @@ async function loadOrderDetails(orderId) {
     document.getElementById('order-date-display').textContent = new Date(order.created_at).toLocaleString();
     document.getElementById('order-email').textContent = order.email || 'N/A';
     document.getElementById('order-user').textContent = `ID: ${order.user_id}`;
-    document.getElementById('order-total').textContent = `USD ${order.total}`;
+    document.getElementById('order-total').textContent = `USD ${parseFloat(order.total).toFixed(2)}`;
+
+    // Coupon Info
+    const couponEl = document.getElementById('order-coupon');
+    const discountEl = document.getElementById('order-discount');
+    const couponCard = document.getElementById('coupon-card');
+
+    if (order.applied_coupon_code) {
+        couponEl.textContent = order.applied_coupon_code.toUpperCase();
+        discountEl.textContent = `Desc: USD ${parseFloat(order.discount_amount || 0).toFixed(2)}`;
+        couponCard.style.opacity = '1';
+    } else {
+        couponEl.textContent = 'Ninguno';
+        discountEl.textContent = 'Desc: USD 0.00';
+        couponCard.style.opacity = '0.7';
+    }
 
     // Status Badge
     const statusEl = document.getElementById('order-status');
@@ -104,9 +119,14 @@ async function loadOrderDetails(orderId) {
                         <strong>${p ? escapeHtml(p.title) : 'Producto Eliminado'}</strong>
                     </div>
                 </td>
-                <td>USD ${parseFloat(item.price).toFixed(2)}</td>
-                <td>${parseInt(item.quantity)}</td>
-                <td><strong>USD ${(parseFloat(item.price) * parseInt(item.quantity)).toFixed(2)}</strong></td>
+                <td>
+                    <div class="checkout-summary__price-container" style="display:flex; flex-direction:column; gap:2px;">
+                        ${item.old_price && parseFloat(item.old_price) > parseFloat(item.price)
+                ? `<span style="text-decoration: line-through; color: var(--color-danger); font-size: 14px; opacity: 0.9;">USD ${parseFloat(item.old_price).toFixed(2)}</span>`
+                : ''}
+                        <strong style="font-size: 16px;">USD ${parseFloat(item.price).toFixed(2)}</strong>
+                    </div>
+                </td>
             </tr>
         `;
     }).join('');

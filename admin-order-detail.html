@@ -43,6 +43,9 @@
                 <a href="admin.html#messages" class="nav-item">
                     <i data-lucide="message-square"></i> Mensajes
                 </a>
+                <a href="admin.html#coupons" class="nav-item">
+                    <i data-lucide="ticket"></i> Cupones
+                </a>
                 <a href="admin.html#content" class="nav-item">
                     <i data-lucide="layout-template"></i> Contenido Home
                 </a>
@@ -60,13 +63,14 @@
 
             <div id="content-area">
                 <div class="page-header">
-                    <div>
-                        <h2 id="order-id-display">Pedido #...</h2>
-                        <p class="text-gray" id="order-date-display">Cargando...</p>
+                    <div style="display: flex; align-items: center; gap: 16px;">
+                        <h2 id="order-id-display" style="margin: 0;">Pedido #...</h2>
+                        <div id="order-status"></div>
                     </div>
-                    <div class="actions">
-                        <!-- Future actions like Refund? -->
-                    </div>
+                    <p class="text-gray" id="order-date-display" style="margin-top: 4px;">Cargando...</p>
+                </div>
+                <div class="actions">
+                    <!-- Future actions like Refund? -->
                 </div>
 
                 <div class="stats-grid">
@@ -75,9 +79,10 @@
                         <p class="stat-value" style="font-size: 16px; word-break: break-all;" id="order-email">...</p>
                         <small class="text-gray" style="font-size: 11px;" id="order-user">ID: ...</small>
                     </div>
-                    <div class="stat-card">
-                        <h3>Estado</h3>
-                        <p class="stat-value" id="order-status">...</p>
+                    <div class="stat-card" id="coupon-card" style="border-left: 4px solid #8B5CF6;">
+                        <h3>Cupón / Descuento</h3>
+                        <p class="stat-value" id="order-coupon">Ninguno</p>
+                        <small class="text-gray" id="order-discount">Desc: $0.00</small>
                     </div>
                     <div class="stat-card">
                         <h3>Total</h3>
@@ -92,9 +97,7 @@
                             <thead>
                                 <tr>
                                     <th>Producto</th>
-                                    <th>Precio Unit.</th>
-                                    <th>Cantidad</th>
-                                    <th>Subtotal</th>
+                                    <th>Precio</th>
                                 </tr>
                             </thead>
                             <tbody><!-- Dynamic --></tbody>

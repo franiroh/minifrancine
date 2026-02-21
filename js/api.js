@@ -70,7 +70,8 @@ export async function fetchProducts({ publishedOnly = false, tag = null, search 
         description: p.description,
         mainImage: p.main_image,
         published: p.published,
-        archived: p.archived
+        archived: p.archived,
+        indexed: p.indexed
     }));
 }
 
@@ -106,7 +107,8 @@ export async function fetchProductById(id) {
         rating: data.rating,
         reviews: data.reviews,
         description: data.description,
-        published: data.published
+        published: data.published,
+        indexed: data.indexed
     };
 }
 
@@ -789,8 +791,20 @@ export async function fetchAdminStats(startDate, endDate) {
 
     // Products Count
     let productQuery = supabase.from('products').select('*', { count: 'exact', head: true });
-    productQuery = applyDates(productQuery);
+    // productQuery = applyDates(productQuery); // No filter for total count
     const { count: productCount } = await productQuery;
+
+    // Published Count
+    const { count: publishedCount } = await supabase.from('products').select('*', { count: 'exact', head: true }).eq('published', true);
+
+    // Private Count
+    const { count: privateCount } = await supabase.from('products').select('*', { count: 'exact', head: true }).eq('published', false);
+
+    // Indexed Count
+    const { count: indexedCount } = await supabase.from('products').select('*', { count: 'exact', head: true }).neq('indexed', false);
+
+    // No-Indexed Count
+    const { count: noIndexedCount } = await supabase.from('products').select('*', { count: 'exact', head: true }).eq('indexed', false);
 
     // Total Revenue
     let salesQuery = supabase.from('orders').select('total').eq('status', 'paid');
@@ -813,19 +827,26 @@ export async function fetchAdminStats(startDate, endDate) {
     const { count: pendingCount } = await pendingQuery;
 
     // --- Coupons Stats ---
+    // Coupon Sales (USD)
+    let couponSalesQuery = supabase.from('orders').select('total').eq('status', 'paid').not('applied_coupon_code', 'is', null);
+    couponSalesQuery = applyDates(couponSalesQuery);
+    const { data: couponSalesData } = await couponSalesQuery;
+
+    const couponSales = (couponSalesData || []).reduce((sum, o) => sum + parseFloat(o.total || 0), 0);
+
     // Total Coupons Count
     let totalCouponsQuery = supabase.from('coupons').select('*', { count: 'exact', head: true });
-    totalCouponsQuery = applyDates(totalCouponsQuery);
+    // totalCouponsQuery = applyDates(totalCouponsQuery); // No filter for total count
     const { count: totalCoupons } = await totalCouponsQuery;
 
-    // Used Coupons Count
-    let usedCouponsQuery = supabase.from('coupons').select('*', { count: 'exact', head: true }).eq('is_used', true);
+    // Used Coupons Count (based on orders in period)
+    let usedCouponsQuery = supabase.from('orders').select('*', { count: 'exact', head: true }).eq('status', 'paid').not('applied_coupon_code', 'is', null);
     usedCouponsQuery = applyDates(usedCouponsQuery);
     const { count: usedCoupons } = await usedCouponsQuery;
 
-    // Available Coupons Count
+    // Available Coupons Count (Absolute)
     let availableCouponsQuery = supabase.from('coupons').select('*', { count: 'exact', head: true }).eq('is_used', false);
-    availableCouponsQuery = applyDates(availableCouponsQuery);
+    // availableCouponsQuery = applyDates(availableCouponsQuery); // No filter for total availability
     const { count: availableCoupons } = await availableCouponsQuery;
 
     return {
@@ -833,10 +854,15 @@ export async function fetchAdminStats(startDate, endDate) {
         paidOrders: paidCount || 0,
         pendingOrders: pendingCount || 0,
         totalProducts: productCount || 0,
+        publishedProducts: publishedCount || 0,
+        privateProducts: privateCount || 0,
+        indexedProducts: indexedCount || 0,
+        noIndexedProducts: noIndexedCount || 0,
         totalSales: totalSales,
         totalCoupons: totalCoupons || 0,
         usedCoupons: usedCoupons || 0,
-        availableCoupons: availableCoupons || 0
+        availableCoupons: availableCoupons || 0,
+        couponSales: couponSales || 0
     };
 }
 

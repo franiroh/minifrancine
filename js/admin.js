@@ -56,7 +56,10 @@ async function init() {
     const btnFilter = document.getElementById('btn-filter-date');
 
     const formatDate = (date) => {
-        return date.toISOString().split('T')[0];
+        const year = date.getFullYear();
+        const month = String(date.getMonth() + 1).padStart(2, '0');
+        const day = String(date.getDate()).padStart(2, '0');
+        return `${year}-${month}-${day}`;
     };
 
     const updateFromPreset = (preset) => {
@@ -120,8 +123,8 @@ async function init() {
     }
 
     if (dateStartEl && dateEndEl) {
-        dateStartEl.valueAsDate = firstDay;
-        dateEndEl.valueAsDate = today;
+        dateStartEl.value = formatDate(firstDay);
+        dateEndEl.value = formatDate(today);
 
         btnFilter.onclick = () => {
             if (currentView === 'dashboard') loadDashboard();
@@ -220,9 +223,14 @@ async function loadDashboard() {
     document.getElementById('stat-paid-orders').textContent = stats.paidOrders;
     document.getElementById('stat-pending-orders').textContent = stats.pendingOrders;
     document.getElementById('stat-total-products').textContent = stats.totalProducts;
+    document.getElementById('stat-published-products').textContent = stats.publishedProducts;
+    document.getElementById('stat-private-products').textContent = stats.privateProducts;
+    document.getElementById('stat-indexed-products').textContent = stats.indexedProducts;
+    document.getElementById('stat-noindexed-products').textContent = stats.noIndexedProducts;
     document.getElementById('stat-total-coupons').textContent = stats.totalCoupons;
     document.getElementById('stat-available-coupons').textContent = stats.availableCoupons;
     document.getElementById('stat-used-coupons').textContent = stats.usedCoupons;
+    document.getElementById('stat-coupon-sales').textContent = `USD ${stats.couponSales.toFixed(2)}`;
 }
 
 async function loadProducts() {
@@ -414,6 +422,12 @@ function renderProductsTable(allProducts, selectedCategoryId, archiveStatus = 'a
             </td>
             <td>USD ${parseFloat(p.price).toFixed(2)}</td>
             <td>
+                <label class="toggle-switch ${p.indexed === false ? 'toggle-switch--gray' : ''}">
+                    <input type="checkbox" ${p.indexed !== false ? 'checked' : ''} ${p.archived ? 'disabled' : ''} onchange="toggleIndexHandler(${parseInt(p.id)}, this.checked)">
+                    <span class="slider"></span>
+                </label>
+            </td>
+            <td>
                 <label class="toggle-switch">
                     <input type="checkbox" ${p.published !== false ? 'checked' : ''} ${p.archived ? 'disabled' : ''} onchange="togglePublishHandler(${parseInt(p.id)}, this.checked)">
                     <span class="slider"></span>
@@ -443,14 +457,14 @@ async function loadOrders() {
     let filteredOrders = orders;
 
     if (dateStartVal) {
-        const start = new Date(dateStartVal);
-        start.setHours(0, 0, 0, 0);
+        const [y, m, d] = dateStartVal.split('-').map(Number);
+        const start = new Date(y, m - 1, d, 0, 0, 0, 0);
         filteredOrders = filteredOrders.filter(o => new Date(o.created_at) >= start);
     }
 
     if (dateEndVal) {
-        const end = new Date(dateEndVal);
-        end.setHours(23, 59, 59, 999);
+        const [y, m, d] = dateEndVal.split('-').map(Number);
+        const end = new Date(y, m - 1, d, 23, 59, 59, 999);
         filteredOrders = filteredOrders.filter(o => new Date(o.created_at) <= end);
     }
 
@@ -536,6 +550,16 @@ window.togglePublishHandler = async (id, published) => {
     const { error } = await updateProduct(id, { published });
     if (error) {
         alert('Error al cambiar estado: ' + error.message);
+        loadProducts(); // Revert UI
+    } else {
+        loadProducts();
+    }
+};
+
+window.toggleIndexHandler = async (id, indexed) => {
+    const { error } = await updateProduct(id, { indexed });
+    if (error) {
+        alert('Error al cambiar indexación: ' + error.message);
         loadProducts(); // Revert UI
     } else {
         loadProducts();

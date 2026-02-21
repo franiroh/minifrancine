@@ -72,6 +72,9 @@
     transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
     color: var(--color-gray-light);
     font-weight: 500;
+    font-size: 14px;
+    font-family: 'Outfit', sans-serif;
+    text-decoration: none;
     border: none;
     background: transparent;
     width: 100%;
@@ -369,6 +372,10 @@
     transition: background 0.2s;
 }
 
+.toggle-switch--gray .slider {
+    background: var(--color-gray-lighter);
+}
+
 .toggle-switch .slider::before {
     content: '';
     position: absolute;
@@ -503,13 +510,13 @@
 }
 
 .status-paid {
-    background-color: var(--color-green-100);
-    color: var(--color-green-700);
+    background-color: var(--color-success-bg);
+    color: var(--color-success);
 }
 
 .status-pending {
-    background-color: var(--color-yellow-100);
-    color: var(--color-yellow-700);
+    background-color: var(--color-warning-bg);
+    color: var(--color-warning);
 }
 
 /* --- Modal --- */

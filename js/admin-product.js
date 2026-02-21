@@ -77,6 +77,14 @@ async function init() {
         pubLabel.style.color = pubCheckbox.checked ? '#22C55E' : '#9CA3AF';
     });
 
+    // Indexed toggle label sync
+    const indexCheckbox = document.getElementById('prod-indexed');
+    const indexLabel = document.getElementById('prod-indexed-label');
+    indexCheckbox.addEventListener('change', () => {
+        indexLabel.textContent = indexCheckbox.checked ? 'Indexar' : 'No indexar';
+        indexLabel.style.color = indexCheckbox.checked ? '#22C55E' : '#9CA3AF';
+    });
+
     setupEventListeners();
     fadeOutPreloader();
 }
@@ -123,6 +131,13 @@ async function loadProductData(id) {
     pubCheckbox.checked = product.published !== false;
     pubLabel.textContent = pubCheckbox.checked ? 'Publicado' : 'No publicado';
     pubLabel.style.color = pubCheckbox.checked ? '#22C55E' : '#9CA3AF';
+
+    // Indexed state
+    const indexCheckbox = document.getElementById('prod-indexed');
+    const indexLabel = document.getElementById('prod-indexed-label');
+    indexCheckbox.checked = product.indexed !== false; // default true
+    indexLabel.textContent = indexCheckbox.checked ? 'Indexar' : 'No indexar';
+    indexLabel.style.color = indexCheckbox.checked ? '#22C55E' : '#9CA3AF';
 
     // Load Images
     const images = await fetchProductImages(id);
@@ -335,6 +350,7 @@ async function handleSave(e) {
             stitches: parseInt(document.getElementById('prod-stitches').value.replace(/,/g, ''), 10) || 0,
             formats: document.getElementById('prod-formats').value,
             published: document.getElementById('prod-published').checked,
+            indexed: document.getElementById('prod-indexed').checked,
         };
 
         let savedProductId = productId; // Existing or new

@@ -112,10 +112,26 @@
                         <h2 class="dashboard-section-title">
                             <i data-lucide="package"></i> Productos e Inventario
                         </h2>
-                        <div class="stats-grid" style="grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));">
-                            <div class="stat-card">
+                        <div class="stats-grid" style="grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));">
+                            <div class="stat-card" style="border-left: 4px solid var(--primary-color);">
                                 <h3>Productos Totales</h3>
                                 <p class="stat-value" id="stat-total-products">0</p>
+                            </div>
+                            <div class="stat-card" style="border-left: 4px solid #10B981;">
+                                <h3>Publicados</h3>
+                                <p class="stat-value" id="stat-published-products">0</p>
+                            </div>
+                            <div class="stat-card" style="border-left: 4px solid #F59E0B;">
+                                <h3>Privados</h3>
+                                <p class="stat-value" id="stat-private-products">0</p>
+                            </div>
+                            <div class="stat-card" style="border-left: 4px solid #6366F1;">
+                                <h3>Indexados</h3>
+                                <p class="stat-value" id="stat-indexed-products">0</p>
+                            </div>
+                            <div class="stat-card" style="border-left: 4px solid #9CA3AF;">
+                                <h3>No Indexados</h3>
+                                <p class="stat-value" id="stat-noindexed-products">0</p>
                             </div>
                         </div>
                     </div>
@@ -137,6 +153,10 @@
                             <div class="stat-card" style="border-left: 4px solid #6B7280;">
                                 <h3>Usados</h3>
                                 <p class="stat-value" id="stat-used-coupons">0</p>
+                            </div>
+                            <div class="stat-card" style="border-left: 4px solid #8B5CF6;">
+                                <h3>Ventas con Cupón</h3>
+                                <p class="stat-value" id="stat-coupon-sales">$0.00</p>
                             </div>
                         </div>
                     </div>
@@ -179,6 +199,7 @@
                                     <th>Categoría</th>
                                     <th>Badge</th>
                                     <th>Precio</th>
+                                    <th>Indexar</th>
                                     <th>Estado</th>
                                     <th>Acciones</th>
                                 </tr>
