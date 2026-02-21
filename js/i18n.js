@@ -120,6 +120,7 @@ export const i18n = {
             'error.profile_save': { es: 'Error al guardar el perfil.', en: 'Error saving profile.', pt: 'Erro ao salvar o perfil.' },
             'msg.profile_saved': { es: 'Perfil actualizado correctamente.', en: 'Profile updated successfully.', pt: 'Perfil atualizado com sucesso.' },
             'msg.no_products_category': { es: 'No se encontraron productos en esta categoría.', en: 'No products found in this category.', pt: 'Nenhum produto encontrado nesta categoria.' },
+            'product.related.title': { es: 'Diseños Relacionados', en: 'Related Designs', pt: 'Designs Relacionados' },
 
             'nav.my_orders': { es: 'Mis Pedidos', en: 'My Orders', pt: 'Meus Pedidos' },
             'error.designs_load': { es: 'Hubo un error al cargar tus diseños.', en: 'There was an error loading your designs.', pt: 'Houve um erro ao carregar seus designs.' },

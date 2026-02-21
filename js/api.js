@@ -108,8 +108,63 @@ export async function fetchProductById(id) {
         reviews: data.reviews,
         description: data.description,
         published: data.published,
-        indexed: data.indexed
+        indexed: data.indexed,
+        relatedProductIds: data.related_product_ids || []
     };
+}
+
+export async function fetchProductsByIds(ids) {
+    if (!ids || ids.length === 0) return [];
+    
+    const { data, error } = await supabase
+        .from('products')
+        .select('*, categories(name)')
+        .in('id', ids)
+        .eq('published', true)
+        .eq('archived', false);
+
+    if (error) {
+        console.error('Error fetching products by ids:', error);
+        return [];
+    }
+
+    return data.map(p => ({
+        id: p.id,
+        title: p.title,
+        category: p.categories?.name || 'Sin categoría',
+        categoryId: p.category_id,
+        price: p.price,
+        oldPrice: p.old_price,
+        imageColor: p.image_color,
+        colorCount: p.color_count,
+        colorChangeCount: p.color_change_count,
+        badge: p.badge,
+        badgeColor: p.badge_color,
+        tags: p.tags || [],
+        size: p.size,
+        stitches: p.stitches,
+        formats: p.formats,
+        rating: p.rating,
+        reviews: p.reviews,
+        description: p.description,
+        mainImage: p.main_image,
+        published: p.published,
+        archived: p.archived,
+        indexed: p.indexed
+    }));
+}
+
+export async function fetchProductsListAdmin() {
+    const { data, error } = await supabase
+        .from('products')
+        .select('id, title, main_image, image_color')
+        .order('title', { ascending: true });
+
+    if (error) {
+        console.error('Error fetching admin product list:', error);
+        return [];
+    }
+    return data;
 }
 
 // --- Auth ---

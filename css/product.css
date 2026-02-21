@@ -430,3 +430,22 @@
         padding: 32px 20px;
     }
 }
+/* --- Related Products --- */
+.related-products {
+    padding: 32px 80px 48px;
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+}
+
+.related-products__title {
+    font-family: 'Bricolage Grotesque', serif;
+    font-size: 32px;
+    font-weight: 700;
+}
+
+@media (max-width: 900px) {
+    .related-products {
+        padding: 32px 20px;
+    }
+}

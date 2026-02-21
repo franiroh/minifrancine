@@ -1,12 +1,13 @@
 
-import { loadComponents, updateNavbarAuth, updateNavbarCartCount } from './components.js';
-import { fetchProductById, fetchProductImages, getUser, onAuthStateChange, downloadProductFile, fetchProductReviews, fetchUserReview } from './api.js';
+import { loadComponents, updateNavbarAuth, updateNavbarCartCount, createProductCard } from './components.js';
+import { fetchProductById, fetchProductImages, getUser, onAuthStateChange, downloadProductFile, fetchProductReviews, fetchUserReview, fetchProductsByIds } from './api.js';
 import { state, loadCart, getCartCount, addToCart, loadFavorites, isFavorite, toggleFavorite, loadPurchases, isPurchased } from './state.js';
 import { getUrlParam, renderBreadcrumbs, escapeHtml, showToast, getBadgeKey } from './utils.js';
 import i18n from './i18n.js';
 
 let currentProduct = null;
 let currentUser = null;
+let relatedProductsData = [];
 
 async function init() {
     await loadComponents();
@@ -38,6 +39,7 @@ async function init() {
     setupListeners();
     setupAuthListener();
     loadAndRenderReviews(currentProduct.id); // Load reviews separately
+    loadAndRenderRelatedProducts(currentProduct.relatedProductIds);
 
     window.addEventListener('cart-updated', () => {
         updateNavbarCartCount(getCartCount());
@@ -516,6 +518,90 @@ async function loadAndRenderReviews(productId) {
         console.error('Error loading reviews:', error);
         container.innerHTML = '<p>Error al cargar las reseñas.</p>';
     }
+}
+
+async function loadAndRenderRelatedProducts(ids) {
+    const section = document.getElementById('related-products-section');
+    const grid = document.getElementById('related-products-grid');
+
+    if (!section || !grid || !ids || ids.length === 0) {
+        if (section) section.style.display = 'none';
+        return;
+    }
+
+    section.style.display = ''; // Show section
+
+    try {
+        const relatedProducts = await fetchProductsByIds(ids);
+        if (relatedProducts.length === 0) {
+            section.style.display = 'none';
+            return;
+        }
+
+        relatedProductsData = ids.map(id => relatedProducts.find(p => p.id === id)).filter(Boolean);
+
+        grid.innerHTML = relatedProductsData.map(p => createProductCard(p)).join('');
+
+        if (window.lucide) window.lucide.createIcons();
+        if (i18n) i18n.updatePage();
+
+        attachRelatedProductsListeners(grid);
+
+    } catch (e) {
+        console.error('Error loading related products:', e);
+        section.style.display = 'none';
+    }
+}
+
+function attachRelatedProductsListeners(grid) {
+    grid.querySelectorAll('.btn-add-cart').forEach(btn => {
+        btn.addEventListener('click', (e) => {
+            e.stopPropagation();
+            const id = parseInt(btn.dataset.id);
+            const product = relatedProductsData.find(p => p.id === id);
+            if (product) {
+                addToCart(product);
+                const originalHTML = btn.innerHTML;
+                btn.innerHTML = '<i data-lucide="check"></i>';
+                btn.classList.add('text-green');
+                if (window.lucide) window.lucide.createIcons();
+                setTimeout(() => {
+                    btn.innerHTML = originalHTML;
+                    btn.classList.remove('text-green');
+                    if (window.lucide) window.lucide.createIcons();
+                }, 1000);
+            }
+        });
+    });
+
+    grid.querySelectorAll('.btn-buy-now').forEach(btn => {
+        btn.addEventListener('click', async (e) => {
+            e.stopPropagation();
+            const id = parseInt(btn.dataset.id);
+            const product = relatedProductsData.find(p => p.id === id);
+            if (product) {
+                await addToCart(product);
+                window.location.href = 'checkout.html';
+            }
+        });
+    });
+
+    grid.querySelectorAll('.product-card__heart').forEach(btn => {
+        btn.addEventListener('click', (e) => {
+            e.stopPropagation();
+            const id = parseInt(btn.dataset.id);
+            toggleFavorite(id);
+        });
+    });
+
+    grid.querySelectorAll('.product-card').forEach(card => {
+        card.addEventListener('click', (e) => {
+            if (!e.target.closest('.btn-add-cart') && !e.target.closest('.btn-buy-now') && !e.target.closest('.btn--purchased') && !e.target.closest('.product-card__heart')) {
+                const id = card.dataset.id;
+                window.location.href = `product.html?id=${id}`;
+            }
+        });
+    });
 }
 
 function setText(id, text) {

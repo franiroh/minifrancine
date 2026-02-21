@@ -12,8 +12,8 @@ import {
     uploadProductFile,
     saveProductFileRecord,
     fetchProductFile,
-    deleteProductFile,
     fetchCategories,
+    fetchProductsListAdmin,
     supabase
 } from './api.js';
 import { escapeHtml } from './utils.js';
@@ -23,6 +23,9 @@ const productId = urlParams.get('id');
 
 let currentProduct = null;
 let currentFileRec = null;
+
+let allAdminProducts = [];
+let selectedRelatedProducts = [];
 
 async function init() {
     // Auth Check
@@ -52,6 +55,18 @@ async function init() {
     catSelect.innerHTML = categories.map(c =>
         `<option value="${c.id}">${escapeHtml(c.name)}</option>`
     ).join('');
+
+    // Fetch all products for related products datalist
+    allAdminProducts = await fetchProductsListAdmin();
+    if (productId) {
+        allAdminProducts = allAdminProducts.filter(p => p.id !== parseInt(productId, 10));
+    }
+    const datalist = document.getElementById('related-products-list');
+    if (datalist) {
+        datalist.innerHTML = allAdminProducts.map(p =>
+            `<option value="${p.id} - ${escapeHtml(p.title)}">`
+        ).join('');
+    }
 
     if (productId) {
         document.getElementById('page-title').textContent = 'Editar Producto';
@@ -139,6 +154,10 @@ async function loadProductData(id) {
     indexLabel.textContent = indexCheckbox.checked ? 'Indexar' : 'No indexar';
     indexLabel.style.color = indexCheckbox.checked ? '#22C55E' : '#9CA3AF';
 
+    // Load Related Products
+    selectedRelatedProducts = product.relatedProductIds || [];
+    renderRelatedProducts();
+
     // Load Images
     const images = await fetchProductImages(id);
     const gallery = document.getElementById('image-gallery');
@@ -187,6 +206,10 @@ function createGalleryItemHTML(id, url, canDelete) {
 function setupEventListeners() {
     // Save Button
     document.getElementById('btn-save').onclick = handleSave;
+
+    // Related Products
+    const btnAddRelated = document.getElementById('btn-add-related');
+    if (btnAddRelated) btnAddRelated.onclick = handleAddRelated;
 
     // Image Upload Drop/Click
     const dropZone = document.getElementById('images-drop-zone');
@@ -325,6 +348,60 @@ window.removeImage = async (id) => {
     }
 };
 
+function handleAddRelated() {
+    const input = document.getElementById('prod-related-search');
+    const val = input.value.trim();
+    if (!val) return;
+
+    // Extract ID from "ID - Title" format
+    const match = val.match(/^(\d+)\s+-/);
+    if (!match) {
+        alert("Selecciona un diseño válido de la lista.");
+        return;
+    }
+    const id = parseInt(match[1], 10);
+
+    if (selectedRelatedProducts.includes(id)) {
+        alert("Este diseño ya está en la lista de relacionados.");
+        input.value = '';
+        return;
+    }
+
+    selectedRelatedProducts.push(id);
+    renderRelatedProducts();
+    input.value = '';
+}
+
+window.removeRelatedProduct = (id) => {
+    selectedRelatedProducts = selectedRelatedProducts.filter(pid => pid !== id);
+    renderRelatedProducts();
+};
+
+function renderRelatedProducts() {
+    const container = document.getElementById('related-products-container');
+    if (!container) return;
+
+    if (selectedRelatedProducts.length === 0) {
+        container.innerHTML = '<p class="text-gray text-sm">No hay diseños relacionados seleccionados.</p>';
+        return;
+    }
+
+    container.innerHTML = selectedRelatedProducts.map(id => {
+        const prod = allAdminProducts.find(p => p.id === id);
+        const title = prod ? escapeHtml(prod.title) : `Diseño #${id} (No encontrado)`;
+        return `
+            <div style="display: flex; justify-content: space-between; align-items: center; padding: 8px; border: 1px solid #e5e7eb; border-radius: 6px;">
+                <span class="text-sm">${title}</span>
+                <button type="button" class="btn-icon text-red" onclick="removeRelatedProduct(${id})">
+                    <i data-lucide="trash-2" style="width:16px; height:16px;"></i>
+                </button>
+            </div>
+        `;
+    }).join('');
+
+    if (window.lucide) window.lucide.createIcons();
+}
+
 async function handleSave(e) {
     e.preventDefault();
     const btn = document.getElementById('btn-save');
@@ -351,6 +428,7 @@ async function handleSave(e) {
             formats: document.getElementById('prod-formats').value,
             published: document.getElementById('prod-published').checked,
             indexed: document.getElementById('prod-indexed').checked,
+            related_product_ids: selectedRelatedProducts
         };
 
         let savedProductId = productId; // Existing or new

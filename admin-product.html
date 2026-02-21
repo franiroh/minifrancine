@@ -234,6 +234,27 @@
                         </div>
                     </div>
 
+                    <div class="card" style="margin-top: 2rem;">
+                        <h3>Diseños Relacionados</h3>
+                        <p class="text-sm text-gray">Elige diseños que aparecerán como recomendados bajo este diseño.
+                        </p>
+
+                        <div class="form-group" style="margin-top: 1rem;">
+                            <label>Agregar Diseño Relacionado</label>
+                            <div style="display: flex; gap: 8px;">
+                                <input type="text" id="prod-related-search" placeholder="Busca por ID o nombre..."
+                                    list="related-products-list" style="flex: 1;" autocomplete="off">
+                                <datalist id="related-products-list"></datalist>
+                                <button type="button" class="btn btn--secondary" id="btn-add-related">Agregar</button>
+                            </div>
+                        </div>
+
+                        <div id="related-products-container"
+                            style="display: flex; flex-direction: column; gap: 8px; margin-top: 1rem;">
+                            <p class="text-gray text-sm">No hay productos relacionados seleccionados.</p>
+                        </div>
+                    </div>
+
                 </form>
             </div> <!-- End content-area -->
         </main>
