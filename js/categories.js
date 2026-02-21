@@ -5,11 +5,13 @@ import { escapeHtml, sanitizeCssValue, renderBreadcrumbs } from './utils.js';
 import i18n from './i18n.js';
 
 async function init() {
-    await loadComponents();
-
-    // Auth & Cart
+    // 1. Init User State early to prevent flickering
     const user = await getUser();
-    updateNavbarAuth(user);
+
+    // 2. Load Navbar/Footer
+    await loadComponents(user);
+
+    // Cart
     await loadCart(user);
     updateNavbarCartCount(getCartCount());
 

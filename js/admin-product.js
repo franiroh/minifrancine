@@ -26,6 +26,8 @@ let currentFileRec = null;
 
 let allAdminProducts = [];
 let selectedRelatedProducts = [];
+let allCategories = [];
+let selectedCategoryIds = [];
 
 async function init() {
     // Auth Check
@@ -49,12 +51,10 @@ async function init() {
 
     if (window.lucide) window.lucide.createIcons();
 
-    // Populate category select from DB
-    const categories = await fetchCategories();
-    const catSelect = document.getElementById('prod-category');
-    catSelect.innerHTML = categories.map(c =>
-        `<option value="${c.id}">${escapeHtml(c.name)}</option>`
-    ).join('');
+    // Populate categories
+    allCategories = await fetchCategories();
+    // Instead of populating a <select>, we just render our custom UI based on the current state.
+    renderCategorySelectorUI();
 
     // Fetch all products for related products datalist
     allAdminProducts = await fetchProductsListAdmin();
@@ -126,7 +126,8 @@ async function loadProductData(id) {
     document.getElementById('prod-description').value = product.description || '';
     document.getElementById('prod-price').value = product.price || '';
     document.getElementById('prod-old-price').value = product.oldPrice || '';
-    document.getElementById('prod-category').value = product.categoryId || '';
+    selectedCategoryIds = product.categoryIds || (product.categoryId ? [product.categoryId] : []);
+    renderCategorySelectorUI();
     const badgeVal = product.badge ? product.badge.toLowerCase() : '';
     // Map existing common values to standardized keys if needed
     const standardizedBadge = badgeVal === 'nuevo' ? 'new' : (badgeVal === 'oferta' ? 'sale' : badgeVal);
@@ -411,12 +412,14 @@ async function handleSave(e) {
 
     try {
         // 1. Save Product Details
+        const selectedCategories = selectedCategoryIds;
         const data = {
             title: document.getElementById('prod-title').value,
             description: document.getElementById('prod-description').value,
             price: parseFloat(document.getElementById('prod-price').value),
             old_price: parseFloat(document.getElementById('prod-old-price').value) || null,
-            category_id: parseInt(document.getElementById('prod-category').value, 10),
+            category_id: selectedCategories.length > 0 ? selectedCategories[0] : null,
+            categoryIds: selectedCategories,
             badge: document.getElementById('prod-badge').value,
             badge_color: document.getElementById('prod-badge-color').value,
             tags: document.getElementById('prod-tags').value.split(',').map(t => t.trim()).filter(t => t),
@@ -506,4 +509,90 @@ async function handleSave(e) {
     }
 }
 
-document.addEventListener('DOMContentLoaded', init);
+function renderCategorySelectorUI() {
+    const container = document.getElementById('selected-categories-container');
+    const dropdownList = document.getElementById('category-dropdown-list');
+    const msg = document.getElementById('no-categories-msg');
+
+    if (!container || !dropdownList) return;
+
+    // 1. Render Selected Tags
+    container.innerHTML = '';
+    if (selectedCategoryIds.length === 0) {
+        if (msg) container.appendChild(msg);
+    } else {
+        selectedCategoryIds.forEach(id => {
+            const category = allCategories.find(c => c.id === id);
+            if (category) {
+                const tagEl = document.createElement('div');
+                tagEl.className = 'selected-tag';
+                tagEl.style.cssText = 'display: inline-flex; align-items: center; background: #FFF0F0; border: 1px solid #FFE0E0; color: #FF6B6B; padding: 4px 8px; border-radius: 9999px; font-size: 14px;';
+
+                const nameSpan = document.createElement('span');
+                nameSpan.textContent = escapeHtml(category.name);
+                tagEl.appendChild(nameSpan);
+
+                const removeBtn = document.createElement('button');
+                removeBtn.type = 'button';
+                removeBtn.innerHTML = '<i data-lucide="x" style="width: 14px; height: 14px;"></i>';
+                removeBtn.style.cssText = 'background: none; border: none; padding: 0; margin-left: 6px; cursor: pointer; color: inherit; display: flex; align-items: center;';
+                removeBtn.onclick = (e) => {
+                    e.stopPropagation();
+                    selectedCategoryIds = selectedCategoryIds.filter(catId => catId !== id);
+                    renderCategorySelectorUI();
+                };
+                tagEl.appendChild(removeBtn);
+
+                container.appendChild(tagEl);
+            }
+        });
+    }
+
+    // 2. Render Dropdown Options
+    dropdownList.innerHTML = '';
+    const availableCategories = allCategories.filter(c => !selectedCategoryIds.includes(c.id));
+
+    if (availableCategories.length === 0) {
+        const emptyEl = document.createElement('div');
+        emptyEl.style.cssText = 'padding: 8px 12px; color: #6B7280; font-size: 14px; text-align: center;';
+        emptyEl.textContent = 'No hay más categorías disponibles';
+        dropdownList.appendChild(emptyEl);
+    } else {
+        availableCategories.forEach(category => {
+            const itemEl = document.createElement('div');
+            itemEl.className = 'dropdown-item';
+            itemEl.style.cssText = 'padding: 8px 12px; cursor: pointer; transition: background 0.2s; font-size: 14px; color: #374151;';
+            itemEl.textContent = escapeHtml(category.name);
+            itemEl.onmouseover = () => itemEl.style.background = '#F3F4F6';
+            itemEl.onmouseout = () => itemEl.style.background = 'transparent';
+            itemEl.onclick = () => {
+                selectedCategoryIds.push(category.id);
+                renderCategorySelectorUI();
+                dropdownList.classList.add('hidden');
+            };
+            dropdownList.appendChild(itemEl);
+        });
+    }
+
+    if (window.lucide) window.lucide.createIcons();
+}
+
+document.addEventListener('DOMContentLoaded', () => {
+    init();
+
+    const dropdownBtn = document.getElementById('category-dropdown-btn');
+    const dropdownList = document.getElementById('category-dropdown-list');
+
+    if (dropdownBtn && dropdownList) {
+        dropdownBtn.addEventListener('click', (e) => {
+            e.stopPropagation();
+            dropdownList.classList.toggle('hidden');
+        });
+
+        document.addEventListener('click', (e) => {
+            if (!dropdownBtn.contains(e.target) && !dropdownList.contains(e.target)) {
+                dropdownList.classList.add('hidden');
+            }
+        });
+    }
+});

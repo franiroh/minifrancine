@@ -9,8 +9,11 @@ let products = [];
 let currentCategory = 'Todos';
 
 async function init() {
-    // 1. Load Navbar/Footer
-    await loadComponents();
+    // 1. Init User State early to prevent flickering
+    const user = await getUser();
+
+    // 2. Load Navbar/Footer
+    await loadComponents(user);
 
     const grid = document.getElementById('catalog-grid'); // Changed from product-grid to catalog-grid
     // Show Skeletons
@@ -18,15 +21,7 @@ async function init() {
         grid.innerHTML = Array(8).fill(0).map(() => createSkeletonCard()).join('');
     }
 
-    // 2. Check Auth & Init Navbar
-    let user = null;
-    const { data: { session } } = await supabase.auth.getSession();
-    if (session) {
-        user = session.user;
-        updateNavbarAuth(user);
-    } else {
-        updateNavbarAuth(null);
-    }
+    // Listen for state updates from other components
 
     // Listen for state updates from other components
     window.addEventListener('cart-updated', () => {
@@ -64,7 +59,7 @@ async function init() {
 
     if (initialCategory) {
         // Just filter, view is already correctly set
-        const filtered = products.filter(p => p.category === initialCategory);
+        const filtered = products.filter(p => (p.categories && p.categories.includes(initialCategory)) || p.category === initialCategory);
         filterProducts(initialCategory); // This also sets active chip
     } else {
         renderCatalog(products); // Render all
@@ -93,7 +88,7 @@ async function init() {
                 } else {
                     currentCategory = selectedCategory;
                     // showCategoryView(selectedCategory); // Keeping simple view
-                    const filtered = products.filter(p => p.category === selectedCategory);
+                    const filtered = products.filter(p => (p.categories && p.categories.includes(selectedCategory)) || p.category === selectedCategory);
                     renderCatalog(filtered);
                 }
             }

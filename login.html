@@ -17,7 +17,7 @@
     <link rel="stylesheet" href="css/login.css">
 </head>
 
-<body class="loading-i18n">
+<body>
 
     <div class="page">
 
@@ -30,19 +30,19 @@
                         <i data-lucide="scissors" style="color: #FF6B6B;"></i>
                         <span>MiniFrancine</span>
                     </div>
-                    <h2 id="auth-title" data-i18n="auth.welcome">Bienvenido de nuevo</h2>
-                    <p id="auth-desc" data-i18n="auth.subtitle">Inicia sesión para acceder a tus diseños</p>
+                    <h2 id="auth-title" data-i18n="auth.welcome"></h2>
+                    <p id="auth-desc" data-i18n="auth.subtitle"></p>
                 </div>
 
                 <div class="login-card__tabs">
                     <button class="login-card__tab login-card__tab--active" data-tab="login"
-                        data-i18n="auth.login">Iniciar Sesión</button>
-                    <button class="login-card__tab" data-tab="register" data-i18n="auth.register">Registrarse</button>
+                        data-i18n="auth.login"></button>
+                    <button class="login-card__tab" data-tab="register" data-i18n="auth.register"></button>
                 </div>
 
                 <div class="login-card__form" id="login-form">
                     <div class="form-field">
-                        <label data-i18n="auth.email">Email</label>
+                        <label data-i18n="auth.email"></label>
                         <div class="form-input">
                             <i data-lucide="mail"></i>
                             <input type="email" id="login-email" placeholder="tu@email.com"
@@ -51,9 +51,8 @@
                     </div>
                     <div class="form-field">
                         <div class="form-field__header">
-                            <label data-i18n="auth.password">Contraseña</label>
-                            <a href="#" class="form-field__link" data-i18n="auth.forgot_password">¿Olvidaste tu
-                                contraseña?</a>
+                            <label data-i18n="auth.password"></label>
+                            <a href="#" class="form-field__link" data-i18n="auth.forgot_password"></a>
                         </div>
                         <div class="form-input">
                             <i data-lucide="lock"></i>
@@ -63,12 +62,12 @@
                         </div>
                     </div>
                     <button id="login-btn" class="btn btn--primary btn--block btn--lg"
-                        data-i18n="auth.btn_login">Iniciar Sesión</button>
+                        data-i18n="auth.btn_login"></button>
                 </div>
 
                 <div class="login-card__form hidden" id="register-form">
                     <div class="form-field">
-                        <label data-i18n="auth.name">Nombre</label>
+                        <label data-i18n="auth.name"></label>
                         <div class="form-input">
                             <i data-lucide="user"></i>
                             <input type="text" id="register-name" placeholder="Tu nombre"
@@ -76,7 +75,7 @@
                         </div>
                     </div>
                     <div class="form-field">
-                        <label data-i18n="auth.email">Email</label>
+                        <label data-i18n="auth.email"></label>
                         <div class="form-input">
                             <i data-lucide="mail"></i>
                             <input type="email" id="register-email" placeholder="tu@email.com"
@@ -85,7 +84,7 @@
                     </div>
                     <div class="form-field">
                         <div class="form-field__header">
-                            <label data-i18n="auth.password">Contraseña</label>
+                            <label data-i18n="auth.password"></label>
                         </div>
                         <div class="form-input">
                             <i data-lucide="lock"></i>
@@ -95,7 +94,7 @@
                         </div>
                     </div>
                     <button id="register-btn" class="btn btn--primary btn--block btn--lg"
-                        data-i18n="auth.btn_register">Registrarse</button>
+                        data-i18n="auth.btn_register"></button>
                 </div>
 
 
@@ -107,16 +106,15 @@
             <div class="modal__overlay"></div>
             <div class="modal__content">
                 <div class="modal__header">
-                    <h3 data-i18n="auth.reset_password">Recuperar Contraseña</h3>
+                    <h3 data-i18n="auth.reset_password"></h3>
                     <button class="modal__close" aria-label="Close">
                         <i data-lucide="x"></i>
                     </button>
                 </div>
                 <div class="modal__body">
-                    <p data-i18n="auth.reset_instructions">Ingresa tu email y te enviaremos un enlace para restablecer
-                        tu contraseña.</p>
+                    <p data-i18n="auth.reset_instructions"></p>
                     <div class="form-field">
-                        <label data-i18n="auth.email">Email</label>
+                        <label data-i18n="auth.email"></label>
                         <div class="form-input">
                             <i data-lucide="mail"></i>
                             <input type="email" id="reset-email" placeholder="tu@email.com"
@@ -127,7 +125,7 @@
                 </div>
                 <div class="modal__footer">
                     <button id="reset-submit-btn" class="btn btn--primary btn--block">
-                        <span data-i18n="auth.send_reset_link">Enviar enlace</span>
+                        <span data-i18n="auth.send_reset_link"></span>
                     </button>
                 </div>
             </div>

@@ -505,7 +505,32 @@
         </main>
     </div>
 
-    <!-- Product Modal Removed -->
+    <!-- Category Modal -->
+    <div id="category-modal" class="modal" style="display: none;">
+        <div class="modal-content" style="max-width: 500px;">
+            <h2 id="category-modal-title">Nueva Categoría</h2>
+            <form id="category-form">
+                <input type="hidden" id="category-id">
+                <div class="form-group">
+                    <label>Nombre (ES)</label>
+                    <input type="text" id="category-name-es" placeholder="Ej: Navidad" required>
+                </div>
+                <div class="form-group">
+                    <label>Nombre (EN)</label>
+                    <input type="text" id="category-name-en" placeholder="Ej: Christmas" required>
+                </div>
+                <div class="form-group">
+                    <label>Nombre (PT)</label>
+                    <input type="text" id="category-name-pt" placeholder="Ej: Natal" required>
+                </div>
+                <div style="display: flex; gap: 12px; margin-top: 32px;">
+                    <button type="submit" class="btn btn--primary" style="flex: 1;">Guardar</button>
+                    <button type="button" class="btn btn--outline" style="flex: 1;"
+                        onclick="document.getElementById('category-modal').style.display='none'">Cancelar</button>
+                </div>
+            </form>
+        </div>
+    </div>
 
     <script type="module" src="js/admin.js?v=2"></script>
 </body>

@@ -4,10 +4,11 @@ import { loadCart, getCartCount } from './state.js';
 import { getUser } from './api.js';
 
 async function init() {
-    await loadComponents();
-
+    // 1. Init User State early to prevent flickering
     const user = await getUser();
-    updateNavbarAuth(user);
+
+    // 2. Load Navbar/Footer
+    await loadComponents(user);
 
     // Listen for state updates
     window.addEventListener('cart-updated', () => {

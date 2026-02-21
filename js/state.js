@@ -1,6 +1,7 @@
 
 import { fetchFavorites, addToFavorites, removeFromFavorites, fetchCart, addToCartDB, removeFromCartDB, clearCartDB, fetchPurchasedProductIds, fetchMyCoupons } from './api.js';
 import { showToast } from './utils.js';
+import { i18n } from './i18n.js';
 
 export const state = {
     cart: [],
@@ -47,7 +48,7 @@ export const loadCart = async (user = null) => {
 export const addToCart = async (product) => {
     // Block adding already-purchased products
     if (isPurchased(product.id)) {
-        showToast('Ya compraste este producto. Puedes descargarlo desde "Mis Compras".', 'info');
+        showToast(i18n.t('msg.already_purchased'), 'info');
         return;
     }
 
@@ -58,7 +59,7 @@ export const addToCart = async (product) => {
             // Reload cart to get the new ID and structure
             await loadCart(state.user);
         } else {
-            showToast('Error al agregar al carrito', 'error');
+            showToast(i18n.t('msg.cart_error'), 'error');
         }
     } else {
         // Local Add
@@ -121,7 +122,7 @@ export const loadFavorites = async (user) => {
 
 export const toggleFavorite = async (productId) => {
     if (!state.user) {
-        showToast('Debes iniciar sesión para agregar favoritos.', 'info');
+        showToast(i18n.t('msg.login_favorites'), 'info');
         return;
     }
 
@@ -146,7 +147,7 @@ export const toggleFavorite = async (productId) => {
 
     if (result.error) {
         console.error('Error toggling favorite:', result.error);
-        showToast('Hubo un error al actualizar favoritos.', 'error');
+        showToast(i18n.t('msg.favorites_error'), 'error');
         // Revert
         if (isFav) {
             state.favorites.add(id);

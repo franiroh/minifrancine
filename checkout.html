@@ -18,7 +18,7 @@
     <link rel="stylesheet" href="css/checkout.css">
 </head>
 
-<body class="loading-i18n">
+<body>
 
     <div class="page">
 
@@ -28,59 +28,53 @@
         <div class="checkout-steps">
             <div class="checkout-steps__item checkout-steps__item--done">
                 <span class="checkout-steps__num checkout-steps__num--done"><i data-lucide="check"></i></span>
-                <span data-i18n="checkout.step_cart">Carrito</span>
+                <span data-i18n="checkout.step_cart"></span>
             </div>
             <div class="checkout-steps__line"></div>
             <div class="checkout-steps__item checkout-steps__item--active">
                 <span class="checkout-steps__num checkout-steps__num--active">2</span>
-                <span data-i18n="checkout.step_payment">Pago</span>
+                <span data-i18n="checkout.step_payment"></span>
             </div>
             <div class="checkout-steps__line"></div>
             <div class="checkout-steps__item">
                 <span class="checkout-steps__num">3</span>
-                <span data-i18n="checkout.step_confirm">Confirmación</span>
+                <span data-i18n="checkout.step_confirm"></span>
             </div>
         </div>
 
         <section class="checkout-body">
             <div class="checkout-body__left">
-                <h2 class="checkout-body__title" data-i18n="checkout.pay_method">Método de Pago</h2>
+                <h2 class="checkout-body__title" data-i18n="checkout.pay_method"></h2>
 
                 <div class="pay-methods">
                     <div class="pay-method pay-method--active">
                         <span class="pay-method__radio pay-method__radio--active"><span
                                 class="pay-method__dot"></span></span>
                         <span class="pay-method__logo pay-method__logo--paypal">PayPal</span>
-                        <span data-i18n="checkout.secure_paypal">Pago seguro con PayPal</span>
+                        <span data-i18n="checkout.secure_paypal"></span>
                     </div>
                 </div>
 
                 <div class="info-box">
                     <i data-lucide="info" class="info-box__icon"></i>
                     <div class="info-box__content">
-                        <span class="info-box__title" data-i18n="checkout.digital_warning_title">Información
-                            Importante</span>
-                        <p class="info-box__text" data-i18n="checkout.digital_warning_text">Estás comprando diseños de
-                            bordado digitales. No recibirás ningún producto físico por correo. Los archivos estarán
-                            disponibles para descargar inmediatamente después de completar el pago.</p>
+                        <span class="info-box__title" data-i18n="checkout.digital_warning_title"></span>
+                        <p class="info-box__text" data-i18n="checkout.digital_warning_text"></p>
                     </div>
                 </div>
 
                 <div class="coupon-section">
-                    <h3 class="coupon-section__title" data-i18n="checkout.coupon_title">Cupones y Descuentos</h3>
+                    <h3 class="coupon-section__title" data-i18n="checkout.coupon_title"></h3>
 
                     <div id="applied-coupon-info" class="applied-coupon-info"
                         style="display: none; margin-bottom: 16px;">
                         <span id="applied-coupon-text"></span>
-                        <button class="btn-link" id="remove-coupon-btn"
-                            data-i18n="checkout.coupon_remove">Quitar</button>
+                        <button class="btn-link" id="remove-coupon-btn" data-i18n="checkout.coupon_remove"></button>
                     </div>
 
                     <div class="coupon-input">
-                        <input type="text" id="coupon-code" data-i18n="[placeholder]checkout.coupon_placeholder"
-                            placeholder="Ingresa código de cupón">
-                        <button class="btn btn--sm" id="apply-coupon-btn"
-                            data-i18n="checkout.coupon_apply">Aplicar</button>
+                        <input type="text" id="coupon-code" data-i18n="[placeholder]checkout.coupon_placeholder">
+                        <button class="btn btn--sm" id="apply-coupon-btn" data-i18n="checkout.coupon_apply"></button>
                     </div>
                     <div id="available-coupons" class="available-coupons">
                         <!-- Coupons will be listed here -->
@@ -91,8 +85,7 @@
                     <div class="form-field">
                         <label class="form-checkbox">
                             <input type="checkbox" id="digital-agreement">
-                            <span data-i18n="checkout.digital_warning_checkbox">Entiendo que estos son archivos
-                                digitales y no productos físicos para envío.</span>
+                            <span data-i18n="checkout.digital_warning_checkbox"></span>
                         </label>
                     </div>
 
@@ -103,12 +96,12 @@
                 <!-- <button class="btn btn--paypal btn--block btn--lg" id="pay-btn">Pagar con PayPal — $0.00</button> -->
                 <div class="checkout-secure">
                     <i data-lucide="lock" style="color: #22C55E;"></i>
-                    <span data-i18n="checkout.secure_ssl">Pago seguro con encriptación SSL de 256 bits</span>
+                    <span data-i18n="checkout.secure_ssl"></span>
                 </div>
             </div>
 
             <aside class="checkout-summary">
-                <h3 class="checkout-summary__title" data-i18n="checkout.order_summary">Tu Pedido</h3>
+                <h3 class="checkout-summary__title" data-i18n="checkout.order_summary"></h3>
                 <hr class="checkout-summary__divider">
 
                 <div id="checkout-items">

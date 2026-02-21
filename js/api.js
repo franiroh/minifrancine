@@ -10,7 +10,7 @@ export const supabase = createClient(supabaseUrl, supabaseKey)
 export async function fetchProducts({ publishedOnly = false, tag = null, search = null, sort = null, badge = null, includeArchived = false } = {}) {
     let query = supabase
         .from('products')
-        .select('*, categories(name)')
+        .select('*, product_categories(category_id, categories(name))')
 
     if (sort === 'oldest') {
         query = query.order('created_at', { ascending: true })
@@ -49,36 +49,43 @@ export async function fetchProducts({ publishedOnly = false, tag = null, search 
     }
 
     // Transform logic to match frontend expectations if necessary (camelCase vs snake_case)
-    return data.map(p => ({
-        id: p.id,
-        title: p.title,
-        category: p.categories?.name || 'Sin categoría',
-        categoryId: p.category_id,
-        price: p.price,
-        oldPrice: p.old_price,
-        imageColor: p.image_color,
-        colorCount: p.color_count,
-        colorChangeCount: p.color_change_count,
-        badge: p.badge,
-        badgeColor: p.badge_color,
-        tags: p.tags || [],
-        size: p.size,
-        stitches: p.stitches,
-        formats: p.formats,
-        rating: p.rating,
-        reviews: p.reviews,
-        description: p.description,
-        mainImage: p.main_image,
-        published: p.published,
-        archived: p.archived,
-        indexed: p.indexed
-    }));
+    return data.map(p => {
+        const categories = p.product_categories ? p.product_categories.map(pc => pc.categories?.name).filter(Boolean) : [];
+        const categoryIds = p.product_categories ? p.product_categories.map(pc => pc.category_id) : [];
+
+        return {
+            id: p.id,
+            title: p.title,
+            category: categories.length > 0 ? categories[0] : 'Sin categoría', // Keep backwards compatibility
+            categories: categories, // Array of strings
+            categoryId: categoryIds.length > 0 ? categoryIds[0] : null, // Keep backwards compatibility
+            categoryIds: categoryIds, // Array of numbers
+            price: p.price,
+            oldPrice: p.old_price,
+            imageColor: p.image_color,
+            colorCount: p.color_count,
+            colorChangeCount: p.color_change_count,
+            badge: p.badge,
+            badgeColor: p.badge_color,
+            tags: p.tags || [],
+            size: p.size,
+            stitches: p.stitches,
+            formats: p.formats,
+            rating: p.rating,
+            reviews: p.reviews,
+            description: p.description,
+            mainImage: p.main_image,
+            published: p.published,
+            archived: p.archived,
+            indexed: p.indexed
+        };
+    });
 }
 
 export async function fetchProductById(id) {
     const { data, error } = await supabase
         .from('products')
-        .select('*, categories(name)')
+        .select('*, product_categories(category_id, categories(name))')
         .eq('id', id)
         .single()
 
@@ -87,11 +94,16 @@ export async function fetchProductById(id) {
         return null
     }
 
+    const categories = data.product_categories ? data.product_categories.map(pc => pc.categories?.name).filter(Boolean) : [];
+    const categoryIds = data.product_categories ? data.product_categories.map(pc => pc.category_id) : [];
+
     return {
         id: data.id,
         title: data.title,
-        category: data.categories?.name || 'Sin categoría',
-        categoryId: data.category_id,
+        category: categories.length > 0 ? categories[0] : 'Sin categoría',
+        categories: categories,
+        categoryId: categoryIds.length > 0 ? categoryIds[0] : null,
+        categoryIds: categoryIds,
         price: data.price,
         oldPrice: data.old_price,
         imageColor: data.image_color,
@@ -115,10 +127,10 @@ export async function fetchProductById(id) {
 
 export async function fetchProductsByIds(ids) {
     if (!ids || ids.length === 0) return [];
-    
+
     const { data, error } = await supabase
         .from('products')
-        .select('*, categories(name)')
+        .select('*, product_categories(category_id, categories(name))')
         .in('id', ids)
         .eq('published', true)
         .eq('archived', false);
@@ -128,30 +140,37 @@ export async function fetchProductsByIds(ids) {
         return [];
     }
 
-    return data.map(p => ({
-        id: p.id,
-        title: p.title,
-        category: p.categories?.name || 'Sin categoría',
-        categoryId: p.category_id,
-        price: p.price,
-        oldPrice: p.old_price,
-        imageColor: p.image_color,
-        colorCount: p.color_count,
-        colorChangeCount: p.color_change_count,
-        badge: p.badge,
-        badgeColor: p.badge_color,
-        tags: p.tags || [],
-        size: p.size,
-        stitches: p.stitches,
-        formats: p.formats,
-        rating: p.rating,
-        reviews: p.reviews,
-        description: p.description,
-        mainImage: p.main_image,
-        published: p.published,
-        archived: p.archived,
-        indexed: p.indexed
-    }));
+    return data.map(p => {
+        const categories = p.product_categories ? p.product_categories.map(pc => pc.categories?.name).filter(Boolean) : [];
+        const categoryIds = p.product_categories ? p.product_categories.map(pc => pc.category_id) : [];
+
+        return {
+            id: p.id,
+            title: p.title,
+            category: categories.length > 0 ? categories[0] : 'Sin categoría',
+            categories: categories,
+            categoryId: categoryIds.length > 0 ? categoryIds[0] : null,
+            categoryIds: categoryIds,
+            price: p.price,
+            oldPrice: p.old_price,
+            imageColor: p.image_color,
+            colorCount: p.color_count,
+            colorChangeCount: p.color_change_count,
+            badge: p.badge,
+            badgeColor: p.badge_color,
+            tags: p.tags || [],
+            size: p.size,
+            stitches: p.stitches,
+            formats: p.formats,
+            rating: p.rating,
+            reviews: p.reviews,
+            description: p.description,
+            mainImage: p.main_image,
+            published: p.published,
+            archived: p.archived,
+            indexed: p.indexed
+        };
+    });
 }
 
 export async function fetchProductsListAdmin() {
@@ -319,7 +338,7 @@ export async function fetchFavoriteProducts(userId, specificIds = null) {
 
     const { data, error } = await supabase
         .from('products')
-        .select('*, categories(name)')
+        .select('*, product_categories(category_id, categories(name))')
         .in('id', favIds)
         .order('title', { ascending: true })
 
@@ -328,27 +347,34 @@ export async function fetchFavoriteProducts(userId, specificIds = null) {
         return []
     }
 
-    return data.map(p => ({
-        id: p.id,
-        title: p.title,
-        category: p.categories?.name || 'Sin categoría',
-        categoryId: p.category_id,
-        price: p.price,
-        oldPrice: p.old_price,
-        imageColor: p.image_color,
-        colorCount: p.color_count,
-        colorChangeCount: p.color_change_count,
-        badge: p.badge,
-        badgeColor: p.badge_color,
-        size: p.size,
-        stitches: p.stitches,
-        formats: p.formats,
-        rating: p.rating,
-        reviews: p.reviews,
-        description: p.description,
-        mainImage: p.main_image,
-        published: p.published
-    }))
+    return data.map(p => {
+        const categories = p.product_categories ? p.product_categories.map(pc => pc.categories?.name).filter(Boolean) : [];
+        const categoryIds = p.product_categories ? p.product_categories.map(pc => pc.category_id) : [];
+
+        return {
+            id: p.id,
+            title: p.title,
+            category: categories.length > 0 ? categories[0] : 'Sin categoría',
+            categories: categories,
+            categoryId: categoryIds.length > 0 ? categoryIds[0] : null,
+            categoryIds: categoryIds,
+            price: p.price,
+            oldPrice: p.old_price,
+            imageColor: p.image_color,
+            colorCount: p.color_count,
+            colorChangeCount: p.color_change_count,
+            badge: p.badge,
+            badgeColor: p.badge_color,
+            size: p.size,
+            stitches: p.stitches,
+            formats: p.formats,
+            rating: p.rating,
+            reviews: p.reviews,
+            description: p.description,
+            mainImage: p.main_image,
+            published: p.published
+        };
+    })
 }
 
 export async function addToFavorites(userId, productId) {
@@ -386,7 +412,7 @@ export async function fetchPurchasedProducts() {
 
     const { data, error } = await supabase
         .from('products')
-        .select('*, categories(name)')
+        .select('*, product_categories(category_id, categories(name))')
         .in('id', purchasedIds)
         .order('id', { ascending: true })
 
@@ -395,25 +421,32 @@ export async function fetchPurchasedProducts() {
         return []
     }
 
-    return data.map(p => ({
-        id: p.id,
-        title: p.title,
-        category: p.categories?.name || 'Sin categoría',
-        categoryId: p.category_id,
-        price: p.price,
-        oldPrice: p.old_price,
-        imageColor: p.image_color,
-        badge: p.badge,
-        badgeColor: p.badge_color,
-        size: p.size,
-        stitches: p.stitches,
-        formats: p.formats,
-        rating: p.rating,
-        reviews: p.reviews,
-        description: p.description,
-        mainImage: p.main_image,
-        published: p.published
-    }))
+    return data.map(p => {
+        const categories = p.product_categories ? p.product_categories.map(pc => pc.categories?.name).filter(Boolean) : [];
+        const categoryIds = p.product_categories ? p.product_categories.map(pc => pc.category_id) : [];
+
+        return {
+            id: p.id,
+            title: p.title,
+            category: categories.length > 0 ? categories[0] : 'Sin categoría',
+            categories: categories,
+            categoryId: categoryIds.length > 0 ? categoryIds[0] : null,
+            categoryIds: categoryIds,
+            price: p.price,
+            oldPrice: p.old_price,
+            imageColor: p.image_color,
+            badge: p.badge,
+            badgeColor: p.badge_color,
+            size: p.size,
+            stitches: p.stitches,
+            formats: p.formats,
+            rating: p.rating,
+            reviews: p.reviews,
+            description: p.description,
+            mainImage: p.main_image,
+            published: p.published
+        };
+    })
 }
 
 // --- Cart ---
@@ -425,7 +458,7 @@ export async function fetchCart(userId) {
             id,
             product_id,
             quantity,
-            product:products (*, categories(name))
+            product:products (*, product_categories(category_id, categories(name)))
         `)
         .eq('user_id', userId)
 
@@ -437,11 +470,16 @@ export async function fetchCart(userId) {
     // Transform to flat structure expected by state
     return data.map(item => {
         const p = item.product;
+        const categories = p.product_categories ? p.product_categories.map(pc => pc.categories?.name).filter(Boolean) : [];
+        const categoryIds = p.product_categories ? p.product_categories.map(pc => pc.category_id) : [];
+
         return {
             id: p.id,
             title: p.title,
-            category: p.categories?.name || 'Sin categoría',
-            categoryId: p.category_id,
+            category: categories.length > 0 ? categories[0] : 'Sin categoría',
+            categories: categories,
+            categoryId: categoryIds.length > 0 ? categoryIds[0] : null,
+            categoryIds: categoryIds,
             price: p.price,
             oldPrice: p.old_price,
             imageColor: p.image_color,
@@ -923,21 +961,69 @@ export async function fetchAdminStats(startDate, endDate) {
 
 
 export async function createProduct(productData) {
+    // Extract categoryIds from payload, don't send it to products table
+    const { categoryIds, ...cleanProductData } = productData;
+
+    // Create product
     const { data, error } = await supabase
         .from('products')
-        .insert(productData)
+        .insert(cleanProductData)
         .select()
         .single()
+
+    if (error || !data) return { data, error };
+
+    // Insert into product_categories table
+    if (categoryIds && categoryIds.length > 0) {
+        const categoryRecords = categoryIds.map(id => ({ product_id: data.id, category_id: id }));
+        const { error: catError } = await supabase
+            .from('product_categories')
+            .insert(categoryRecords);
+
+        if (catError) {
+            console.error("Error creating product categories", catError);
+            return { data, error: catError };
+        }
+    }
+
     return { data, error }
 }
 
 export async function updateProduct(id, productData) {
+    const { categoryIds, ...cleanProductData } = productData;
+
     const { data, error } = await supabase
         .from('products')
-        .update(productData)
+        .update(cleanProductData)
         .eq('id', id)
         .select()
         .single()
+
+    if (error || !data) return { data, error };
+
+    // Update categories if provided
+    if (categoryIds !== undefined) {
+        // Find existing mappings to avoid re-insertion or delete missing ones
+        // Easiest is to delete all and re-insert 
+        const { error: delError } = await supabase.from('product_categories').delete().eq('product_id', id);
+        if (delError) {
+            console.error("Error deleting product categories", delError);
+            return { data, error: delError };
+        }
+
+        if (categoryIds.length > 0) {
+            const categoryRecords = categoryIds.map(catId => ({ product_id: data.id, category_id: catId }));
+            const { error: catError } = await supabase
+                .from('product_categories')
+                .insert(categoryRecords);
+
+            if (catError) {
+                console.error("Error updating product categories", catError);
+                return { data, error: catError };
+            }
+        }
+    }
+
     return { data, error }
 }
 
@@ -1252,6 +1338,38 @@ export async function deleteCategory(id) {
 
     if (!error) localStorage.removeItem(CACHE_KEY);
     return { error }
+}
+
+export async function upsertCategoryTranslations(id, names) {
+    const key = `category.${id}`;
+    const values = {
+        key,
+        es: names.es,
+        en: names.en,
+        pt: names.pt,
+        section: 'category',
+        updated_at: new Date()
+    };
+
+    const { error } = await supabase
+        .from('site_translations')
+        .upsert(values, { onConflict: 'key' });
+
+    if (!error) {
+        localStorage.removeItem('site_translations_cache');
+    }
+    return { error };
+}
+
+export async function fetchCategoryTranslations(id) {
+    const key = `category.${id}`;
+    const { data, error } = await supabase
+        .from('site_translations')
+        .select('*')
+        .eq('key', key)
+        .maybeSingle();
+
+    return { data, error };
 }
 
 

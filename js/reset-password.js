@@ -6,10 +6,11 @@ import { showToast } from './utils.js';
 import { i18n } from './i18n.js';
 
 async function init() {
-    await loadComponents();
-
+    // 1. Init User State early to prevent flickering
     const user = await getUser();
-    updateNavbarAuth(user);
+
+    // 2. Load Navbar/Footer
+    await loadComponents(user);
 
     // Listen for state updates
     window.addEventListener('cart-updated', () => {
@@ -63,7 +64,7 @@ function setupPasswordUpdate() {
             const { error } = await updatePassword(newPassword);
 
             if (error) {
-                showToast('Error: ' + error.message, 'error');
+                showToast(i18n.t('error.prefix') + error.message, 'error');
                 updateBtn.disabled = false;
                 updateBtn.innerHTML = `<span data-i18n="reset_password.update_button">${i18n.t('reset_password.update_button')}</span>`;
             } else {

@@ -1,4 +1,3 @@
-
 import { supabase } from './api.js';
 import { showToast } from './utils.js';
 

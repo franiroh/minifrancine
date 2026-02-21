@@ -17,7 +17,7 @@
     <link rel="stylesheet" href="css/cart.css">
 </head>
 
-<body class="loading-i18n">
+<body>
 
     <div class="page">
 
@@ -26,9 +26,9 @@
         <section class="cart-body">
             <div class="cart-body__left">
                 <div class="cart-body__header">
-                    <h2 class="cart-body__title"><span data-i18n="cart.title">Tu Carrito</span> (<span
-                            id="cart-count">0</span>)</h2>
-                    <a href="#" id="clear-cart-btn" class="cart-body__clear" data-i18n="cart.clear">Vaciar carrito</a>
+                    <h2 class="cart-body__title"><span data-i18n="cart.title"></span> (<span id="cart-count">0</span>)
+                    </h2>
+                    <a href="#" id="clear-cart-btn" class="cart-body__clear" data-i18n="cart.clear"></a>
                 </div>
 
                 <div class="cart-items" id="cart-items-container">
@@ -37,19 +37,18 @@
             </div>
 
             <aside class="cart-summary">
-                <h3 class="cart-summary__title" data-i18n="cart.summary">Resumen del Pedido</h3>
+                <h3 class="cart-summary__title" data-i18n="cart.summary"></h3>
                 <hr class="cart-summary__divider">
-                <div class="cart-summary__row"><span data-i18n="cart.subtotal">Subtotal</span><span
+                <div class="cart-summary__row"><span data-i18n="cart.subtotal"></span><span
                         id="cart-subtotal">$0.00</span></div>
                 <hr class="cart-summary__divider">
                 <div class="cart-summary__total">
-                    <span data-i18n="cart.total">Total</span>
+                    <span data-i18n="cart.total"></span>
                     <span class="cart-summary__total-val" id="cart-total">$0.00</span>
                 </div>
-                <p class="cart-summary__notice" data-i18n="cart.coupon_notice">Los cupones y descuentos se aplican en el
-                    checkout</p>
+                <p class="cart-summary__notice" data-i18n="cart.coupon_notice"></p>
                 <button class="btn btn--primary btn--block btn--lg" onclick="window.location.href='checkout.html'">
-                    <i data-lucide="credit-card"></i> <span data-i18n="cart.checkout">Proceder al Pago</span>
+                    <i data-lucide="credit-card"></i> <span data-i18n="cart.checkout"></span>
                 </button>
             </aside>
         </section>

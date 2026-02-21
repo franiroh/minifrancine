@@ -17,34 +17,34 @@
     <link rel="stylesheet" href="css/profile.css?v=4">
 </head>
 
-<body class="loading-i18n">
+<body>
 
     <div class="page">
         <div id="navbar-placeholder"></div>
 
         <section class="profile-header">
-            <h1 data-i18n="profile.title">Mi Perfil</h1>
-            <p data-i18n="profile.subtitle">Gestiona tu información personal</p>
+            <h1 data-i18n="profile.title"></h1>
+            <p data-i18n="profile.subtitle"></p>
         </section>
 
         <section class="profile-container">
             <div class="profile-card">
                 <form id="profile-form">
                     <div class="form-group">
-                        <label for="email" data-i18n="profile.email">Email</label>
+                        <label for="email" data-i18n="profile.email"></label>
                         <input type="email" id="email" disabled class="input-disabled">
-                        <small data-i18n="profile.email_helper">El email no se puede cambiar.</small>
+                        <small data-i18n="profile.email_helper"></small>
                     </div>
 
                     <div class="form-group">
-                        <label for="full_name" data-i18n="profile.name">Nombre Completo</label>
+                        <label for="full_name" data-i18n="profile.name"></label>
                         <input type="text" id="full_name" required>
                     </div>
 
                     <div class="form-actions"
                         style="display: flex; flex-direction: column; gap: 16px; align-items: flex-end;">
                         <button type="submit" class="btn btn--primary" id="save-btn">
-                            <i data-lucide="save"></i> <span data-i18n="profile.save">Guardar Cambios</span>
+                            <i data-lucide="save"></i> <span data-i18n="profile.save"></span>
                         </button>
 
                         <button type="button" id="delete-account-btn" class="btn"

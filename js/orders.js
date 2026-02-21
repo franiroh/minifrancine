@@ -10,10 +10,11 @@ import i18n from './i18n.js';
 let currentUser = null;
 
 async function init() {
-    await loadComponents();
-
+    // 1. Init User State early to prevent flickering
     currentUser = await getUser();
-    updateNavbarAuth(currentUser);
+
+    // 2. Load Navbar/Footer
+    await loadComponents(currentUser);
 
     if (!currentUser) {
         window.location.href = 'login.html';
@@ -109,7 +110,7 @@ function renderOrderCard(order, reviewsMap = {}) {
 
             const downloadBtn = isPaid
                 ? `<button class="order-item__download btn btn--sm btn--outline" data-id="${productId}" data-title="${escapeHtml(title)}" style="margin-right: 8px;">
-                     <i data-lucide="download"></i> Descargar
+                     <i data-lucide="download"></i> ${i18n.t('btn.download')}
                    </button>`
                 : '';
 
@@ -192,7 +193,7 @@ function renderOrderCard(order, reviewsMap = {}) {
 
             <div class="order-card__footer">
                 <div class="order-summary-row">
-                    <span class="order-summary-label">Subtotal</span>
+                    <span class="order-summary-label">${i18n.t('cart.subtotal')}</span>
                     <span class="order-summary-value">USD ${(parseFloat(order.total) + parseFloat(order.discount_amount || 0)).toFixed(2)}</span>
                 </div>
 
@@ -200,14 +201,14 @@ function renderOrderCard(order, reviewsMap = {}) {
                 <div class="order-summary-row order-summary-discount">
                     <span class="order-summary-label order-summary-discount">
                         <i data-lucide="tag" style="width: 12px; height: 12px; vertical-align: middle; margin-right: 4px;"></i>
-                        Cupón: <strong>${escapeHtml(order.applied_coupon_code)}</strong>
+                        ${i18n.t('cart.coupon_label')} <strong>${escapeHtml(order.applied_coupon_code)}</strong>
                     </span>
                     <span class="order-summary-value order-summary-discount">-USD ${parseFloat(order.discount_amount).toFixed(2)}</span>
                 </div>
                 ` : ''}
 
                 <div class="order-summary-row order-summary-total">
-                    <span class="order-summary-label">Total</span>
+                    <span class="order-summary-label">${i18n.t('cart.total')}</span>
                     <span class="order-summary-value">USD ${parseFloat(order.total).toFixed(2)}</span>
                 </div>
             </div>
@@ -236,8 +237,8 @@ function attachDownloadListeners() {
                     link.click();
                     document.body.removeChild(link);
 
-                    btn.innerHTML = '<i data-lucide="check"></i> Listo';
-                    showToast('Descarga iniciada correctamente.', 'success');
+                    btn.innerHTML = `<i data-lucide="check"></i> ${i18n.t('btn.downloaded')}`;
+                    showToast(i18n.t('msg.download_started'), 'success');
                     if (window.lucide) window.lucide.createIcons();
                     setTimeout(() => {
                         btn.innerHTML = originalHTML;
@@ -245,14 +246,14 @@ function attachDownloadListeners() {
                         if (window.lucide) window.lucide.createIcons();
                     }, 2000);
                 } else {
-                    showToast('El archivo digital para este producto no está disponible todavía.', 'error');
+                    showToast(i18n.t('error.file_unavailable'), 'error');
                     btn.innerHTML = originalHTML;
                     btn.disabled = false;
                     if (window.lucide) window.lucide.createIcons();
                 }
             } catch (err) {
                 console.error('Download error:', err);
-                showToast('Error al generar el enlace de descarga.', 'error');
+                showToast(i18n.t('error.download_link'), 'error');
                 btn.innerHTML = originalHTML;
                 btn.disabled = false;
                 if (window.lucide) window.lucide.createIcons();
@@ -332,24 +333,24 @@ function setupRatingModal() {
 
         // 1. Validation: Rating Range
         if (!rating || rating < 1 || rating > 5) {
-            showToast('Por favor selecciona una puntuación válida (1-5).', 'error');
+            showToast(i18n.t('msg.invalid_score'), 'error');
             return;
         }
 
         // 2. Validation: Comment Length
         if (comment.length > 1000) {
-            showToast('El comentario no puede exceder los 1000 caracteres.', 'error');
+            showToast(i18n.t('msg.comment_limit'), 'error');
             return;
         }
 
         if (!rating) {
-            showToast('Por favor selecciona una puntuación.', 'error');
+            showToast(i18n.t('msg.score_required'), 'error');
             return;
         }
 
         const submitBtn = ratingForm.querySelector('button[type="submit"]');
         submitBtn.disabled = true;
-        submitBtn.textContent = 'Guardando...';
+        submitBtn.textContent = i18n.t('btn.saving');
 
         let result;
         if (reviewId) {
@@ -359,11 +360,11 @@ function setupRatingModal() {
         }
 
         if (result.error) {
-            showToast('Error al guardar la calificación.', 'error');
+            showToast(i18n.t('error.rating_save'), 'error');
             console.error(result.error);
         } else {
             modal.style.display = 'none';
-            showToast('Calificación guardada correctamente.', 'success');
+            showToast(i18n.t('msg.rating_saved'), 'success');
             // Reload orders to update buttons potentially (though state is ok)
             loadOrders(currentUser.id);
         }
@@ -378,16 +379,16 @@ function setupRatingModal() {
         const reviewId = document.getElementById('rating-review-id').value;
         const submitBtn = deleteBtn;
         submitBtn.disabled = true;
-        submitBtn.textContent = 'Eliminando...';
+        submitBtn.textContent = i18n.t('btn.deleting');
 
         const result = await deleteReview(reviewId);
 
         if (result.error) {
-            showToast('Error al eliminar la reseña.', 'error');
+            showToast(i18n.t('error.review_delete'), 'error');
             console.error(result.error);
         } else {
             modal.style.display = 'none';
-            showToast('Reseña eliminada.', 'success');
+            showToast(i18n.t('msg.review_deleted'), 'success');
             loadOrders(currentUser.id);
         }
         submitBtn.disabled = false;

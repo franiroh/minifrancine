@@ -28,10 +28,11 @@ function loadPayPalScript(clientId) {
 }
 
 async function init() {
-    await loadComponents();
-
+    // 1. Init User State early to prevent flickering
     const user = await getUser();
-    updateNavbarAuth(user);
+
+    // 2. Load Navbar/Footer
+    await loadComponents(user);
 
     await loadCart(user);
     updateNavbarCartCount(getCartCount());
@@ -192,7 +193,7 @@ function renderCheckout() {
                         return result.orderID;
 
                     } catch (err) {
-                        showToast('Error al crear la orden: ' + err.message, 'error');
+                        showToast(i18n.t('error.order_create') + err.message, 'error');
                         return Promise.reject(err);
                     }
                 },
@@ -240,7 +241,7 @@ function renderCheckout() {
                             // If we get here, the server might have processed OK but response shape is unexpected
                             // Check if result exists at all
                             console.warn('Unexpected capture result shape:', result);
-                            showToast('Pago procesado. Verificá en "Mis Compras".', 'info');
+                            showToast(i18n.t('msg.payment_processed'), 'info');
 
                             // Mark coupon as used anyway if we reached here
                             if (state.appliedCoupon) {
@@ -262,12 +263,12 @@ function renderCheckout() {
 
                     } catch (err) {
                         console.error('Capture error:', err);
-                        showToast('Hubo un error al procesar el pago: ' + err.message, 'error');
+                        showToast(i18n.t('error.payment_process') + err.message, 'error');
                     }
                 },
                 onError: (err) => {
                     console.error('PayPal Error:', err);
-                    showToast('Hubo un error con el pago de PayPal.', 'error');
+                    showToast(i18n.t('error.paypal_error'), 'error');
                 }
             }).render('#paypal-button-container');
 

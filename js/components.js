@@ -1,22 +1,134 @@
-
-import { fetchCategories } from './api.js';
+import { fetchCategories, getProfile } from './api.js';
 import i18n from './i18n.js';
+import { escapeHtml, sanitizeCssValue, getBadgeKey } from './utils.js';
+import { isFavorite, isPurchased } from './state.js';
 
-export const loadComponents = async () => {
+let userProfileCache = {};
+
+export const updateNavbarAuth = async (user, profileInfo = null) => {
+  const userBtn = document.getElementById('navbar-user-btn');
+  const userText = document.getElementById('navbar-user-text');
+  const navLinks = document.querySelector('.navbar__links');
+  const accountWrap = document.getElementById('navbar-account');
+  const dropdown = document.getElementById('navbar-dropdown');
+  const logoutBtn = document.getElementById('navbar-logout-btn');
+
+  if (userBtn && userText) {
+    if (user) {
+      // Fetch profile first if not provided
+      let profile = profileInfo || userProfileCache[user.id] || null;
+      if (!profile) {
+        const { data } = await getProfile(user.id);
+        profile = data;
+        if (profile) userProfileCache[user.id] = profile;
+      }
+
+      // Prefer full name if available, otherwise email
+      const displayName = (profile && profile.full_name) ? profile.full_name : user.email;
+      userText.textContent = escapeHtml(displayName);
+      userText.removeAttribute('data-i18n'); // Prevent i18n from overwriting name/email
+
+      // Show arrow
+      const arrow = document.getElementById('navbar-user-arrow');
+      if (arrow) arrow.style.display = 'block';
+
+      // Reset button click to managed by setupToggle logic (close dropdown logic is already in setupToggle)
+      userBtn.onclick = (e) => {
+        e.stopPropagation();
+        // Close Language menu if open
+        const langMenu = document.getElementById('lang-menu');
+        if (langMenu) langMenu.classList.remove('navbar__menu-item--open');
+        accountWrap.classList.toggle('navbar__account--open');
+      };
+
+      // Show dropdown
+      if (dropdown) dropdown.style.display = '';
+
+      // Logout button
+      if (logoutBtn) {
+        logoutBtn.onclick = async () => {
+          const { supabase } = await import('./api.js');
+          await supabase.auth.signOut();
+          window.location.href = 'login.html';
+        };
+      }
+
+      // Check for Admin role
+      if (profile && profile.role === 'admin') {
+        if (navLinks && !document.getElementById('admin-link')) {
+          const adminLink = document.createElement('a');
+          adminLink.href = 'admin.html';
+          adminLink.className = 'navbar__link';
+          adminLink.id = 'admin-link';
+          adminLink.style.color = 'var(--color-primary)';
+          adminLink.style.fontWeight = 'bold';
+          adminLink.textContent = 'Admin';
+          navLinks.appendChild(adminLink);
+        }
+      } else {
+        const adminLink = document.getElementById('admin-link');
+        if (adminLink) adminLink.remove();
+      }
+    } else {
+      userText.setAttribute('data-i18n', 'nav.login');
+      userText.textContent = i18n.t('nav.login');
+      // Hide arrow
+      const arrow = document.getElementById('navbar-user-arrow');
+      if (arrow) arrow.style.display = 'none';
+
+      userBtn.onclick = () => window.location.href = 'login.html';
+      // Hide dropdown when logged out
+      if (dropdown) dropdown.style.display = 'none';
+      // Remove Admin link if logging out
+      const adminLink = document.getElementById('admin-link');
+      if (adminLink) adminLink.remove();
+    }
+  }
+};
+
+export const loadComponents = async (user = null) => {
   const navbarPlaceholder = document.getElementById('navbar-placeholder');
   const footerPlaceholder = document.getElementById('footer-placeholder');
 
-  // Initialize i18n first
+  // Initialize i18n
   await i18n.init();
-  document.body.classList.remove('loading-i18n');
 
   if (navbarPlaceholder) {
+    // 1. Pre-calculate Auth State for flicker-free rendering
+    let displayName = i18n.t('nav.login');
+    let displayAttr = 'data-i18n="nav.login"';
+    let arrowStyle = 'display: none;';
+    let userOnClick = "window.location.href='login.html'";
+    let adminLinkHtml = '';
+
+    if (user) {
+      // Get profile from cache or fetch it
+      let profile = userProfileCache[user.id];
+      if (!profile) {
+        const { data } = await getProfile(user.id);
+        profile = data;
+        if (profile) userProfileCache[user.id] = profile;
+      }
+
+      displayName = (profile && profile.full_name) ? profile.full_name : user.email;
+      displayAttr = ''; // No i18n for user labels
+      arrowStyle = 'display: block;';
+      userOnClick = ""; // Managed by JS events later
+
+      if (profile && profile.role === 'admin') {
+        adminLinkHtml = `<a href="admin.html" class="navbar__link" id="admin-link" style="color: var(--color-primary); font-weight: bold;">Admin</a>`;
+      }
+    }
+
     // Fetch categories for dropdown
     const categories = await fetchCategories();
     // Categories names are dynamic, we might translate them later via a different mechanism or JSON column
-    const categoriesList = categories.map(c =>
-      `<a href="catalog.html?category=${encodeURIComponent(c.name)}" class="navbar__dropdown-item" data-i18n="category.${c.id}">${i18n.t(`category.${c.id}`) || escapeHtml(c.name)}</a>`
-    ).join('');
+    const categoriesList = categories.map(c => {
+      const key = `category.${c.id}`;
+      const trans = i18n.t(key);
+      const label = trans === key ? c.name : trans;
+      return `<a href="catalog.html?category=${encodeURIComponent(c.name)}" class="navbar__dropdown-item" ${trans !== key ? `data-i18n="${key}"` : ''}>${escapeHtml(label)}</a>`;
+    }).join('');
 
     const lastCount = localStorage.getItem('patchfiles_last_count') || '0';
 
@@ -30,27 +142,28 @@ export const loadComponents = async () => {
           <i data-lucide="scissors" class="navbar__logo-icon"></i>
           <div class="navbar__brand-wrap">
               <a href="index.html" class="navbar__logo-text">MiniFrancine</a>
-              <span class="navbar__subtitle" data-i18n="nav.subtitle">Embroidery ITH Files</span>
+              <span class="navbar__subtitle" data-i18n="nav.subtitle"></span>
           </div>
         </div>
 
         <div class="navbar__links">
-          <a href="index.html" class="navbar__link ${window.location.pathname.includes('index.html') || window.location.pathname === '/' ? 'navbar__link--active' : ''}" data-i18n="nav.home">Inicio</a>
+          <a href="index.html" class="navbar__link ${window.location.pathname.includes('index.html') || window.location.pathname === '/' ? 'navbar__link--active' : ''}" data-i18n="nav.home"></a>
           
           <div class="navbar__menu-item">
               <a href="categories.html" class="navbar__link ${window.location.pathname.includes('categories.html') ? 'navbar__link--active' : ''}" style="display:flex;align-items:center;gap:4px;">
-                  <span data-i18n="nav.catalog">Categorías</span> <i data-lucide="chevron-down" style="width:14px;height:14px;"></i>
+                  <span data-i18n="nav.catalog"></span> <i data-lucide="chevron-down" style="width:14px;height:14px;"></i>
               </a>
               <div class="navbar__dropdown">
-                  <a href="categories.html" class="navbar__dropdown-item" style="font-weight:700; color:var(--primary-color);" data-i18n="nav.all_categories">Ver todas</a>
+                  <a href="categories.html" class="navbar__dropdown-item" style="font-weight:700; color:var(--primary-color);" data-i18n="nav.all_categories"></a>
                   <div class="navbar__dropdown-divider"></div>
                   ${categoriesList}
               </div>
           </div>
 
-          <a href="catalog.html?sort=newest" class="navbar__link ${window.location.search.includes('sort=newest') ? 'navbar__link--active' : ''}" data-i18n="nav.new">Novedades</a>
-          <a href="catalog.html?sale=true" class="navbar__link ${window.location.search.includes('sale=true') ? 'navbar__link--active' : ''}" data-i18n="nav.sale">Ofertas</a>
-          <a href="faq.html" class="navbar__link" data-i18n="nav.faq">FAQ</a>
+          <a href="catalog.html?sort=newest" class="navbar__link ${window.location.search.includes('sort=newest') ? 'navbar__link--active' : ''}" data-i18n="nav.new"></a>
+          <a href="catalog.html?sale=true" class="navbar__link ${window.location.search.includes('sale=true') ? 'navbar__link--active' : ''}" data-i18n="nav.sale"></a>
+          <a href="faq.html" class="navbar__link" data-i18n="nav.faq"></a>
+          ${adminLinkHtml}
         </div>
 
         <div class="navbar__right">
@@ -62,13 +175,13 @@ export const loadComponents = async () => {
             </button>
               <div class="navbar__dropdown" style="min-width:140px; right:0; left:auto;">
                   <button class="navbar__dropdown-item lang-btn" data-lang="es" style="width:100%;text-align:left;">
-                      <img src="https://flagcdn.com/w20/es.png" class="navbar__flag" alt="ES" style="margin-right:8px;"> Español
+                      <img src="https://flagcdn.com/w20/es.png" class="navbar__flag" alt="ES" style="margin-right:8px;">
                   </button>
                   <button class="navbar__dropdown-item lang-btn" data-lang="en" style="width:100%;text-align:left;">
-                      <img src="https://flagcdn.com/w20/us.png" class="navbar__flag" alt="EN" style="margin-right:8px;"> English
+                      <img src="https://flagcdn.com/w20/us.png" class="navbar__flag" alt="EN" style="margin-right:8px;">
                   </button>
                   <button class="navbar__dropdown-item lang-btn" data-lang="pt" style="width:100%;text-align:left;">
-                      <img src="https://flagcdn.com/w20/br.png" class="navbar__flag" alt="PT" style="margin-right:8px;"> Português
+                      <img src="https://flagcdn.com/w20/br.png" class="navbar__flag" alt="PT" style="margin-right:8px;">
                   </button>
               </div>
           </div>
@@ -85,30 +198,30 @@ export const loadComponents = async () => {
             <span class="navbar__cart-badge">${lastCount}</span>
           </div>
           <div class="navbar__account" id="navbar-account">
-            <button class="navbar__user-btn" id="navbar-user-btn" onclick="window.location.href='login.html'">
+            <button class="navbar__user-btn" id="navbar-user-btn" onclick="${userOnClick}">
               <i data-lucide="user"></i>
-              <span id="navbar-user-text" data-i18n="nav.login">Login</span>
-              <i data-lucide="chevron-down" id="navbar-user-arrow" style="width: 16px; height: 16px; margin-left: -2px; display: none;"></i>
+              <span id="navbar-user-text" ${displayAttr}>${escapeHtml(displayName)}</span>
+              <i data-lucide="chevron-down" id="navbar-user-arrow" style="width: 16px; height: 16px; margin-left: -2px; ${arrowStyle}"></i>
             </button>
-            <div class="navbar__dropdown" id="navbar-dropdown">
+            <div class="navbar__dropdown" id="navbar-dropdown" style="${!user ? 'display: none;' : ''}">
               <a href="profile.html" class="navbar__dropdown-item">
-                <i data-lucide="user"></i> <span data-i18n="nav.profile">Mi Perfil</span>
+                <i data-lucide="user"></i> <span data-i18n="nav.profile"></span>
               </a>
               <a href="favorites.html" class="navbar__dropdown-item">
-                <i data-lucide="heart"></i> <span data-i18n="nav.favorites">Mis Favoritos</span>
+                <i data-lucide="heart"></i> <span data-i18n="nav.favorites"></span>
               </a>
               <a href="mis-disenos.html" class="navbar__dropdown-item">
-                <i data-lucide="palette"></i> <span data-i18n="nav.my_designs">Mis Diseños</span>
+                <i data-lucide="palette"></i> <span data-i18n="nav.my_designs"></span>
               </a>
               <a href="orders.html" class="navbar__dropdown-item">
-                <i data-lucide="receipt"></i> <span data-i18n="nav.my_orders">Mis Pedidos</span>
+                <i data-lucide="receipt"></i> <span data-i18n="nav.my_orders"></span>
               </a>
               <a href="orders.html" class="navbar__dropdown-item">
-                <i data-lucide="message-circle"></i> <span data-i18n="nav.messages">Mensajes</span>
+                <i data-lucide="message-circle"></i> <span data-i18n="nav.messages"></span>
               </a>
               <div class="navbar__dropdown-divider"></div>
               <button class="navbar__dropdown-item navbar__dropdown-item--danger" id="navbar-logout-btn">
-                <i data-lucide="log-out"></i> <span data-i18n="nav.logout">Cerrar sesión</span>
+                <i data-lucide="log-out"></i> <span data-i18n="nav.logout"></span>
               </button>
             </div>
           </div>
@@ -137,28 +250,23 @@ export const loadComponents = async () => {
       <div class="footer__top">
         <div class="footer__brand">
           <div class="footer__brand-logo"><i data-lucide="scissors"></i><span>MiniFrancine</span></div>
-          <p class="footer__brand-desc" data-i18n="footer.description">Archivos digitales de bordado premium para máquinas bordadoras domésticas.</p>
+          <p class="footer__brand-desc" data-i18n="footer.description"></p>
         </div>
         <div class="footer__col">
-          <a href="index.html" data-i18n="nav.home">Inicio</a>
-          <a href="categories.html" data-i18n="nav.catalog">Categorías</a>
-          <a href="catalog.html?sort=newest" data-i18n="nav.new">Novedades</a>
-          <a href="faq.html" data-i18n="nav.faq">FAQ</a>
+          <a href="index.html" data-i18n="nav.home"></a>
+          <a href="categories.html" data-i18n="nav.catalog"></a>
+          <a href="catalog.html?sort=newest" data-i18n="nav.new"></a>
+          <a href="faq.html" data-i18n="nav.faq"></a>
         </div>
       </div>
       <div class="footer__bottom">
         <span>
-          &copy; 2026 MiniFrancine. <span data-i18n="footer.rights">Todos los derechos reservados.</span>
-          <a href="terms.html" style="margin-left: 10px; color: inherit; text-decoration: none;" data-i18n="footer.terms">Términos y Condiciones</a>
+          &copy; 2026 MiniFrancine. <span data-i18n="footer.rights"></span>
+          <a href="terms.html" style="margin-left: 10px; color: inherit; text-decoration: none;" data-i18n="footer.terms"></a>
         </span>
       </div>
     </footer>`;
-
   }
-
-  // Handle Search Logic
-  const searchForm = document.getElementById('nav-search-form');
-  const searchInput = document.getElementById('nav-search-input');
 
   // Handle Search Logic (Desktop and Mobile)
   const setupSearch = (formId, inputId) => {
@@ -191,7 +299,7 @@ export const loadComponents = async () => {
   const menuToggle = document.getElementById('mobile-menu-toggle');
 
   if (navbar && menuToggle) {
-    menuToggle.addEventListener('click', () => {
+    menuToggle.onclick = () => {
       navbar.classList.toggle('navbar--mobile-open');
       const icon = menuToggle.querySelector('i');
       if (icon) {
@@ -199,7 +307,7 @@ export const loadComponents = async () => {
         icon.setAttribute('data-lucide', isOpening ? 'x' : 'menu');
         if (window.lucide) window.lucide.createIcons();
       }
-    });
+    };
   }
 
   // Dropdown Toggle Logic (Mobile & Desktop Click)
@@ -220,7 +328,9 @@ export const loadComponents = async () => {
     }
   };
 
-  setupToggle('navbar-user-btn', 'navbar-account', 'navbar__account--open');
+  if (user) {
+    setupToggle('navbar-user-btn', 'navbar-account', 'navbar__account--open');
+  }
   // Special handling for language menu button which is a child of the menu-item
   const langMenu = document.getElementById('lang-menu');
   if (langMenu) {
@@ -274,95 +384,11 @@ export const loadComponents = async () => {
       });
     }
   });
-};
 
-import { getProfile } from './api.js';
-import { escapeHtml } from './utils.js';
-
-export const updateNavbarAuth = async (user) => {
-  const userBtn = document.getElementById('navbar-user-btn');
-  const userText = document.getElementById('navbar-user-text');
-  const navLinks = document.querySelector('.navbar__links');
-  const accountWrap = document.getElementById('navbar-account');
-  const dropdown = document.getElementById('navbar-dropdown');
-  const logoutBtn = document.getElementById('navbar-logout-btn');
-
-  if (userBtn && userText) {
-    if (user) {
-      // Fetch profile first
-      let profile = null;
-      const { data } = await getProfile(user.id);
-      profile = data;
-
-      // Prefer full name if available, otherwise email
-      const displayName = (profile && profile.full_name) ? profile.full_name : user.email;
-      userText.textContent = escapeHtml(displayName);
-      userText.removeAttribute('data-i18n'); // Prevent i18n from overwriting email
-
-      // Show arrow
-      const arrow = document.getElementById('navbar-user-arrow');
-      if (arrow) arrow.style.display = 'block';
-
-      // Toggle dropdown on click (Consistently handles other menus)
-      userBtn.onclick = (e) => {
-        e.stopPropagation();
-        // Close Language menu if open
-        const langMenu = document.getElementById('lang-menu');
-        if (langMenu) langMenu.classList.remove('navbar__menu-item--open');
-
-        accountWrap.classList.toggle('navbar__account--open');
-      };
-
-      // Close dropdown when clicking outside
-      document.addEventListener('click', (e) => {
-        if (accountWrap && !accountWrap.contains(e.target)) {
-          accountWrap.classList.remove('navbar__account--open');
-        }
-      });
-
-      // Show dropdown
-      if (dropdown) dropdown.style.display = '';
-
-      // Logout button
-      if (logoutBtn) {
-        logoutBtn.onclick = async () => {
-          const { supabase } = await import('./api.js');
-          await supabase.auth.signOut();
-          window.location.href = 'login.html';
-        };
-      }
-
-      // Check for Admin role
-      if (profile && profile.role === 'admin') {
-        // Add Admin link if it doesn't exist
-        if (navLinks && !document.getElementById('admin-link')) {
-          const adminLink = document.createElement('a');
-          adminLink.href = 'admin.html';
-          adminLink.className = 'navbar__link';
-          adminLink.id = 'admin-link';
-          adminLink.style.color = 'var(--color-primary)';
-          adminLink.style.fontWeight = 'bold';
-          adminLink.textContent = 'Admin';
-          navLinks.appendChild(adminLink);
-        }
-      }
-    } else {
-      userText.setAttribute('data-i18n', 'nav.login');
-      userText.textContent = i18n.t('nav.login');
-      // Hide arrow
-      const arrow = document.getElementById('navbar-user-arrow');
-      if (arrow) arrow.style.display = 'none';
-
-      userBtn.onclick = () => window.location.href = 'login.html';
-      // Hide dropdown when logged out
-      if (dropdown) dropdown.style.display = 'none';
-      // Remove Admin link if logging out
-      const adminLink = document.getElementById('admin-link');
-      if (adminLink) adminLink.remove();
-    }
+  if (user) {
+    await updateNavbarAuth(user);
   }
-}
-
+};
 
 export const updateNavbarCartCount = (count) => {
   localStorage.setItem('patchfiles_last_count', count);
@@ -370,19 +396,15 @@ export const updateNavbarCartCount = (count) => {
   badges.forEach(b => b.textContent = count);
 };
 
-import { isFavorite, isPurchased } from './state.js';
-import { sanitizeCssValue, getBadgeKey } from './utils.js';
-
 export const createProductCard = (product) => {
   const purchased = isPurchased(product.id);
   const favorite = isFavorite(product.id);
 
   // Discount Calculation
-  const isProdPurchased = purchased; // already defined above
+  const isProdPurchased = purchased;
   const price = isProdPurchased ? 0 : parseFloat(product.price);
   const oldPrice = parseFloat(product.oldPrice || product.old_price);
   const hasDiscount = !isProdPurchased && oldPrice > price;
-  const discountPerc = hasDiscount ? Math.round(((oldPrice - price) / oldPrice) * 100) : 0;
 
   return `
     <div class="product-card ${purchased ? 'product-card--purchased' : ''}" data-id="${parseInt(product.id)}">
@@ -400,7 +422,14 @@ export const createProductCard = (product) => {
         </div>
       </div>
       <div class="product-card__info">
-        <span class="product-card__category">${escapeHtml(i18n.t(`category.${product.categoryId}`) || product.category)}</span>
+        <span class="product-card__category">
+            ${(product.categoryIds && product.categoryIds.length > 0)
+      ? product.categoryIds.map((id, index) => {
+        const trans = i18n.t(`category.${id}`);
+        return escapeHtml(trans !== `category.${id}` ? trans : (product.categories ? product.categories[index] : product.category));
+      }).join(', ')
+      : escapeHtml((i18n.t(`category.${product.categoryId}`) !== `category.${product.categoryId}` ? i18n.t(`category.${product.categoryId}`) : product.category) || 'Sin categoría')}
+        </span>
         
         <div class="product-card__price-wrap">
             <span class="product-card__price">USD ${price.toFixed(2)}</span>

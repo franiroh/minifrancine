@@ -10,12 +10,12 @@ let currentUser = null;
 let relatedProductsData = [];
 
 async function init() {
-    await loadComponents();
-
+    // 1. Init User State early to prevent flickering
     currentUser = await getUser();
-    updateNavbarAuth(currentUser);
 
-    await loadCart(currentUser);
+    // 2. Load Components
+    await loadComponents(currentUser);
+
     updateNavbarCartCount(getCartCount());
 
     await loadFavorites(currentUser);
@@ -60,14 +60,18 @@ function renderProductBreadcrumbs() {
     const placeholder = document.getElementById('breadcrumbs-placeholder');
     if (placeholder && currentProduct) {
         // Resolve translated category name
-        const transKey = `category.${currentProduct.categoryId}`;
+        // Use the first category as the main category for the breadcrumb
+        const mainCategoryId = currentProduct.categoryIds && currentProduct.categoryIds.length > 0 ? currentProduct.categoryIds[0] : currentProduct.categoryId;
+        const mainCategoryName = currentProduct.categories && currentProduct.categories.length > 0 ? currentProduct.categories[0] : currentProduct.category;
+
+        const transKey = `category.${mainCategoryId}`;
         const translatedCat = i18n.t(transKey);
-        const categoryLabel = translatedCat === transKey ? currentProduct.category : translatedCat;
+        const categoryLabel = translatedCat === transKey ? mainCategoryName : translatedCat;
 
         placeholder.innerHTML = renderBreadcrumbs([
             { label: i18n.t('nav.home'), href: 'index.html' },
             { label: i18n.t('nav.catalog'), href: 'categories.html' },
-            { label: categoryLabel, href: `catalog.html?category=${encodeURIComponent(currentProduct.category)}` },
+            { label: categoryLabel, href: `catalog.html?category=${encodeURIComponent(mainCategoryName)}` },
             { label: currentProduct.title, href: null }
         ]);
     }
@@ -187,13 +191,18 @@ async function renderProduct() {
     // Make category clickable
     const catEl = document.getElementById('detail-category');
     if (catEl) {
-        const transKey = `category.${p.categoryId}`;
-        const translatedCat = i18n.t(transKey);
-        const categoryLabel = translatedCat === transKey ? p.category : translatedCat;
+        const categories = currentProduct.categories || (currentProduct.category ? [currentProduct.category] : []);
+        const categoryIds = currentProduct.categoryIds || (currentProduct.categoryId ? [currentProduct.categoryId] : []);
 
-        catEl.innerHTML = `<a href="catalog.html?category=${encodeURIComponent(p.category)}" style="color:inherit; text-decoration:none; transition:opacity 0.2s;">${escapeHtml(categoryLabel)}</a>`;
-        catEl.querySelector('a').onmouseover = e => e.target.style.opacity = '0.7';
-        catEl.querySelector('a').onmouseout = e => e.target.style.opacity = '1';
+        const categoryLinksHTML = categories.map((catName, index) => {
+            const catId = categoryIds[index];
+            const transKey = `category.${catId}`;
+            const translatedCat = i18n.t(transKey);
+            const categoryLabel = translatedCat === transKey ? catName : translatedCat;
+            return `<a class="detail__tag detail__tag-category" href="catalog.html?category=${encodeURIComponent(catName)}" style="color:inherit; text-decoration:none; transition:opacity 0.2s;">${escapeHtml(categoryLabel)}</a>`;
+        }).join('');
+
+        catEl.innerHTML = categoryLinksHTML;
     }
 
     // setText('detail-category-crumb', p.category); // Removed as we use Breadcrumb component

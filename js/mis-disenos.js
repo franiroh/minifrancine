@@ -6,16 +6,17 @@ import { escapeHtml, sanitizeCssValue, showToast, InfiniteScrollManager } from '
 import i18n from './i18n.js';
 
 async function init() {
-    await loadComponents();
+    // 1. Init User State early to prevent flickering
+    const user = await getUser();
+
+    // 2. Load Navbar/Footer
+    await loadComponents(user);
 
     // Show skeletons immediately
     const grid = document.getElementById('designs-grid');
     if (grid) {
         grid.innerHTML = Array(4).fill(0).map(() => createSkeletonCard()).join('');
     }
-
-    const user = await getUser();
-    updateNavbarAuth(user);
 
     if (!user) {
         window.location.href = 'login.html';
@@ -184,7 +185,7 @@ function attachDownloadListeners() {
                 }
             } catch (err) {
                 console.error('Download error:', err);
-                showToast('Error al generar el enlace de descarga.', 'error');
+                showToast(i18n.t('error.download_link'), 'error');
                 btn.innerHTML = originalHTML;
                 btn.disabled = false;
                 if (window.lucide) window.lucide.createIcons();

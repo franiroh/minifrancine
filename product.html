@@ -16,9 +16,10 @@
     <link rel="stylesheet" href="css/main.css">
     <link rel="stylesheet" href="css/components.css">
     <link rel="stylesheet" href="css/product.css?v=1.1">
+    <link rel="stylesheet" href="css/fixes.css">
 </head>
 
-<body class="loading-i18n">
+<body>
 
     <div class="page">
 
@@ -67,27 +68,26 @@
                 <hr class="detail__divider">
 
                 <div class="detail__specs">
-                    <h3 class="detail__specs-title" data-i18n="product.specs.title">Especificaciones</h3>
+                    <h3 class="detail__specs-title" data-i18n="product.specs.title"></h3>
                     <div class="detail__specs-grid">
                         <div class="detail__spec-item detail__spec-item--full">
-                            <span class="detail__spec-label" data-i18n="product.specs.formats">Formatos incluidos</span>
+                            <span class="detail__spec-label" data-i18n="product.specs.formats"></span>
                             <span id="detail-formats" class="detail__spec-value">-</span>
                         </div>
                         <div class="detail__spec-item">
-                            <span class="detail__spec-label" data-i18n="product.specs.size">Tamaño (pulgadas)</span>
+                            <span class="detail__spec-label" data-i18n="product.specs.size"></span>
                             <span id="detail-size" class="detail__spec-value">-</span>
                         </div>
                         <div class="detail__spec-item">
-                            <span class="detail__spec-label" data-i18n="product.specs.stitches">Puntadas Totales</span>
+                            <span class="detail__spec-label" data-i18n="product.specs.stitches"></span>
                             <span id="detail-stitches" class="detail__spec-value">-</span>
                         </div>
                         <div class="detail__spec-item">
-                            <span class="detail__spec-label" data-i18n="product.specs.color_changes">Cambios de
-                                color</span>
+                            <span class="detail__spec-label" data-i18n="product.specs.color_changes"></span>
                             <span id="detail-color-change-count" class="detail__spec-value">-</span>
                         </div>
                         <div class="detail__spec-item">
-                            <span class="detail__spec-label" data-i18n="product.specs.colors">Cantidad de Colores</span>
+                            <span class="detail__spec-label" data-i18n="product.specs.colors"></span>
                             <span id="detail-color-count" class="detail__spec-value">-</span>
                         </div>
                     </div>
@@ -97,10 +97,10 @@
 
                 <div class="detail__actions">
                     <button id="detail-add-btn" class="btn btn--outline btn--block btn--lg">
-                        <i data-lucide="shopping-cart"></i> <span data-i18n="btn.add_cart">Agregar al Carrito</span>
+                        <i data-lucide="shopping-cart"></i> <span data-i18n="btn.add_cart"></span>
                     </button>
                     <button id="detail-buy-btn" class="btn btn--primary btn--block btn--lg">
-                        <i data-lucide="zap"></i> <span data-i18n="btn.buy_now">Comprar Ahora</span>
+                        <i data-lucide="zap"></i> <span data-i18n="btn.buy_now"></span>
                     </button>
                 </div>
             </div>
@@ -108,17 +108,16 @@
 
         <!-- Reviews Section -->
         <section class="reviews">
-            <h2 style="font-size: 24px; font-weight: 700; margin-bottom: 20px;" data-i18n="product.reviews.title">
-                Reseñas de Clientes</h2>
+            <h2 style="font-size: 24px; font-weight: 700; margin-bottom: 20px;" data-i18n="product.reviews.title"></h2>
             <div id="reviews-container">
-                <p style="color: var(--color-gray);" data-i18n="product.reviews.loading">Cargando reseñas...</p>
+                <p style="color: var(--color-gray);" data-i18n="product.reviews.loading"></p>
             </div>
         </section>
 
         <!-- Related Products Section -->
         <section class="related-products" id="related-products-section" style="display: none; padding-top: 0;">
             <div class="related-products__header">
-                <h2 class="related-products__title" data-i18n="product.related.title">Diseños Relacionados</h2>
+                <h2 class="related-products__title" data-i18n="product.related.title"></h2>
             </div>
             <div class="product-grid" id="related-products-grid">
                 <!-- Related product cards will be populated here -->

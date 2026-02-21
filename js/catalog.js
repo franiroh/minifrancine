@@ -1,5 +1,5 @@
 import { fetchProducts, getUser, fetchCategories } from './api.js';
-import { loadComponents, createProductCard, createSkeletonCard, updateNavbarCartCount } from './components.js';
+import { loadComponents, updateNavbarAuth, createProductCard, createSkeletonCard, updateNavbarCartCount } from './components.js';
 import { loadFavorites, loadPurchases, addToCart, toggleFavorite, loadCart, getCartCount } from './state.js';
 import { renderBreadcrumbs, escapeHtml, InfiniteScrollManager } from './utils.js';
 import i18n from './i18n.js';
@@ -22,46 +22,34 @@ document.addEventListener('DOMContentLoaded', async () => {
     // Apply visibility/text changes immediately
     // Apply visibility/text changes
     if (category) {
-        // Category View
         if (catalogHeader) catalogHeader.style.display = 'none';
         categoryHeader.style.display = 'block';
-        // Wait for translation to load before setting text
-        // categoryTitle.textContent = category; 
         categoryTitle.innerHTML = '<span class="skeleton-text" style="width: 200px; display: inline-block;"></span>';
-        categoryTitle.removeAttribute('data-i18n');
-        document.title = `Categoría: ${category} — MiniFrancine`;
+        document.title = `Categoría — MiniFrancine`;
     } else if (tag) {
-        // Tag View
         if (pageTitle) {
-            // Use i18n for "Tag:" prefix if possible, or just hardcode as existing but allow dynamic updates
-            // Better: Set data-i18n to a key that accepts params? 
-            // Or just manual construction:
-            const tagPrefix = i18n.t('catalog.tag_prefix') || 'Etiqueta:';
-            pageTitle.textContent = `${tagPrefix} "${tag}"`;
-            pageTitle.removeAttribute('data-i18n');
+            pageTitle.innerHTML = '<span class="skeleton-text" style="width: 150px; display: inline-block;"></span>';
         }
-        document.title = `Etiqueta: ${tag} — MiniFrancine`;
+        document.title = `Etiqueta — MiniFrancine`;
     } else if (search) {
-        // Search View
         if (pageTitle) {
-            const searchPrefix = i18n.t('catalog.search_prefix') || 'Resultados para:';
-            pageTitle.textContent = `${searchPrefix} "${search}"`;
-            pageTitle.removeAttribute('data-i18n');
+            pageTitle.innerHTML = '<span class="skeleton-text" style="width: 180px; display: inline-block;"></span>';
         }
-        document.title = `Búsqueda: ${search} — MiniFrancine`;
+        document.title = `Búsqueda — MiniFrancine`;
     } else if (sale) {
-        // Sale View
         if (catalogHeader) catalogHeader.style.display = 'none';
         categoryHeader.style.display = 'block';
         if (categoryTitle) {
-            categoryTitle.textContent = i18n.t('nav.sale') || 'Ofertas';
-            categoryTitle.setAttribute('data-i18n', 'nav.sale');
+            categoryTitle.innerHTML = '<span class="skeleton-text" style="width: 120px; display: inline-block;"></span>';
         }
         document.title = `Ofertas — MiniFrancine`;
     }
 
-    // 2. Load Components (Navbar/Footer) - This initializes i18n
-    await loadComponents();
+    // 2. Init User State early to prevent flickering
+    const user = await getUser();
+
+    // 3. Load Components (Navbar/Footer) - This initializes i18n
+    await loadComponents(user);
 
     // 3. Fetch Categories for Translations (Needed for Title, Breadcrumbs and Return Button)
     let categories = [];
@@ -108,6 +96,20 @@ document.addEventListener('DOMContentLoaded', async () => {
                 if (window.lucide) window.lucide.createIcons();
             }
         }
+    } else if (sale) {
+        if (catalogHeader) catalogHeader.style.display = 'none';
+        categoryHeader.style.display = 'block';
+        if (categoryTitle) {
+            categoryTitle.textContent = i18n.t('nav.sale') || 'Ofertas';
+            categoryTitle.setAttribute('data-i18n', 'nav.sale');
+        }
+        document.title = `${i18n.t('nav.sale')} — MiniFrancine`;
+    } else if (search) {
+        if (pageTitle) {
+            const searchPrefix = i18n.t('catalog.search_prefix') || 'Resultados para:';
+            pageTitle.textContent = `${searchPrefix} "${search}"`;
+        }
+        document.title = `Búsqueda: ${search} — MiniFrancine`;
     } else {
         // Default All View - Show category header with full catalog title
         if (catalogHeader) catalogHeader.style.display = 'none';
@@ -129,8 +131,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         grid.innerHTML = Array(8).fill(0).map(() => createSkeletonCard()).join('');
     }
 
-    // 3. Init User State
-    const user = await getUser();
+    // Listen for state updates
 
     // Listen for state updates
     window.addEventListener('cart-updated', () => {
@@ -155,9 +156,11 @@ document.addEventListener('DOMContentLoaded', async () => {
     if (category) {
         const catObj = categories.find(c => c.name === category);
         if (catObj) {
-            const translatedName = i18n.t(`category.${catObj.id}`);
-            if (categoryTitle) categoryTitle.textContent = translatedName;
-            document.title = `Categoría: ${translatedName} — MiniFrancine`;
+            const key = `category.${catObj.id}`;
+            const translatedName = i18n.t(key);
+            const label = translatedName === key ? catObj.name : translatedName;
+            if (categoryTitle) categoryTitle.textContent = label;
+            document.title = `Categoría: ${label} — MiniFrancine`;
         } else {
             if (categoryTitle) categoryTitle.textContent = category;
         }
@@ -168,7 +171,9 @@ document.addEventListener('DOMContentLoaded', async () => {
     if (breadcrumbsContainer) {
         if (category) {
             const catObj = categories.find(c => c.name === category);
-            const label = catObj ? i18n.t(`category.${catObj.id}`) : category;
+            const key = `category.${catObj.id}`;
+            const translatedName = i18n.t(key);
+            const label = (catObj && translatedName !== key) ? translatedName : (catObj ? catObj.name : category);
 
             breadcrumbsContainer.innerHTML = renderBreadcrumbs([
                 { label: i18n.t('nav.home'), href: 'index.html' },
@@ -218,7 +223,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     let displayProducts = fetchedProducts;
     if (category) {
-        displayProducts = fetchedProducts.filter(p => p.category === category);
+        displayProducts = fetchedProducts.filter(p => (p.categories && p.categories.includes(category)) || p.category === category);
         // Render tag filters based on ALL products in this category
         renderTagFilters(displayProducts, category, tag);
 

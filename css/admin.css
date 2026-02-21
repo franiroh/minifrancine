@@ -605,6 +605,49 @@
     border-color: var(--admin-primary);
 }
 
+/* --- Custom Category Dropdown --- */
+.custom-select-container {
+    font-family: 'Outfit', sans-serif;
+}
+
+.selected-tags-container {
+    transition: border-color 0.2s;
+}
+
+.selected-tags-container:hover {
+    border-color: #d1d5db;
+}
+
+.custom-dropdown-list {
+    scrollbar-width: thin;
+    scrollbar-color: #d1d5db transparent;
+}
+
+.custom-dropdown-list::-webkit-scrollbar {
+    width: 6px;
+}
+
+.custom-dropdown-list::-webkit-scrollbar-thumb {
+    background-color: #d1d5db;
+    border-radius: 10px;
+}
+
+.selected-tag {
+    animation: scaleIn 0.2s ease-out;
+}
+
+@keyframes scaleIn {
+    from {
+        transform: scale(0.95);
+        opacity: 0;
+    }
+
+    to {
+        transform: scale(1);
+        opacity: 1;
+    }
+}
+
 /* Dashboard Sections Styling */
 .dashboard-group {
     margin-bottom: 40px;

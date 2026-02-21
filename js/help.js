@@ -1,14 +1,16 @@
 
 import { loadComponents, updateNavbarAuth, updateNavbarCartCount } from './components.js';
+import { i18n } from './i18n.js';
 import { showToast } from './utils.js';
 import { getUser, onAuthStateChange } from './api.js';
 import { loadCart, getCartCount } from './state.js';
 
 async function init() {
-    await loadComponents();
-
+    // 1. Init User State early to prevent flickering
     const user = await getUser();
-    updateNavbarAuth(user);
+
+    // 2. Load Navbar/Footer
+    await loadComponents(user);
 
     await loadCart(user);
     updateNavbarCartCount(getCartCount());
@@ -55,13 +57,13 @@ async function handleSubmit(e) {
 
     // 1. Basic Validation
     if (!email || !message) {
-        showToast('Por favor completa todos los campos.', 'error');
+        showToast(i18n.t('auth.fill_all'), 'error');
         return;
     }
 
     // 2. Length Validation (Double check)
     if (message.length > 500) {
-        showToast('El mensaje es demasiado largo. Por favor redúcelo a 500 caracteres.', 'error');
+        showToast(i18n.t('msg.message_too_long'), 'error');
         return;
     }
 
@@ -74,7 +76,7 @@ async function handleSubmit(e) {
     const submitBtn = document.querySelector('button[type="submit"]');
     const originalBtnText = submitBtn.innerHTML;
     submitBtn.disabled = true;
-    submitBtn.innerHTML = 'Enviando... <i data-lucide="loader-2" class="spin"></i>';
+    submitBtn.innerHTML = `${i18n.t('msg.sending')} <i data-lucide="loader-2" class="spin"></i>`;
 
     try {
         const { supabase } = await import('./api.js');
@@ -88,13 +90,13 @@ async function handleSubmit(e) {
 
         if (error) throw error;
 
-        showToast('¡Mensaje enviado correctamente! Nos pondremos en contacto contigo pronto.', 'success');
+        showToast(i18n.t('msg.message_sent'), 'success');
         document.getElementById('contact-form').reset();
         document.getElementById('char-count').textContent = '0 / 500';
 
     } catch (err) {
         console.error('Error sending email:', err);
-        showToast('Hubo un error al enviar el mensaje. Por favor escríbenos a minifrancine@gmail.com.', 'error');
+        showToast(i18n.t('msg.send_error'), 'error');
     } finally {
         submitBtn.disabled = false;
         submitBtn.innerHTML = originalBtnText;

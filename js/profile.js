@@ -2,18 +2,14 @@
 import { loadComponents, updateNavbarAuth } from './components.js';
 import { getUser, getProfile, updateProfile, anonymizeUser, signOut } from './api.js';
 import { showToast } from './utils.js';
-import i18n from './i18n.js';
+import { i18n } from './i18n.js';
 
 async function init() {
-    await loadComponents();
-
+    // 1. Init User State early to prevent flickering
     const user = await getUser();
-    if (!user) {
-        window.location.href = 'login.html';
-        return;
-    }
 
-    updateNavbarAuth(user);
+    // 2. Load Navbar/Footer
+    await loadComponents(user);
 
     // Listen for state updates
     window.addEventListener('cart-updated', () => {
@@ -72,7 +68,7 @@ async function handleDeleteAccount(userId) {
     const confirmBtn = document.getElementById('confirm-delete-btn');
     const originalText = confirmBtn.innerHTML;
 
-    confirmBtn.innerHTML = `<i data-lucide="loader-2" class="animate-spin"></i> Eliminando...`;
+    confirmBtn.innerHTML = `<i data-lucide="loader-2" class="animate-spin"></i> ${i18n.t('btn.deleting')}`;
     confirmBtn.disabled = true;
     if (window.lucide) window.lucide.createIcons();
 
@@ -81,7 +77,7 @@ async function handleDeleteAccount(userId) {
 
     if (error) {
         console.error('Error deleting account:', error);
-        showToast('Error al eliminar cuenta. Intenta nuevamente.', 'error');
+        showToast(i18n.t('msg.delete_account_error'), 'error');
         confirmBtn.innerHTML = originalText;
         confirmBtn.disabled = false;
         return;
@@ -91,7 +87,7 @@ async function handleDeleteAccount(userId) {
     await signOut();
 
     // 3. Redirect
-    showToast('Tu cuenta ha sido eliminada.', 'success');
+    showToast(i18n.t('msg.account_deleted'), 'success');
     setTimeout(() => {
         window.location.href = 'index.html';
     }, 1500);

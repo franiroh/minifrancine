@@ -1,7 +1,7 @@
 
 import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js/+esm'
 import { getUser, signOut, fetchProducts, updateProduct } from './api.js';
-import { fetchAllOrders, fetchAdminStats, deleteProduct, archiveProduct, unarchiveProduct, fetchCategories, createCategory, updateCategory, deleteCategory } from './api.js';
+import { fetchAllOrders, fetchAdminStats, deleteProduct, archiveProduct, unarchiveProduct, fetchCategories, createCategory, updateCategory, deleteCategory, upsertCategoryTranslations, fetchCategoryTranslations } from './api.js';
 import { loadAdminMessages } from './admin-messages.js';
 import { initContent } from './admin-content.js';
 import { initI18nEditor } from './admin-i18n.js';
@@ -48,6 +48,9 @@ async function init() {
 
     // 4. Icons
     if (window.lucide) window.lucide.createIcons();
+
+    // 5. Setup Modal Handlers
+    document.getElementById('category-form').onsubmit = handleCategorySave;
 
     // 5. Date Filter Logic
     const dateStartEl = document.getElementById('date-start');
@@ -253,7 +256,7 @@ async function loadProducts() {
         categoryFilter.innerHTML = `
             <option value="">Todas las categorías (${products.length})</option>
             ${categories.map(cat => {
-            const count = products.filter(p => p.categoryId === cat.id).length;
+            const count = products.filter(p => p.categoryIds && p.categoryIds.includes(cat.id)).length;
             return `<option value="${cat.id}">${escapeHtml(cat.name)} (${count})</option>`;
         }).join('')}
         `;
@@ -307,7 +310,7 @@ function renderProductsTable(allProducts, selectedCategoryId, archiveStatus = 'a
 
     // Filter products by category
     let filteredProducts = selectedCategoryId
-        ? allProducts.filter(p => p.categoryId === parseInt(selectedCategoryId))
+        ? allProducts.filter(p => p.categoryIds && p.categoryIds.includes(parseInt(selectedCategoryId)))
         : allProducts;
 
     // Filter by archive status
@@ -416,7 +419,7 @@ function renderProductsTable(allProducts, selectedCategoryId, archiveStatus = 'a
                 <strong>${escapeHtml(p.title)}</strong>
                 ${p.archived ? '<br><span style="font-size: 11px; color: #9CA3AF;">📦 Archivado</span>' : ''}
             </td>
-            <td>${escapeHtml(p.category || 'Sin categoría')}</td>
+            <td>${p.categories && p.categories.length > 0 ? escapeHtml(p.categories.join(', ')) : 'Sin categoría'}</td>
             <td>
                 ${p.badge ? `<span class="product-card__badge" style="position:static; display:inline-block; font-size: 10px; padding: 2px 6px;">${escapeHtml(i18n.t('badge.' + getBadgeKey(p.badge)))}</span>` : '-'}
             </td>
@@ -512,27 +515,67 @@ async function loadCategories() {
     if (window.lucide) window.lucide.createIcons();
 
     // Wire up "Nueva Categoría" button
-    document.getElementById('btn-add-category').onclick = async () => {
-        const name = prompt('Nombre de la nueva categoría:');
-        if (!name || !name.trim()) return;
-        const { error } = await createCategory({ name: name.trim() });
-        if (error) {
-            alert('Error al crear categoría: ' + error.message);
+    document.getElementById('btn-add-category').onclick = () => openCategoryModal();
+}
+
+async function openCategoryModal(category = null) {
+    const modal = document.getElementById('category-modal');
+    const title = document.getElementById('category-modal-title');
+    const form = document.getElementById('category-form');
+
+    // Reset form
+    form.reset();
+    document.getElementById('category-id').value = category ? category.id : '';
+    title.textContent = category ? 'Editar Categoría' : 'Nueva Categoría';
+
+    if (category) {
+        // Fetch translations
+        const { data: translations } = await fetchCategoryTranslations(category.id);
+        document.getElementById('category-name-es').value = translations?.es || category.name || '';
+        document.getElementById('category-name-en').value = translations?.en || '';
+        document.getElementById('category-name-pt').value = translations?.pt || '';
+    }
+
+    modal.style.display = 'flex';
+}
+
+async function handleCategorySave(e) {
+    e.preventDefault();
+    const id = document.getElementById('category-id').value;
+    const nameEs = document.getElementById('category-name-es').value.trim();
+    const nameEn = document.getElementById('category-name-en').value.trim();
+    const namePt = document.getElementById('category-name-pt').value.trim();
+
+    if (!nameEs) return alert('El nombre en español es obligatorio');
+
+    const names = { es: nameEs, en: nameEn, pt: namePt };
+
+    try {
+        let categoryId = id;
+        if (id) {
+            // Update
+            const { error } = await updateCategory(id, { name: nameEs });
+            if (error) throw error;
         } else {
-            loadCategories();
+            // Create
+            const { data, error } = await createCategory({ name: nameEs });
+            if (error) throw error;
+            categoryId = data.id;
         }
-    };
+
+        // Save translations
+        const { error: transError } = await upsertCategoryTranslations(categoryId, names);
+        if (transError) throw transError;
+
+        document.getElementById('category-modal').style.display = 'none';
+        loadCategories();
+    } catch (error) {
+        alert('Error al guardar categoría: ' + error.message);
+    }
 }
 
 window.editCategoryHandler = async (id, currentName) => {
-    const name = prompt('Editar nombre de categoría:', currentName);
-    if (!name || !name.trim() || name.trim() === currentName) return;
-    const { error } = await updateCategory(id, { name: name.trim() });
-    if (error) {
-        alert('Error al actualizar categoría: ' + error.message);
-    } else {
-        loadCategories();
-    }
+    openCategoryModal({ id, name: currentName });
 };
 
 window.deleteCategoryHandler = async (id) => {

@@ -5,7 +5,11 @@ import { state, loadCart, getCartCount, loadFavorites, loadPurchases } from './s
 import { InfiniteScrollManager } from './utils.js';
 
 async function init() {
-    await loadComponents();
+    // 1. Init User State early to prevent flickering
+    const user = await getUser();
+
+    // 2. Load Navbar/Footer
+    await loadComponents(user);
 
     // Show skeletons immediately
     const grid = document.getElementById('favorites-grid');
@@ -17,13 +21,10 @@ async function init() {
     }
 
     // Auth Check
-    const user = await getUser();
     if (!user) {
         window.location.href = 'login.html';
         return;
     }
-
-    updateNavbarAuth(user);
     await loadCart(user);
     updateNavbarCartCount(getCartCount());
     await loadFavorites(user);

@@ -16,6 +16,7 @@
     <link rel="stylesheet" href="css/main.css">
     <link rel="stylesheet" href="css/components.css">
     <link rel="stylesheet" href="css/home.css">
+    <link rel="stylesheet" href="css/fixes.css">
 </head>
 <script>
     // Immediate View State Handling to prevent Flash of Incorrect Content
@@ -25,6 +26,8 @@
             document.documentElement.setAttribute('data-view', 'category');
         } else if (params.get('tag')) {
             document.documentElement.setAttribute('data-view', 'tag');
+        } else if (params.get('sale') === 'true') {
+            document.documentEletAttribute('data-view', 'sale');
         }
     })();
 </script>
@@ -43,7 +46,8 @@
         display: none !important;
     }
 
-    html[data-view="category"] #category-header {
+    html[data-view="category"] #category-header,
+    html[data-view="sale"] #category-header {
         display: block !important;
     }
 
@@ -53,7 +57,7 @@
     }
 </style>
 
-<body class="loading-i18n">
+<body>
 
     <div class="page">
         <div id="navbar-placeholder"></div>
@@ -63,16 +67,15 @@
         <!-- Category Header (Hidden by default, shown via JS if category selected) -->
         <section id="category-header" class="category-header" style="display: none;">
             <h1 id="category-title"
-                style="font-family: 'Bricolage Grotesque', serif; font-size: 36px; font-weight: 800; margin-bottom: 8px;"
-                data-i18n="category.title">
-                Category</h1>
-            <p style="color: #6B7280;" data-i18n="category.subtitle">Explore our curated collection.</p>
+                style="font-family: 'Bricolage Grotesque', serif; font-size: 36px; font-weight: 800; margin-bottom: 8px;">
+            </h1>
+            <p style="color: #6B7280;" data-i18n="category.subtitle"></p>
         </section>
 
         <section class="catalog" style="padding-top: 24px; min-height: 60vh;">
             <div class="catalog__header">
-                <h1 id="page-title" class="catalog__title" data-i18n="catalog.full_title">Catálogo Completo</h1>
-                <span id="result-count" class="catalog__count" data-i18n="common.loading">Cargando...</span>
+                <h1 id="page-title" class="catalog__title" data-i18n="catalog.full_title"></h1>
+                <span id="result-count" class="catalog__count" data-i18n="common.loading"></span>
             </div>
 
             <div class="catalog__filters" id="tag-filters"

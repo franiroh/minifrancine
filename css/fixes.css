@@ -1,0 +1,28 @@
+/* --- Grid Fix --- */
+.product-grid {
+    display: grid !important;
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)) !important;
+    gap: 32px !important;
+    width: 100% !important;
+}
+
+@media (max-width: 768px) {
+    .product-grid {
+        grid-template-columns: repeat(2, 1fr) !important;
+        gap: 16px !important;
+    }
+}
+
+/* --- Navbar Hover Fix --- */
+@media (min-width: 1025px) {
+
+    .navbar__menu-item:hover .navbar__dropdown,
+    .navbar__account:hover .navbar__dropdown,
+    #lang-menu:hover .navbar__dropdown {
+        display: block !important;
+        opacity: 1 !important;
+        transform: translateY(0) !important;
+        pointer-events: auto !important;
+        visibility: visible !important;
+    }
+}

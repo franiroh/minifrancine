@@ -7,10 +7,11 @@ import { showToast } from './utils.js';
 import i18n from './i18n.js';
 
 async function init() {
-    await loadComponents();
-
+    // 1. Init User State early to prevent flickering
     const user = await getUser();
-    updateNavbarAuth(user);
+
+    // 2. Load Navbar/Footer
+    await loadComponents(user);
 
     // Listen for state updates
     window.addEventListener('cart-updated', () => {
@@ -98,7 +99,7 @@ function setupForms() {
             const email = document.getElementById('login-email').value;
             const password = document.getElementById('login-password').value;
             if (!email || !password) {
-                showToast('Completa todos los campos', 'error');
+                showToast(i18n.t('auth.fill_all'), 'error');
                 return;
             }
 
@@ -108,7 +109,7 @@ function setupForms() {
             const { error } = await signIn(email, password);
 
             if (error) {
-                showToast('Error: ' + error.message, 'error');
+                showToast(i18n.t('error.prefix') + error.message, 'error');
                 loginBtn.textContent = i18n.t('auth.btn_login');
                 loginBtn.disabled = false;
             } else {
@@ -128,7 +129,7 @@ function setupForms() {
 
                 if (!nameInput || !emailInput || !passInput) {
                     console.error('Missing form elements');
-                    showToast('Error interno del formulario', 'error');
+                    showToast(i18n.t('auth.internal_error'), 'error');
                     return;
                 }
 
@@ -169,7 +170,7 @@ function setupForms() {
                     if (error.status === 429 || error.message.includes('429') || error.message.includes('rate limit')) {
                         showToast(i18n.t('auth.rate_limit'), 'error');
                     } else {
-                        showToast('Error: ' + error.message, 'error');
+                        showToast(i18n.t('error.prefix') + error.message, 'error');
                     }
                     registerBtn.textContent = i18n.t('auth.btn_register');
                     registerBtn.disabled = false;
@@ -179,8 +180,8 @@ function setupForms() {
                 }
             } catch (err) {
                 console.error('Unexpected error during registration:', err);
-                showToast('Error inesperado: ' + err.message, 'error');
-                registerBtn.textContent = 'Registrarse';
+                showToast(i18n.t('error.unexpected') + err.message, 'error');
+                registerBtn.textContent = i18n.t('auth.btn_register');
                 registerBtn.disabled = false;
             }
         });
@@ -237,7 +238,7 @@ function setupPasswordReset() {
             const { error } = await resetPassword(email);
 
             if (error) {
-                messageDiv.textContent = 'Error: ' + error.message;
+                messageDiv.textContent = i18n.t('error.prefix') + error.message;
                 messageDiv.className = 'error';
                 submitBtn.disabled = false;
                 submitBtn.innerHTML = `<span data-i18n="auth.send_reset_link">${i18n.t('auth.send_reset_link')}</span>`;

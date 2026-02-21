@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>MiniFrancine — Mensajes</title>
+    <title data-i18n="messages.page_title"></title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link
@@ -23,8 +23,8 @@
         <div id="navbar-placeholder"></div>
 
         <section class="messages-header">
-            <h1 class="messages-title">Mis Mensajes</h1>
-            <p class="messages-subtitle">Comunícate directamente con nosotros para resolver tus dudas.</p>
+            <h1 class="messages-title" data-i18n="messages.title"></h1>
+            <p class="messages-subtitle" data-i18n="messages.subtitle"></p>
         </section>
 
         <section class="messages-container">
@@ -32,7 +32,7 @@
             <aside class="messages-sidebar">
                 <div class="sidebar-header">
                     <button class="btn btn--primary btn-new-message" id="btn-new-conversation">
-                        <i data-lucide="plus"></i> Nuevo Mensaje
+                        <i data-lucide="plus"></i> <span data-i18n="messages.btn_new"></span>
                     </button>
                 </div>
                 <div class="conversations-list" id="conversations-list">
@@ -48,7 +48,7 @@
                 <div class="empty-chat-state">
                     <i data-lucide="message-square"
                         style="width: 48px; height: 48px; margin-bottom: 16px; opacity: 0.5;"></i>
-                    <p>Selecciona una conversación o inicia una nueva.</p>
+                    <p data-i18n="messages.empty_state"></p>
                 </div>
             </main>
         </section>
@@ -59,21 +59,22 @@
     <!-- New Conversation Modal -->
     <div id="new-conversation-modal" class="modal hidden">
         <div class="modal-content">
-            <h2 style="font-family: 'Bricolage Grotesque'; margin-bottom: 20px;">Nuevo Mensaje</h2>
+            <h2 style="font-family: 'Bricolage Grotesque'; margin-bottom: 20px;" data-i18n="messages.modal_title"></h2>
             <form id="new-conversation-form">
                 <div class="form-group">
-                    <label class="form-label">Asunto</label>
+                    <label class="form-label" data-i18n="messages.label_subject"></label>
                     <input type="text" id="new-subject" class="form-input" placeholder="Ej: Pregunta sobre pedido"
                         data-i18n-placeholder="auth.placeholder_subject" required>
                 </div>
                 <div class="form-group">
-                    <label class="form-label">Mensaje</label>
+                    <label class="form-label" data-i18n="messages.label_message"></label>
                     <textarea id="new-message" class="form-input" rows="4" placeholder="Escribe tu mensaje aquí..."
                         data-i18n-placeholder="auth.placeholder_message" required style="resize: vertical;"></textarea>
                 </div>
                 <div style="display: flex; gap: 10px; justify-content: flex-end; margin-top: 20px;">
-                    <button type="button" class="btn btn--outline" id="btn-cancel-new">Cancelar</button>
-                    <button type="submit" class="btn btn--primary">Enviar</button>
+                    <button type="button" class="btn btn--outline" id="btn-cancel-new"
+                        data-i18n="messages.btn_cancel"></button>
+                    <button type="submit" class="btn btn--primary" data-i18n="messages.btn_send"></button>
                 </div>
             </form>
         </div>

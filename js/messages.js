@@ -3,20 +3,23 @@ import { loadComponents, updateNavbarAuth, updateNavbarCartCount } from './compo
 import { getUser, supabase } from './api.js';
 import { loadCart, getCartCount } from './state.js';
 import { escapeHtml } from './utils.js';
+import { i18n } from './i18n.js';
 
 let currentUser = null;
 let currentConversationId = null;
 let conversations = [];
 
 async function init() {
-    await loadComponents();
-
+    // 1. Init User State early to prevent flickering
     currentUser = await getUser();
+
+    // 2. Load Navbar/Footer
+    await loadComponents(currentUser);
+
     if (!currentUser) {
         window.location.href = 'login.html';
         return;
     }
-    updateNavbarAuth(currentUser);
 
     // Listen for state updates
     window.addEventListener('cart-updated', () => {
@@ -75,7 +78,7 @@ async function loadConversations() {
 
     if (error) {
         console.error('Error fetching conversations:', error);
-        listContainer.innerHTML = '<p style="text-align:center; padding:20px; color:red;">Error al cargar mensajes. Asegúrate de que las tablas estén credas en la base de datos.</p>';
+        listContainer.innerHTML = `<p style="text-align:center; padding:20px; color:red;">${i18n.t('messages.error_loading')}</p>`;
         return;
     }
 
@@ -86,13 +89,13 @@ async function loadConversations() {
 function renderConversationsList() {
     const listContainer = document.getElementById('conversations-list');
     if (conversations.length === 0) {
-        listContainer.innerHTML = '<p style="text-align:center; padding:20px;">No tienes mensajes.</p>';
+        listContainer.innerHTML = `<p style="text-align:center; padding:20px;">${i18n.t('messages.no_messages')}</p>`;
         return;
     }
 
     listContainer.innerHTML = conversations.map(conv => `
         <div class="conversation-item ${currentConversationId === conv.id ? 'active' : ''}" onclick="window.selectConversation('${conv.id}')">
-            <div class="conversation-subject">${escapeHtml(conv.subject || 'Sin asunto')}</div>
+            <div class="conversation-subject">${escapeHtml(conv.subject || i18n.t('messages.no_subject'))}</div>
             <div class="conversation-meta">
                 <span>${new Date(conv.updated_at).toLocaleDateString()}</span>
                 <span style="text-transform: capitalize;">${escapeHtml(conv.status)}</span>
@@ -120,11 +123,11 @@ async function loadChatArea(conversationId) {
             <span style="font-size: 12px; font-weight: normal; color: #6b7280;">#${conversationId.slice(0, 8)}</span>
         </div>
         <div class="chat-messages" id="messages-container">
-            <div style="text-align:center; padding:20px;"><i data-lucide="loader-2" class="animate-spin"></i> Cargando...</div>
+            <div style="text-align:center; padding:20px;"><i data-lucide="loader-2" class="animate-spin"></i> ${i18n.t('messages.chat_loading')}</div>
         </div>
         <div class="chat-input-area">
             <form class="chat-input-form" id="reply-form">
-                <input type="text" class="chat-input" placeholder="Escribe una respuesta..." id="reply-input" required>
+                <input type="text" class="chat-input" placeholder="${i18n.t('messages.chat_placeholder')}" id="reply-input" required>
                 <button type="submit" class="btn btn--primary">
                     <i data-lucide="send"></i>
                 </button>
