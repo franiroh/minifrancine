@@ -407,10 +407,14 @@
         margin: 0;
     }
 
-    .detail__title {
-        order: -1;
-        font-size: 28px;
-        margin: 0;
+    .detail__actions {
+        flex-direction: column;
+        gap: 12px;
+    }
+
+    .detail__actions .btn {
+        width: 100%;
+        flex: none;
     }
 }
 
