@@ -108,6 +108,10 @@ input {
 
 #navbar-placeholder {
     min-height: 72px;
+    position: sticky;
+    top: 0;
+    z-index: 1000;
+    background: var(--color-surface);
 }
 
 #footer-placeholder {
