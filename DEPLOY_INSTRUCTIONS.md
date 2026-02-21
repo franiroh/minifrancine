@@ -18,7 +18,7 @@ Estás en: https://supabase.com/dashboard/project/dxqsdzktytehycpnrbtn/functions
 ### Paso 3: Pegar y desplegar
 1. En el editor del Dashboard de Supabase, **borra** cualquier código de ejemplo
 2. **Pega** el código que copiaste (Ctrl + V)
-3. **Verifica** que la URL del botón sea: `https://franiroh.github.io/minifrancine/mis-disenos.html`
+3. **Verifica** que la URL del botón sea: `https://minifrancine.com/mis-disenos.html`
 4. Haz clic en **"Deploy"** o **"Save"**
 
 ### Paso 4: Verificar variables de entorno

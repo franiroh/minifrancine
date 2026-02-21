@@ -81,7 +81,7 @@ function createOrderConfirmationHTML(order: OrderEmailData['order']): string {
             </div>
             
             <div style="text-align: center; margin: 30px 0;">
-                <a href="https://franiroh.github.io/minifrancine/mis-disenos.html" 
+                <a href="https://minifrancine.com/mis-disenos.html" 
                    style="display: inline-block; background-color: #FF6B9D; color: white; text-decoration: none; padding: 14px 32px; border-radius: 8px; font-weight: 600; font-size: 16px;">
                     Descargar mis diseños
                 </a>
