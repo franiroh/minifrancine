@@ -166,7 +166,7 @@ export const i18n = {
             'nav.catalog': { es: 'Categorías', en: 'Categories', pt: 'Categorias' },
             'nav.new': { es: 'Novedades', en: 'New', pt: 'Novidades' },
             'nav.sale': { es: 'Ofertas', en: 'Sale', pt: 'Ofertas' },
-            'nav.subtitle': { es: 'Diseños de Bordado ITH', en: 'Embroidery ITH Files', pt: 'Desenhos de Bordado ITH' },
+            'nav.subtitle': { es: 'Embroidery Downloads', en: 'Embroidery Downloads', pt: 'Embroidery Downloads' },
             'nav.search_placeholder': { es: 'Buscar diseños...', en: 'Search designs...', pt: 'Buscar desenhos...' },
             'nav.all_categories': { es: 'Ver todas', en: 'See all', pt: 'Ver todas' },
             'nav.faq': { es: 'FAQ', en: 'FAQ', pt: 'FAQ' },
