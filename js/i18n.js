@@ -38,6 +38,17 @@ export const i18n = {
             'hero.badge': { es: 'Más de 5,000 diseños disponibles', en: 'Over 5,000 designs available', pt: 'Mais de 5.000 designs disponíveis' },
             'hero.title': { es: 'Diseños de Bordado Profesionales', en: 'Professional Embroidery Designs', pt: 'Desenhos de Bordado Profissionais' },
             'hero.description': { es: 'Archivos digitales listos para tu máquina. Formatos DST, PES, JEF, VP3 y más. Descarga instantánea.', en: 'Digital files ready for your embroidery machine. DST, PES, JEF, VP3 formats and more. Instant download.', pt: 'Arquivos digitais prontos para sua máquina. Formatos DST, PES, JEF, VP3 e mais. Download instantâneo.' },
+            'home.promos.title': { es: 'Ofertas Especiales', en: 'Special Offers', pt: 'Ofertas Especiais' },
+            'home.promos.welcome_title': { es: '20% dcto. Primera Compra', en: '20% OFF First Order', pt: '20% desc. Primeira Compra' },
+            'home.promos.welcome_desc': { es: 'Usa el código <b>WELCOME20</b> en tu primer pedido.', en: 'Use code <b>WELCOME20</b> on your first purchase.', pt: 'Use o código <b>WELCOME20</b> no seu primeiro pedido.' },
+            'home.promos.bulk_title': { es: '50% dcto. por Volumen', en: '50% Bulk Discount', pt: '50% desc. por Volume' },
+            'home.promos.bulk_desc': { es: 'Lleva 10 o más diseños y obtén un 50% de descuento. Usa el código <b>BULK50</b>.', en: 'Get 50% OFF when you buy 10 or more designs. Use code <b>BULK50</b>.', pt: 'Leve 10 ou mais designs e ganhe 50% de desconto. Use o código <b>BULK50</b>.' },
+            'home.promos.copy_code': { es: 'Copiar Código', en: 'Copy Code', pt: 'Copiar Código' },
+            'home.promos.bar_text': {
+                es: '<b>WELCOME20</b>: 20% dcto en tu 1ra compra &nbsp;&nbsp;&nbsp;&nbsp; | &nbsp;&nbsp;&nbsp;&nbsp; <b>BULK50</b>: 50% dcto llevando 10+ diseños',
+                en: '<b>WELCOME20</b>: 20% OFF 1st order &nbsp;&nbsp;&nbsp;&nbsp; | &nbsp;&nbsp;&nbsp;&nbsp; <b>BULK50</b>: 50% OFF on 10+ designs',
+                pt: '<b>WELCOME20</b>: 20% desc na 1ª compra &nbsp;&nbsp;&nbsp;&nbsp; | &nbsp;&nbsp;&nbsp;&nbsp; <b>BULK50</b>: 50% desc em 10+ designs'
+            },
 
             'cart.coupon_notice': { es: 'Los cupones y descuentos se aplican en el checkout', en: 'Coupons and discounts are applied at checkout', pt: 'Cupons e descontos são aplicados no checkout' },
 

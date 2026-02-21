@@ -22,104 +22,112 @@ export const loadComponents = async () => {
 
     navbarPlaceholder.innerHTML = `
     <header class="navbar" id="main-navbar">
-      <div class="navbar__left">
-        <button class="navbar__toggle" id="mobile-menu-toggle">
-            <i data-lucide="menu"></i>
-        </button>
-        <i data-lucide="scissors" class="navbar__logo-icon"></i>
-        <div class="navbar__brand-wrap">
-            <a href="index.html" class="navbar__logo-text">MiniFrancine</a>
-            <span class="navbar__subtitle" data-i18n="nav.subtitle">Embroidery ITH Files</span>
-        </div>
-      </div>
-      <div class="navbar__links">
-        <div class="navbar__search navbar__search--mobile">
-            <form class="navbar__search-form" id="mobile-search-form">
-                <i data-lucide="search" class="navbar__search-icon" style="width:16px;height:16px;color:#9CA3AF;margin-right:8px;"></i>
-                <input type="text" class="navbar__search-input" placeholder="Buscar..." id="mobile-search-input" data-i18n-placeholder="nav.search_placeholder">
-                <button type="submit" class="hidden"></button>
-            </form>
-        </div>
-
-        <a href="index.html" class="navbar__link ${window.location.pathname.includes('index.html') || window.location.pathname === '/' ? 'navbar__link--active' : ''}" data-i18n="nav.home">Inicio</a>
-        
-        <div class="navbar__menu-item">
-            <a href="categories.html" class="navbar__link ${window.location.pathname.includes('categories.html') ? 'navbar__link--active' : ''}" style="display:flex;align-items:center;gap:4px;">
-                <span data-i18n="nav.catalog">Categorías</span> <i data-lucide="chevron-down" style="width:14px;height:14px;"></i>
-            </a>
-            <div class="navbar__dropdown">
-                <a href="categories.html" class="navbar__dropdown-item" style="font-weight:700; color:var(--primary-color);" data-i18n="nav.all_categories">Ver todas</a>
-                <div class="navbar__dropdown-divider"></div>
-                ${categoriesList}
-            </div>
-        </div>
-
-        <a href="catalog.html?sort=newest" class="navbar__link ${window.location.search.includes('sort=newest') ? 'navbar__link--active' : ''}" data-i18n="nav.new">Novedades</a>
-        <a href="catalog.html?sale=true" class="navbar__link ${window.location.search.includes('sale=true') ? 'navbar__link--active' : ''}" data-i18n="nav.sale">Ofertas</a>
-        <a href="faq.html" class="navbar__link" data-i18n="nav.faq">FAQ</a>
-      </div>
-      <div class="navbar__right">
-        <!-- Language Switcher -->
-        <!-- Language Switcher -->
-        <div class="navbar__menu-item" id="lang-menu" style="margin-right:8px;">
-            <button class="navbar__link" style="display:flex;align-items:center;gap:6px;background:none;border:none;cursor:pointer;padding:0;">
-                <img src="https://flagcdn.com/w20/${i18n.lang === 'en' ? 'us' : i18n.lang}.png" class="navbar__flag" alt="${i18n.lang}">
-                <i data-lucide="chevron-down" style="width:14px;height:14px;opacity:0.5;"></i>
-            </button>
-            <div class="navbar__dropdown" style="min-width:140px; right:0; left:auto;">
-                <button class="navbar__dropdown-item lang-btn" data-lang="es" style="width:100%;text-align:left;">
-                    <img src="https://flagcdn.com/w20/es.png" class="navbar__flag" alt="ES" style="margin-right:8px;"> Español
-                </button>
-                <button class="navbar__dropdown-item lang-btn" data-lang="en" style="width:100%;text-align:left;">
-                    <img src="https://flagcdn.com/w20/us.png" class="navbar__flag" alt="EN" style="margin-right:8px;"> English
-                </button>
-                <button class="navbar__dropdown-item lang-btn" data-lang="pt" style="width:100%;text-align:left;">
-                    <img src="https://flagcdn.com/w20/br.png" class="navbar__flag" alt="PT" style="margin-right:8px;"> Português
-                </button>
-            </div>
-        </div>
-
-        <div class="navbar__search">
-            <form class="navbar__search-form" id="nav-search-form">
-                <i data-lucide="search" class="navbar__search-icon" style="width:16px;height:16px;color:#9CA3AF;margin-right:8px;"></i>
-                <input type="text" class="navbar__search-input" placeholder="Buscar..." id="nav-search-input" data-i18n-placeholder="nav.search_placeholder">
-                <button type="submit" class="hidden"></button>
-            </form>
-        </div>
-        <div class="navbar__cart-wrap" onclick="window.location.href='cart.html'">
-          <i data-lucide="shopping-cart" class="navbar__icon"></i>
-          <span class="navbar__cart-badge">${lastCount}</span>
-        </div>
-        <div class="navbar__account" id="navbar-account">
-          <button class="navbar__user-btn" id="navbar-user-btn" onclick="window.location.href='login.html'">
-            <i data-lucide="user"></i>
-            <span id="navbar-user-text" data-i18n="nav.login">Login</span>
-            <i data-lucide="chevron-down" id="navbar-user-arrow" style="width: 16px; height: 16px; margin-left: -2px; display: none;"></i>
+      <div class="navbar__main">
+        <div class="navbar__left">
+          <button class="navbar__toggle" id="mobile-menu-toggle">
+              <i data-lucide="menu"></i>
           </button>
-          <div class="navbar__dropdown" id="navbar-dropdown">
-            <a href="profile.html" class="navbar__dropdown-item">
-              <i data-lucide="user"></i> <span data-i18n="nav.profile">Mi Perfil</span>
-            </a>
-            <a href="favorites.html" class="navbar__dropdown-item">
-              <i data-lucide="heart"></i> <span data-i18n="nav.favorites">Mis Favoritos</span>
-            </a>
-            <a href="mis-disenos.html" class="navbar__dropdown-item">
-              <i data-lucide="palette"></i> <span data-i18n="nav.my_designs">Mis Diseños</span>
-            </a>
-            <a href="orders.html" class="navbar__dropdown-item">
-              <i data-lucide="receipt"></i> <span data-i18n="nav.my_orders">Mis Pedidos</span>
-            </a>
-            <a href="messages.html" class="navbar__dropdown-item">
-              <i data-lucide="message-circle"></i> <span data-i18n="nav.messages">Mensajes</span>
-            </a>
-            <div class="navbar__dropdown-divider"></div>
-            <button class="navbar__dropdown-item navbar__dropdown-item--danger" id="navbar-logout-btn">
-              <i data-lucide="log-out"></i> <span data-i18n="nav.logout">Cerrar sesión</span>
+          <i data-lucide="scissors" class="navbar__logo-icon"></i>
+          <div class="navbar__brand-wrap">
+              <a href="index.html" class="navbar__logo-text">MiniFrancine</a>
+              <span class="navbar__subtitle" data-i18n="nav.subtitle">Embroidery ITH Files</span>
+          </div>
+        </div>
+
+        <div class="navbar__links">
+          <a href="index.html" class="navbar__link ${window.location.pathname.includes('index.html') || window.location.pathname === '/' ? 'navbar__link--active' : ''}" data-i18n="nav.home">Inicio</a>
+          
+          <div class="navbar__menu-item">
+              <a href="categories.html" class="navbar__link ${window.location.pathname.includes('categories.html') ? 'navbar__link--active' : ''}" style="display:flex;align-items:center;gap:4px;">
+                  <span data-i18n="nav.catalog">Categorías</span> <i data-lucide="chevron-down" style="width:14px;height:14px;"></i>
+              </a>
+              <div class="navbar__dropdown">
+                  <a href="categories.html" class="navbar__dropdown-item" style="font-weight:700; color:var(--primary-color);" data-i18n="nav.all_categories">Ver todas</a>
+                  <div class="navbar__dropdown-divider"></div>
+                  ${categoriesList}
+              </div>
+          </div>
+
+          <a href="catalog.html?sort=newest" class="navbar__link ${window.location.search.includes('sort=newest') ? 'navbar__link--active' : ''}" data-i18n="nav.new">Novedades</a>
+          <a href="catalog.html?sale=true" class="navbar__link ${window.location.search.includes('sale=true') ? 'navbar__link--active' : ''}" data-i18n="nav.sale">Ofertas</a>
+          <a href="faq.html" class="navbar__link" data-i18n="nav.faq">FAQ</a>
+        </div>
+
+        <div class="navbar__right">
+          <!-- Language Switcher -->
+          <div class="navbar__menu-item navbar__lang" id="lang-menu" style="margin-right:8px;">
+            <button class="navbar__lang-btn">
+                <img src="https://flagcdn.com/w20/${i18n.lang === 'en' ? 'us' : i18n.lang}.png" class="navbar__flag" alt="${i18n.lang}">
+                <i data-lucide="chevron-down"></i>
             </button>
+              <div class="navbar__dropdown" style="min-width:140px; right:0; left:auto;">
+                  <button class="navbar__dropdown-item lang-btn" data-lang="es" style="width:100%;text-align:left;">
+                      <img src="https://flagcdn.com/w20/es.png" class="navbar__flag" alt="ES" style="margin-right:8px;"> Español
+                  </button>
+                  <button class="navbar__dropdown-item lang-btn" data-lang="en" style="width:100%;text-align:left;">
+                      <img src="https://flagcdn.com/w20/us.png" class="navbar__flag" alt="EN" style="margin-right:8px;"> English
+                  </button>
+                  <button class="navbar__dropdown-item lang-btn" data-lang="pt" style="width:100%;text-align:left;">
+                      <img src="https://flagcdn.com/w20/br.png" class="navbar__flag" alt="PT" style="margin-right:8px;"> Português
+                  </button>
+              </div>
+          </div>
+
+          <div class="navbar__search">
+              <form class="navbar__search-form" id="nav-search-form">
+                  <i data-lucide="search" class="navbar__search-icon" style="width:16px;height:16px;color:#9CA3AF;margin-right:8px;"></i>
+                  <input type="text" class="navbar__search-input" placeholder="Buscar..." id="nav-search-input" data-i18n-placeholder="nav.search_placeholder">
+                  <button type="submit" class="hidden"></button>
+              </form>
+          </div>
+          <div class="navbar__cart-wrap" onclick="window.location.href='cart.html'">
+            <i data-lucide="shopping-cart" class="navbar__icon"></i>
+            <span class="navbar__cart-badge">${lastCount}</span>
+          </div>
+          <div class="navbar__account" id="navbar-account">
+            <button class="navbar__user-btn" id="navbar-user-btn" onclick="window.location.href='login.html'">
+              <i data-lucide="user"></i>
+              <span id="navbar-user-text" data-i18n="nav.login">Login</span>
+              <i data-lucide="chevron-down" id="navbar-user-arrow" style="width: 16px; height: 16px; margin-left: -2px; display: none;"></i>
+            </button>
+            <div class="navbar__dropdown" id="navbar-dropdown">
+              <a href="profile.html" class="navbar__dropdown-item">
+                <i data-lucide="user"></i> <span data-i18n="nav.profile">Mi Perfil</span>
+              </a>
+              <a href="favorites.html" class="navbar__dropdown-item">
+                <i data-lucide="heart"></i> <span data-i18n="nav.favorites">Mis Favoritos</span>
+              </a>
+              <a href="mis-disenos.html" class="navbar__dropdown-item">
+                <i data-lucide="palette"></i> <span data-i18n="nav.my_designs">Mis Diseños</span>
+              </a>
+              <a href="orders.html" class="navbar__dropdown-item">
+                <i data-lucide="receipt"></i> <span data-i18n="nav.my_orders">Mis Pedidos</span>
+              </a>
+              <a href="orders.html" class="navbar__dropdown-item">
+                <i data-lucide="message-circle"></i> <span data-i18n="nav.messages">Mensajes</span>
+              </a>
+              <div class="navbar__dropdown-divider"></div>
+              <button class="navbar__dropdown-item navbar__dropdown-item--danger" id="navbar-logout-btn">
+                <i data-lucide="log-out"></i> <span data-i18n="nav.logout">Cerrar sesión</span>
+              </button>
+            </div>
           </div>
         </div>
       </div>
+
+      <div class="navbar__mobile-search">
+          <form class="navbar__search-form" id="mobile-search-form">
+              <i data-lucide="search" class="navbar__search-icon" style="width:16px;height:16px;color:#9CA3AF;margin-right:8px;"></i>
+              <input type="text" class="navbar__search-input" placeholder="Buscar..." id="mobile-search-input" data-i18n-placeholder="nav.search_placeholder">
+              <button type="submit" class="hidden"></button>
+          </form>
+      </div>
     </header>
+    <div class="promo-bar" id="promo-bar">
+      <div class="promo-bar__content" data-i18n="home.promos.bar_text">
+        ${i18n.t('home.promos.bar_text')}
+      </div>
+    </div>
         `;
   }
 
@@ -216,7 +224,7 @@ export const loadComponents = async () => {
   // Special handling for language menu button which is a child of the menu-item
   const langMenu = document.getElementById('lang-menu');
   if (langMenu) {
-    const langBtn = langMenu.querySelector('.navbar__link');
+    const langBtn = langMenu.querySelector('.navbar__lang-btn');
     if (langBtn) {
       langBtn.onclick = (e) => {
         e.stopPropagation();
