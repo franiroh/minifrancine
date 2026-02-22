@@ -7,6 +7,17 @@ const supabaseUrl = 'https://dxqsdzktytehycpnrbtn.supabase.co'
 const supabaseKey = 'sb_publishable_crjG8THHPXfnLrtQityLWg_7pLdQPhG'
 export const supabase = createClient(supabaseUrl, supabaseKey)
 
+// Global Password Recovery Handling
+// If a user lands on ANY page with a recovery token, redirect them to the reset page
+supabase.auth.onAuthStateChange((event) => {
+    if (event === 'PASSWORD_RECOVERY' && !window.location.pathname.includes('reset-password.html')) {
+        console.log('Recovery event detected, redirecting to reset-password.html');
+        // Preserve hash if it exists (contains the access token)
+        const hash = window.location.hash;
+        window.location.href = 'reset-password.html' + hash;
+    }
+});
+
 export async function fetchProducts({ publishedOnly = false, tag = null, search = null, sort = null, badge = null, includeArchived = false } = {}) {
     let query = supabase
         .from('products')

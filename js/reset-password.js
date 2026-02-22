@@ -1,6 +1,6 @@
 
 import { loadComponents, updateNavbarAuth, updateNavbarCartCount } from './components.js';
-import { updatePassword, getUser } from './api.js';
+import { updatePassword, getUser, onAuthStateChange } from './api.js';
 import { loadCart, getCartCount } from './state.js';
 import { showToast } from './utils.js';
 import { i18n } from './i18n.js';
@@ -23,14 +23,14 @@ async function init() {
     // 3. If no user, wait for PASSWORD_RECOVERY event (Supabase processes hash fragment)
     if (!user) {
         console.log('No current user, waiting for auth recovery state change...');
-        const { data: { subscription } } = await import('./api.js').then(m => m.onAuthStateChange(async (event, session) => {
+        const { data: { subscription } } = onAuthStateChange(async (event, session) => {
             if (event === 'PASSWORD_RECOVERY' || event === 'SIGNED_IN') {
                 console.log('Auth event caught:', event);
                 subscription.unsubscribe();
                 setupPasswordUpdate();
                 if (window.lucide) window.lucide.createIcons();
             }
-        }));
+        });
 
         // Fail-safe timeout
         setTimeout(async () => {
