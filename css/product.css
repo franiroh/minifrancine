@@ -221,12 +221,25 @@
     text-transform: capitalize;
     text-decoration: none;
     /* For links */
-    transition: background 0.2s, color 0.2s;
+    transition: all 0.2s ease;
 }
 
 .detail__tag:hover {
     background: var(--color-gray-lighter);
     color: var(--color-foreground);
+}
+
+.detail__tag-category {
+    background: transparent !important;
+    color: var(--primary-color) !important;
+    padding: 0 4px;
+    font-weight: 600;
+    border-radius: 0;
+}
+
+.detail__tag-category:hover {
+    color: var(--primary-hover) !important;
+    text-decoration: underline !important;
 }
 
 .detail__price {
@@ -430,6 +443,7 @@
         padding: 32px 20px;
     }
 }
+
 /* --- Related Products --- */
 .related-products {
     padding: 32px 80px 48px;

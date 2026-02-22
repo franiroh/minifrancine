@@ -199,7 +199,7 @@ async function renderProduct() {
             const transKey = `category.${catId}`;
             const translatedCat = i18n.t(transKey);
             const categoryLabel = translatedCat === transKey ? catName : translatedCat;
-            return `<a class="detail__tag detail__tag-category" href="catalog.html?category=${encodeURIComponent(catName)}" style="color:inherit; text-decoration:none; transition:opacity 0.2s;">${escapeHtml(categoryLabel)}</a>`;
+            return `<a class="detail__tag detail__tag-category" href="catalog.html?category=${encodeURIComponent(catName)}">${escapeHtml(categoryLabel)}</a>`;
         }).join('');
 
         catEl.innerHTML = categoryLinksHTML;
