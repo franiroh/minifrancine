@@ -216,7 +216,7 @@ export const loadComponents = async (user = null) => {
               <a href="orders.html" class="navbar__dropdown-item">
                 <i data-lucide="receipt"></i> <span data-i18n="nav.my_orders"></span>
               </a>
-              <a href="orders.html" class="navbar__dropdown-item">
+              <a href="messages.html" class="navbar__dropdown-item">
                 <i data-lucide="message-circle"></i> <span data-i18n="nav.messages"></span>
               </a>
               <div class="navbar__dropdown-divider"></div>
