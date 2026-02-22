@@ -219,22 +219,21 @@ function renderCheckout() {
                                 await loadCoupons(state.user);
                             }
 
-                            // Send order confirmation email
-                            // Don't block on email - send asynchronously
-                            import('./api.js').then(m => {
-                                m.sendOrderConfirmationEmail(window.currentDbOrderId)
-                                    .then(emailResult => {
-                                        if (emailResult.error) {
-                                            console.warn('Email confirmation failed (non-blocking):', emailResult.error);
-                                        } else {
-                                            console.log('Order confirmation email sent');
-                                        }
-                                    })
-                                    .catch(err => console.warn('Email send error (non-blocking):', err));
-                            });
+                            // Send order confirmation email (wait for it to ensure it sends before redirecting)
+                            try {
+                                const m = await import('./api.js');
+                                const emailResult = await m.sendOrderConfirmationEmail(window.currentDbOrderId);
+                                if (emailResult && emailResult.error) {
+                                    console.warn('Email confirmation failed:', emailResult.error);
+                                } else {
+                                    console.log('Order confirmation email sent');
+                                }
+                            } catch (err) {
+                                console.warn('Email send error:', err);
+                            }
 
                             state.cart = [];
-                            setTimeout(() => window.location.href = 'orders.html', 2000);
+                            window.location.href = 'orders.html';
                         } else if (result && result.error) {
                             throw new Error(result.error);
                         } else {
@@ -251,14 +250,16 @@ function renderCheckout() {
                                 await loadCoupons(state.user);
                             }
 
-                            // Try to send email anyway
-                            import('./api.js').then(m => {
-                                m.sendOrderConfirmationEmail(window.currentDbOrderId)
-                                    .catch(err => console.warn('Email send error (non-blocking):', err));
-                            });
+                            // Try to send email anyway (wait for it to ensure it sends before redirecting)
+                            try {
+                                const m = await import('./api.js');
+                                await m.sendOrderConfirmationEmail(window.currentDbOrderId);
+                            } catch (err) {
+                                console.warn('Email send error:', err);
+                            }
 
                             state.cart = [];
-                            setTimeout(() => window.location.href = 'orders.html', 2000);
+                            window.location.href = 'orders.html';
                         }
 
                     } catch (err) {
