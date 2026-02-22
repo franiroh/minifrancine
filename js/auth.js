@@ -254,13 +254,17 @@ function setupPasswordReset() {
                 const { error } = await resetPassword(email);
 
                 if (error) {
-                    console.error('Password reset error:', error);
+                    console.error('Password reset error object:', error);
+
+                    const errMsg = error.message || '';
+                    const status = error.status || error.code || '';
 
                     // Handle rate limit specifically
-                    if (error.status === 429 || error.message.includes('429') || error.message.includes('rate limit')) {
+                    if (status === 429 || errMsg.includes('429') || errMsg.toLowerCase().includes('rate limit')) {
                         messageDiv.textContent = i18n.t('auth.rate_limit');
                     } else {
-                        messageDiv.textContent = i18n.t('error.prefix') + error.message;
+                        // Fallback to error message or stringified error if no message exists
+                        messageDiv.textContent = i18n.t('error.prefix') + (errMsg || JSON.stringify(error) || 'Unknown error');
                     }
 
                     messageDiv.className = 'error';
