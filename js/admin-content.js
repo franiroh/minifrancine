@@ -31,11 +31,13 @@ async function loadContentConfig() {
             console.error('Error loading config:', configError);
         }
 
-        if (config && config.hero_image_url) {
-            const preview = document.getElementById('hero-img-preview');
-            if (preview) {
-                preview.style.backgroundImage = `url('${config.hero_image_url}')`;
-                preview.innerHTML = ''; // Clear "No image" text
+        if (config) {
+            if (config.hero_image_url) {
+                const preview = document.getElementById('hero-img-preview');
+                if (preview) {
+                    preview.style.backgroundImage = `url('${config.hero_image_url}')`;
+                    preview.innerHTML = ''; // Clear "No image" text
+                }
             }
         }
 
@@ -104,7 +106,11 @@ async function saveContentConfig() {
         const { data: existingConfig } = await supabase.from('site_config').select('id, hero_image_url').limit(1).single();
         if (!imageUrl && existingConfig) imageUrl = existingConfig.hero_image_url;
 
-        const configPayload = { hero_image_url: imageUrl, updated_at: new Date() };
+        const configPayload = {
+            hero_image_url: imageUrl,
+            updated_at: new Date()
+        };
+
         if (existingConfig) {
             const { error } = await supabase.from('site_config').update(configPayload).eq('id', existingConfig.id);
             if (error) throw error;

@@ -29,7 +29,10 @@
                 <i data-lucide="external-link"></i> Ver Tienda
             </a>
             <nav class="sidebar__nav">
-                <button class="nav-item active" data-tab="dashboard">
+                <button class="nav-item active" data-tab="content">
+                    <i data-lucide="layout-template"></i> Contenido Home
+                </button>
+                <button class="nav-item" data-tab="dashboard">
                     <i data-lucide="layout-dashboard"></i> Dashboard
                 </button>
                 <button class="nav-item" data-tab="products">
@@ -46,9 +49,6 @@
                 </button>
                 <button class="nav-item" data-tab="coupons">
                     <i data-lucide="ticket"></i> Cupones
-                </button>
-                <button class="nav-item" data-tab="content">
-                    <i data-lucide="layout-template"></i> Contenido Home
                 </button>
                 <button class="nav-item" data-tab="translations">
                     <i data-lucide="languages"></i> Traducciones
@@ -395,13 +395,16 @@
                 <!-- Home Content View -->
                 <div id="view-content" class="view">
                     <div class="view-header">
-                        <h2>Contenido de Inicio (Home)</h2>
+                        <h2>Contenido y Preferencias</h2>
                         <button class="btn btn--primary" id="btn-save-content">
                             <i data-lucide="save"></i> Guardar Cambios
                         </button>
                     </div>
 
                     <div class="card" style="max-width: 800px; margin: 0 auto;">
+                        <h3
+                            style="margin-bottom: 16px; font-size: 1.1rem; color: var(--admin-text); border-bottom: 1px solid var(--admin-border); padding-bottom: 8px;">
+                            Textos del Home</h3>
                         <form id="home-content-form">
                             <div class="form-row-group">
                                 <div class="form-group">
