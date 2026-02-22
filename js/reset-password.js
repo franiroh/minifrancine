@@ -6,10 +6,10 @@ import { showToast } from './utils.js';
 import { i18n } from './i18n.js';
 
 async function init() {
-    // 1. Init User State early to prevent flickering
-    const user = await getUser();
+    // 1. Check for immediate user (session exists)
+    let user = await getUser();
 
-    // 2. Load Navbar/Footer
+    // 2. Load basic components
     await loadComponents(user);
 
     // Listen for state updates
@@ -20,15 +20,31 @@ async function init() {
     await loadCart(user);
     updateNavbarCartCount(getCartCount());
 
+    // 3. If no user, wait for PASSWORD_RECOVERY event (Supabase processes hash fragment)
     if (!user) {
-        showToast(i18n.t('reset_password.invalid_session'), 'error');
-        setTimeout(() => {
-            window.location.href = 'login.html';
-        }, 3000);
-        return;
-    }
+        console.log('No current user, waiting for auth recovery state change...');
+        const { data: { subscription } } = await import('./api.js').then(m => m.onAuthStateChange(async (event, session) => {
+            if (event === 'PASSWORD_RECOVERY' || event === 'SIGNED_IN') {
+                console.log('Auth event caught:', event);
+                subscription.unsubscribe();
+                setupPasswordUpdate();
+                if (window.lucide) window.lucide.createIcons();
+            }
+        }));
 
-    setupPasswordUpdate();
+        // Fail-safe timeout
+        setTimeout(async () => {
+            const finalUser = await getUser();
+            if (!finalUser) {
+                showToast(i18n.t('reset_password.invalid_session'), 'error');
+                setTimeout(() => {
+                    window.location.href = 'login.html';
+                }, 3000);
+            }
+        }, 5000);
+    } else {
+        setupPasswordUpdate();
+    }
 
     if (window.lucide) window.lucide.createIcons();
 }
