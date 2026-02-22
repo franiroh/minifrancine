@@ -121,23 +121,21 @@ function setupForms() {
 
     if (registerBtn) {
         registerBtn.addEventListener('click', async () => {
-            console.log('Register button clicked');
+            console.log('Register attempt started');
             try {
                 const nameInput = document.getElementById('register-name');
                 const emailInput = document.getElementById('register-email');
                 const passInput = document.getElementById('register-password');
 
                 if (!nameInput || !emailInput || !passInput) {
-                    console.error('Missing form elements');
+                    console.error('Registration error: Missing form elements');
                     showToast(i18n.t('auth.internal_error'), 'error');
                     return;
                 }
 
-                const name = nameInput.value;
-                const email = emailInput.value;
+                const name = nameInput.value.trim();
+                const email = emailInput.value.trim();
                 const password = passInput.value;
-
-                console.log('Attempting to register:', { name, email });
 
                 if (!name || !email || !password) {
                     showToast(i18n.t('auth.fill_all'), 'error');
@@ -148,12 +146,11 @@ function setupForms() {
                 registerBtn.disabled = true;
 
                 // Check if name exists
-                console.log('Checking name availability...');
                 const exists = await checkNameExists(name);
-                console.log('Name exists:', exists);
 
                 if (exists) {
                     showToast(i18n.t('auth.name_taken'), 'error');
+                    // Reset button
                     registerBtn.textContent = i18n.t('auth.btn_register');
                     registerBtn.disabled = false;
                     return;
@@ -161,26 +158,31 @@ function setupForms() {
 
                 registerBtn.textContent = i18n.t('auth.loading');
 
-                console.log('Calling signUp...');
                 const { data, error } = await signUp(email, password, name);
-                console.log('SignUp result:', { data, error });
 
                 if (error) {
-                    console.error('SignUp Error:', error);
-                    if (error.status === 429 || error.message.includes('429') || error.message.includes('rate limit')) {
+                    console.error('SignUp Error details:', error);
+
+                    // Handle rate limit specifically
+                    if (error.status === 429 || error.message.toLowerCase().includes('rate limit') || error.message.includes('429')) {
                         showToast(i18n.t('auth.rate_limit'), 'error');
                     } else {
-                        showToast(i18n.t('error.prefix') + error.message, 'error');
+                        showToast(i18n.t('error.prefix') + (error.message || 'Error desconocido'), 'error');
                     }
+
+                    // Always reset button on error
                     registerBtn.textContent = i18n.t('auth.btn_register');
                     registerBtn.disabled = false;
                 } else {
+                    console.log('SignUp successful:', data);
                     showToast(i18n.t('auth.register_success'), 'success');
-                    // Depending on settings, might auto login
+                    // Reset or redirect logic if needed
                 }
             } catch (err) {
-                console.error('Unexpected error during registration:', err);
+                console.error('Unexpected error during registration caught:', err);
                 showToast(i18n.t('error.unexpected') + err.message, 'error');
+
+                // Final safety reset
                 registerBtn.textContent = i18n.t('auth.btn_register');
                 registerBtn.disabled = false;
             }
@@ -201,6 +203,18 @@ function setupPasswordReset() {
     if (forgotPasswordLink && modal) {
         forgotPasswordLink.addEventListener('click', (e) => {
             e.preventDefault();
+
+            // Clear previous state
+            if (emailInput) emailInput.value = '';
+            if (messageDiv) {
+                messageDiv.textContent = '';
+                messageDiv.className = 'hidden';
+            }
+            if (submitBtn) {
+                submitBtn.disabled = false;
+                submitBtn.innerHTML = `<span data-i18n="auth.send_reset_link">${i18n.t('auth.send_reset_link')}</span>`;
+            }
+
             modal.classList.remove('hidden');
             // Apply i18n translations to modal content
             i18n.updatePage();
@@ -232,29 +246,47 @@ function setupPasswordReset() {
                 return;
             }
 
-            submitBtn.disabled = true;
-            submitBtn.innerHTML = `<span data-i18n="auth.sending">${i18n.t('auth.sending')}</span>`;
+            try {
+                submitBtn.disabled = true;
+                submitBtn.innerHTML = `<span data-i18n="auth.sending">${i18n.t('auth.sending')}</span>`;
+                messageDiv.className = 'hidden';
 
-            const { error } = await resetPassword(email);
+                const { error } = await resetPassword(email);
 
-            if (error) {
-                messageDiv.textContent = i18n.t('error.prefix') + error.message;
+                if (error) {
+                    console.error('Password reset error:', error);
+
+                    // Handle rate limit specifically
+                    if (error.status === 429 || error.message.includes('429') || error.message.includes('rate limit')) {
+                        messageDiv.textContent = i18n.t('auth.rate_limit');
+                    } else {
+                        messageDiv.textContent = i18n.t('error.prefix') + error.message;
+                    }
+
+                    messageDiv.className = 'error';
+                    submitBtn.disabled = false;
+                    submitBtn.innerHTML = `<span data-i18n="auth.send_reset_link">${i18n.t('auth.send_reset_link')}</span>`;
+                    i18n.updatePage();
+                } else {
+                    messageDiv.textContent = i18n.t('auth.reset_link_sent');
+                    messageDiv.className = 'success';
+                    emailInput.value = '';
+                    submitBtn.disabled = false;
+                    submitBtn.innerHTML = `<span data-i18n="auth.send_reset_link">${i18n.t('auth.send_reset_link')}</span>`;
+                    i18n.updatePage();
+
+                    // Close modal after 4 seconds to give user time to read
+                    setTimeout(() => {
+                        closeModal();
+                    }, 4000);
+                }
+            } catch (err) {
+                console.error('Unexpected error during password reset:', err);
+                messageDiv.textContent = i18n.t('error.unexpected') + err.message;
                 messageDiv.className = 'error';
                 submitBtn.disabled = false;
                 submitBtn.innerHTML = `<span data-i18n="auth.send_reset_link">${i18n.t('auth.send_reset_link')}</span>`;
                 i18n.updatePage();
-            } else {
-                messageDiv.textContent = i18n.t('auth.reset_link_sent');
-                messageDiv.className = 'success';
-                emailInput.value = '';
-                submitBtn.disabled = false;
-                submitBtn.innerHTML = `<span data-i18n="auth.send_reset_link">${i18n.t('auth.send_reset_link')}</span>`;
-                i18n.updatePage();
-
-                // Close modal after 3 seconds
-                setTimeout(() => {
-                    closeModal();
-                }, 3000);
             }
         });
     }
