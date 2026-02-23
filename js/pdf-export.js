@@ -30,7 +30,9 @@ export async function generateProductPDF(product, settings) {
     // Helper: Add image to PDF with border and aspect ratio preservation
     const addImageFromUrl = async (url, x, y, w, h, addBorder = false) => {
         try {
-            const response = await fetch(url);
+            // Security: Enforce HTTPS for external fetches
+            const secureUrl = url.startsWith('http://') ? url.replace('http://', 'https://') : url;
+            const response = await fetch(secureUrl);
             const blob = await response.blob();
             const imgData = await new Promise((resolve) => {
                 const reader = new FileReader();
@@ -201,7 +203,9 @@ export async function generateProductPDF(product, settings) {
     let logoProps = null;
     if (settings.logo && settings.logo.startsWith('http')) {
         try {
-            const resp = await fetch(settings.logo);
+            // Security: Enforce HTTPS for external logo fetches
+            const secureLogoUrl = settings.logo.startsWith('http://') ? settings.logo.replace('http://', 'https://') : settings.logo;
+            const resp = await fetch(secureLogoUrl);
             const blob = await resp.blob();
             logoData = await new Promise(r => {
                 const reader = new FileReader();
