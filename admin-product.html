@@ -11,8 +11,11 @@
     <link
         href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&family=DM+Sans:wght@400;500;700&display=swap"
         rel="stylesheet">
+    <!-- Quill.js for Rich Text -->
+    <link href="https://cdn.quilljs.com/1.3.6/quill.snow.css" rel="stylesheet">
+    <script src="https://cdn.quilljs.com/1.3.6/quill.js"></script>
     <script src="https://unpkg.com/lucide@latest"></script>
-    <script src="https://unpkg.com/lucide@latest"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 </head>
 
 <body>
@@ -32,7 +35,10 @@
                 <a href="admin.html#dashboard" class="nav-item">
                     <i data-lucide="layout-dashboard"></i> Dashboard
                 </a>
-                <a href="admin.html#products" class="nav-item active">
+                <a href="admin.html#content" class="nav-item">
+                    <i data-lucide="layout-template"></i> Contenido Home
+                </a>
+                <a href="admin.html#products" class="nav-item">
                     <i data-lucide="package"></i> Productos
                 </a>
                 <a href="admin.html#orders" class="nav-item">
@@ -44,8 +50,8 @@
                 <a href="admin.html#messages" class="nav-item">
                     <i data-lucide="message-square"></i> Mensajes
                 </a>
-                <a href="admin.html#content" class="nav-item">
-                    <i data-lucide="layout-template"></i> Contenido Home
+                <a href="admin.html#coupons" class="nav-item">
+                    <i data-lucide="ticket"></i> Cupones
                 </a>
                 <a href="admin.html#translations" class="nav-item">
                     <i data-lucide="languages"></i> Traducciones
@@ -94,6 +100,10 @@
 
                         <button type="button" class="btn btn--outline hidden" id="btn-view-product" target="_blank">
                             <i data-lucide="external-link" style="width:16px;"></i> Ver en Tienda
+                        </button>
+                        <button type="button" class="btn btn--primary hidden" id="btn-export-pdf"
+                            style="background: var(--admin-secondary); border-color: var(--admin-secondary);">
+                            <i data-lucide="file-text" style="width:16px;"></i> Exportar PDF
                         </button>
                         <button type="button" class="btn btn--primary" id="btn-save">Guardar Producto</button>
                     </div>
@@ -218,6 +228,18 @@
                                 <input type="number" id="prod-color-change-count" placeholder="Ej: 7">
                             </div>
                         </div>
+
+                        <!-- Secuencia de Colores Section -->
+                        <div class="card" style="margin-top: 24px;">
+                            <h3
+                                style="margin-bottom: 16px; border-bottom: 1px solid var(--admin-border); padding-bottom: 8px;">
+                                Secuencia de Colores (Color Sheet)</h3>
+                            <p style="font-size: 0.85rem; color: #666; margin-bottom: 12px;">Usa este editor para listar
+                                los colores. Puedes usar listas numeradas, negritas, etc.</p>
+                            <div id="thread-colors-editor"
+                                style="height: 300px; background: white; border-radius: 4px;"></div>
+                            <input type="hidden" id="thread-colors-html">
+                        </div>
                     </div>
 
                     <div class="card" style="margin-top: 2rem;">
@@ -280,6 +302,7 @@
     <!-- Modals or Toasts could go here -->
 
     <script type="module" src="js/admin-product.js"></script>
+    <script type="module" src="js/pdf-export.js"></script>
 </body>
 
 </html>

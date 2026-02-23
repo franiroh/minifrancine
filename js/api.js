@@ -88,7 +88,8 @@ export async function fetchProducts({ publishedOnly = false, tag = null, search 
             mainImage: p.main_image,
             published: p.published,
             archived: p.archived,
-            indexed: p.indexed
+            indexed: p.indexed,
+            threadColors: p.thread_colors || []
         };
     });
 }
@@ -132,7 +133,8 @@ export async function fetchProductById(id) {
         description: data.description,
         published: data.published,
         indexed: data.indexed,
-        relatedProductIds: data.related_product_ids || []
+        relatedProductIds: data.related_product_ids || [],
+        threadColors: data.thread_colors || []
     };
 }
 
@@ -179,7 +181,8 @@ export async function fetchProductsByIds(ids) {
             mainImage: p.main_image,
             published: p.published,
             archived: p.archived,
-            indexed: p.indexed
+            indexed: p.indexed,
+            threadColors: p.thread_colors || []
         };
     });
 }

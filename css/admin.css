@@ -486,6 +486,19 @@
     font-size: 15px;
 }
 
+.actions-cell {
+    white-space: nowrap;
+    width: 1%;
+    /* Shrink to fit content */
+}
+
+.actions-wrapper {
+    display: flex;
+    gap: 8px;
+    align-items: center;
+    min-width: 140px;
+}
+
 .data-table tr:last-child td {
     border-bottom: none;
 }

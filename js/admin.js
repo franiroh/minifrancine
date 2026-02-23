@@ -1,6 +1,6 @@
 
 import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js/+esm'
-import { getUser, signOut, fetchProducts, updateProduct } from './api.js';
+import { getUser, signOut, fetchProducts, updateProduct, fetchProductById } from './api.js';
 import { fetchAllOrders, fetchAdminStats, deleteProduct, archiveProduct, unarchiveProduct, fetchCategories, createCategory, updateCategory, deleteCategory, upsertCategoryTranslations, fetchCategoryTranslations } from './api.js';
 import { loadAdminMessages } from './admin-messages.js';
 import { initContent } from './admin-content.js';
@@ -8,6 +8,8 @@ import { initI18nEditor } from './admin-i18n.js';
 import { initAdminCoupons } from './admin-coupons.js';
 import i18n from './i18n.js';
 import { escapeHtml, sanitizeCssValue, getBadgeKey } from './utils.js';
+import { generateProductPDF } from './pdf-export.js';
+import { fetchProductImages } from './api.js';
 
 let currentView = 'dashboard';
 let currentProductPage = 1;
@@ -436,12 +438,15 @@ function renderProductsTable(allProducts, selectedCategoryId, archiveStatus = 'a
                     <span class="slider"></span>
                 </label>
             </td>
-            <td>
-                <button class="btn-icon" onclick="window.location.href='admin-product.html?id=${parseInt(p.id)}'"><i data-lucide="edit-3"></i></button>
-                ${p.archived
+            <td class="actions-cell">
+                <div class="actions-wrapper">
+                    <button class="btn-icon" onclick="window.location.href='admin-product.html?id=${parseInt(p.id)}'"><i data-lucide="edit-3"></i></button>
+                    <button class="btn-icon" onclick="downloadPDFHandler(${parseInt(p.id)}, this)" title="Descargar PDF"><i data-lucide="file-text"></i></button>
+                    ${p.archived
             ? `<button class="btn-icon" onclick="unarchiveProductHandler(${parseInt(p.id)})" title="Desarchivar"><i data-lucide="archive-restore"></i></button>`
             : `<button class="btn-icon" onclick="archiveProductHandler(${parseInt(p.id)})" title="Archivar"><i data-lucide="archive"></i></button>`
         }
+                </div>
             </td>
         </tr>
     `).join('');
@@ -505,9 +510,11 @@ async function loadCategories() {
     tbody.innerHTML = categories.map(c => `
         <tr>
             <td><strong>${escapeHtml(c.name)}</strong></td>
-            <td>
-                <button class="btn-icon" onclick="editCategoryHandler(${parseInt(c.id)}, '${escapeHtml(c.name).replace(/'/g, "\\'")}')"><i data-lucide="edit-3"></i></button>
-                <button class="btn-icon" onclick="deleteCategoryHandler(${parseInt(c.id)})"><i data-lucide="trash-2"></i></button>
+            <td class="actions-cell">
+                <div class="actions-wrapper">
+                    <button class="btn-icon" onclick="editCategoryHandler(${parseInt(c.id)}, '${escapeHtml(c.name).replace(/'/g, "\\'")}')"><i data-lucide="edit-3"></i></button>
+                    <button class="btn-icon" onclick="deleteCategoryHandler(${parseInt(c.id)})"><i data-lucide="trash-2"></i></button>
+                </div>
             </td>
         </tr>
     `).join('');
@@ -606,6 +613,61 @@ window.toggleIndexHandler = async (id, indexed) => {
         loadProducts(); // Revert UI
     } else {
         loadProducts();
+    }
+};
+
+window.downloadPDFHandler = async (productId, btn) => {
+    try {
+        const originalText = btn.innerHTML;
+        btn.disabled = true;
+        btn.innerHTML = '<i data-lucide="loader-2" class="animate-spin" style="width: 16px; height: 16px;"></i>';
+        if (window.lucide) window.lucide.createIcons();
+
+        // 1. Fetch Product Images
+        const images = await fetchProductImages(productId);
+        const imageData = images.map(img => img.public_url);
+
+        // 2. Fetch Full Product Data (to ensure we have all fields for PDF)
+        const product = await fetchProductById(productId);
+
+        if (!product) throw new Error('Producto no encontrado');
+
+        // 3. Fetch PDF Settings
+        const { data: settingsData } = await supabase.from('site_translations').select('key, es').ilike('key', 'pdf.%');
+        const settings = {};
+        if (settingsData) {
+            settingsData.forEach(s => {
+                const k = s.key.split('.')[1];
+                settings[k] = s.es;
+            });
+        }
+
+        const pdfProduct = {
+            ...product,
+            images: imageData,
+            meta: {
+                size: product.size || '-',
+                stitches: String(product.stitches || 0),
+                color_changes: String(product.colorChangeCount || 0),
+                colors_used: String(product.colorCount || 0)
+            }
+        };
+
+        if (window.generateProductPDF) {
+            await window.generateProductPDF(pdfProduct, settings);
+        } else if (generateProductPDF) {
+            await generateProductPDF(pdfProduct, settings);
+        } else {
+            throw new Error('Generador de PDF no disponible');
+        }
+
+    } catch (err) {
+        console.error(err);
+        alert('Error al descargar PDF: ' + err.message);
+    } finally {
+        btn.disabled = false;
+        btn.innerHTML = '<i data-lucide="file-text"></i>';
+        if (window.lucide) window.lucide.createIcons();
     }
 };
 

@@ -1,9 +1,12 @@
 import { supabase } from './api.js';
 import { showToast } from './utils.js';
 
+let quill = null;
+
 export function initContent() {
     const btnSave = document.getElementById('btn-save-content');
     const fileInput = document.getElementById('hero-img-input');
+    const pdfLogoInput = document.getElementById('pdf-logo-input');
 
     if (btnSave) {
         btnSave.addEventListener('click', saveContentConfig);
@@ -11,6 +14,25 @@ export function initContent() {
 
     if (fileInput) {
         fileInput.addEventListener('change', handleImagePreview);
+    }
+
+    if (pdfLogoInput) {
+        pdfLogoInput.addEventListener('change', handlePdfLogoPreview);
+    }
+
+    // Initialize Quill
+    if (document.getElementById('pdf-promo-editor') && !quill) {
+        quill = new Quill('#pdf-promo-editor', {
+            theme: 'snow',
+            modules: {
+                toolbar: [
+                    ['bold', 'italic', 'underline'],
+                    ['link'],
+                    [{ 'list': 'ordered' }, { 'list': 'bullet' }],
+                    ['clean']
+                ]
+            }
+        });
     }
 
     // Load initial data when tab is active or on init
@@ -45,7 +67,10 @@ async function loadContentConfig() {
         const { data: trans, error: transError } = await supabase
             .from('site_translations')
             .select('*')
-            .in('key', ['hero.badge', 'hero.title', 'hero.description']);
+            .in('key', [
+                'hero.badge', 'hero.title', 'hero.description',
+                'pdf.logo', 'pdf.promo', 'pdf.footer'
+            ]);
 
         if (transError) {
             console.error('Error loading translations:', transError);
@@ -53,10 +78,30 @@ async function loadContentConfig() {
 
         if (trans) {
             trans.forEach(t => {
-                const prefix = t.key.replace('hero.', 'home-'); // badge -> home-badge, title -> home-title, description -> home-description
-                if (document.getElementById(`${prefix}-es`)) document.getElementById(`${prefix}-es`).value = t.es || '';
-                if (document.getElementById(`${prefix}-en`)) document.getElementById(`${prefix}-en`).value = t.en || '';
-                if (document.getElementById(`${prefix}-pt`)) document.getElementById(`${prefix}-pt`).value = t.pt || '';
+                if (t.key.startsWith('pdf.')) {
+                    const id = t.key.replace('.', '-'); // pdf.logo -> pdf-logo
+                    if (id === 'pdf-logo') {
+                        const urlInput = document.getElementById('pdf-logo-url');
+                        const preview = document.getElementById('pdf-logo-preview');
+                        if (urlInput) urlInput.value = t.es || '';
+                        if (preview && t.es) {
+                            preview.style.backgroundImage = `url('${t.es}')`;
+                            preview.innerHTML = '';
+                        }
+                    } else if (id === 'pdf-promo') {
+                        if (quill) {
+                            quill.root.innerHTML = t.es || '';
+                        }
+                        if (document.getElementById(id)) document.getElementById(id).value = t.es || '';
+                    } else {
+                        if (document.getElementById(id)) document.getElementById(id).value = t.es || '';
+                    }
+                } else {
+                    const prefix = t.key.replace('hero.', 'home-'); // badge -> home-badge, title -> home-title, description -> home-description
+                    if (document.getElementById(`${prefix}-es`)) document.getElementById(`${prefix}-es`).value = t.es || '';
+                    if (document.getElementById(`${prefix}-en`)) document.getElementById(`${prefix}-en`).value = t.en || '';
+                    if (document.getElementById(`${prefix}-pt`)) document.getElementById(`${prefix}-pt`).value = t.pt || '';
+                }
             });
         }
     } catch (err) {
@@ -71,6 +116,21 @@ async function handleImagePreview(e) {
     const preview = document.getElementById('hero-img-preview');
     if (preview) {
         // Show local preview
+        const reader = new FileReader();
+        reader.onload = (e) => {
+            preview.style.backgroundImage = `url('${e.target.result}')`;
+            preview.innerHTML = '';
+        };
+        reader.readAsDataURL(file);
+    }
+}
+
+async function handlePdfLogoPreview(e) {
+    const file = e.target.files[0];
+    if (!file) return;
+
+    const preview = document.getElementById('pdf-logo-preview');
+    if (preview) {
         const reader = new FileReader();
         reader.onload = (e) => {
             preview.style.backgroundImage = `url('${e.target.result}')`;
@@ -120,17 +180,54 @@ async function saveContentConfig() {
         }
 
         // 3. Update site_translations (Texts)
-        const keys = ['hero.badge', 'hero.title', 'hero.description'];
+        const keys = [
+            'hero.badge', 'hero.title', 'hero.description',
+            'pdf.logo', 'pdf.promo', 'pdf.footer'
+        ];
         for (const key of keys) {
-            const prefix = key.replace('hero.', 'home-');
-            const values = {
-                key,
-                es: document.getElementById(`${prefix}-es`).value,
-                en: document.getElementById(`${prefix}-en`).value,
-                pt: document.getElementById(`${prefix}-pt`).value,
-                section: 'home',
-                updated_at: new Date()
-            };
+            let values;
+            if (key.startsWith('pdf.')) {
+                let value;
+                if (key === 'pdf.logo') {
+                    const pdfLogoInput = document.getElementById('pdf-logo-input');
+                    const pdfLogoFile = pdfLogoInput ? pdfLogoInput.files[0] : null;
+                    if (pdfLogoFile) {
+                        const fileExt = pdfLogoFile.name.split('.').pop();
+                        const fileName = `pdf-logo-${Date.now()}.${fileExt}`;
+                        const filePath = `${fileName}`;
+                        const { error: uploadError } = await supabase.storage.from('site-assets').upload(filePath, pdfLogoFile);
+                        if (uploadError) throw uploadError;
+                        const { data: { publicUrl } } = supabase.storage.from('site-assets').getPublicUrl(filePath);
+                        value = publicUrl;
+                    } else {
+                        value = document.getElementById('pdf-logo-url').value;
+                    }
+                } else {
+                    const id = key.replace('.', '-');
+                    if (id === 'pdf-promo' && quill) {
+                        value = quill.root.innerHTML;
+                    } else {
+                        value = document.getElementById(id).value;
+                    }
+                }
+
+                values = {
+                    key,
+                    es: value,
+                    section: 'pdf',
+                    updated_at: new Date()
+                };
+            } else {
+                const prefix = key.replace('hero.', 'home-');
+                values = {
+                    key,
+                    es: document.getElementById(`${prefix}-es`).value,
+                    en: document.getElementById(`${prefix}-en`).value,
+                    pt: document.getElementById(`${prefix}-pt`).value,
+                    section: 'home',
+                    updated_at: new Date()
+                };
+            }
 
             const { error: upsertError } = await supabase
                 .from('site_translations')

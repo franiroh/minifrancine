@@ -28,6 +28,7 @@ let allAdminProducts = [];
 let selectedRelatedProducts = [];
 let allCategories = [];
 let selectedCategoryIds = [];
+let quillColors = null;
 
 async function init() {
     // Auth Check
@@ -50,6 +51,20 @@ async function init() {
     if (emailEl) emailEl.textContent = user.email;
 
     if (window.lucide) window.lucide.createIcons();
+
+    // Initialize Quill for Colors BEFORE loading data
+    if (document.getElementById('thread-colors-editor') && !quillColors) {
+        quillColors = new Quill('#thread-colors-editor', {
+            theme: 'snow',
+            modules: {
+                toolbar: [
+                    ['bold', 'italic', 'underline'],
+                    [{ 'list': 'ordered' }, { 'list': 'bullet' }],
+                    ['clean']
+                ]
+            }
+        });
+    }
 
     // Populate categories
     allCategories = await fetchCategories();
@@ -140,6 +155,18 @@ async function loadProductData(id) {
     document.getElementById('prod-size').value = product.size || '';
     document.getElementById('prod-stitches').value = product.stitches ? Number(product.stitches).toLocaleString('en-US') : '';
     document.getElementById('prod-formats').value = product.formats || '';
+
+    // Load Colors
+    if (quillColors) {
+        const colorsData = product.threadColors;
+        if (Array.isArray(colorsData)) {
+            // Backward compatibility: Convert array to HTML list
+            const html = colorsData.map((c, i) => `<li>${escapeHtml(c.description || c.name || c)}</li>`).join('');
+            quillColors.root.innerHTML = `<ol>${html}</ol>`;
+        } else {
+            quillColors.root.innerHTML = colorsData || '';
+        }
+    }
 
     // Published state
     const pubCheckbox = document.getElementById('prod-published');
@@ -251,6 +278,62 @@ function setupEventListeners() {
         const raw = stitchesInput.value.replace(/,/g, '').replace(/\D/g, '');
         stitchesInput.value = raw ? Number(raw).toLocaleString('en-US') : '';
     });
+
+    // Add Color Button removed as we use Quill now
+
+    // Export PDF Button
+    const btnExportPdf = document.getElementById('btn-export-pdf');
+    if (btnExportPdf) {
+        btnExportPdf.onclick = async () => {
+            const originalText = btnExportPdf.innerHTML;
+            btnExportPdf.disabled = true;
+            btnExportPdf.innerHTML = '<i data-lucide="loader-2" class="animate-spin" style="width:16px;"></i> Generando...';
+            if (window.lucide) window.lucide.createIcons();
+
+            try {
+                // Fetch PDF settings
+                const { data: settingsData } = await supabase
+                    .from('site_translations')
+                    .select('key, es')
+                    .in('key', ['pdf.logo', 'pdf.promo', 'pdf.footer']);
+
+                const settings = {};
+                settingsData.forEach(s => {
+                    const k = s.key.split('.')[1];
+                    settings[k] = s.es;
+                });
+
+                // Get full images for PDF
+                const images = await fetchProductImages(productId);
+                const imageData = images.map(img => img.public_url);
+
+                // Prepare product data for PDF
+                const pdfProduct = {
+                    ...currentProduct,
+                    images: imageData,
+                    meta: {
+                        size: document.getElementById('prod-size').value,
+                        stitches: document.getElementById('prod-stitches').value,
+                        color_changes: document.getElementById('prod-color-change-count').value,
+                        colors_used: document.getElementById('prod-color-count').value
+                    }
+                };
+
+                if (window.generateProductPDF) {
+                    await window.generateProductPDF(pdfProduct, settings);
+                } else {
+                    throw new Error('PDF generator not loaded');
+                }
+            } catch (err) {
+                console.error(err);
+                alert('Error al exportar PDF: ' + err.message);
+            } finally {
+                btnExportPdf.disabled = false;
+                btnExportPdf.innerHTML = originalText;
+                if (window.lucide) window.lucide.createIcons();
+            }
+        };
+    }
 }
 
 let pendingImages = [];
@@ -403,6 +486,8 @@ function renderRelatedProducts() {
     if (window.lucide) window.lucide.createIcons();
 }
 
+// Deprecated color list functions removed
+
 async function handleSave(e) {
     e.preventDefault();
     const btn = document.getElementById('btn-save');
@@ -431,7 +516,8 @@ async function handleSave(e) {
             formats: document.getElementById('prod-formats').value,
             published: document.getElementById('prod-published').checked,
             indexed: document.getElementById('prod-indexed').checked,
-            related_product_ids: selectedRelatedProducts
+            related_product_ids: selectedRelatedProducts,
+            thread_colors: quillColors ? quillColors.root.innerHTML : ''
         };
 
         let savedProductId = productId; // Existing or new
