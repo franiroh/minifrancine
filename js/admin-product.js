@@ -585,6 +585,8 @@ async function handleSave(e) {
                 if (res) {
                     const { error: fileErr } = await saveProductFileRecord(savedProductId, res.storagePath, res.filename);
                     if (fileErr) throw fileErr;
+                } else {
+                    throw new Error(`Error al subir el archivo: ${file.name}. Asegúrese de que el formato sea válido.`);
                 }
             }
         }

@@ -1103,7 +1103,11 @@ function sanitizeFileName(name) {
 
 const ALLOWED_IMAGE_MIMES = ['image/jpeg', 'image/png', 'image/webp', 'image/gif'];
 const MAX_IMAGE_BYTES = 5 * 1024 * 1024; // 5MB
-const ALLOWED_FILE_MIMES = ['application/zip', 'application/x-zip-compressed', 'application/x-rar-compressed', 'application/x-7z-compressed'];
+const ALLOWED_FILE_MIMES = [
+    'application/zip', 'application/x-zip-compressed', 'application/x-rar-compressed', 'application/x-7z-compressed',
+    'application/octet-stream', // Generic binary (common for PES, DST, etc.)
+    '' // Some embroidery files have no detected mime type
+];
 const MAX_FILE_BYTES = 50 * 1024 * 1024; // 50MB
 
 export async function uploadProductImage(file) {
