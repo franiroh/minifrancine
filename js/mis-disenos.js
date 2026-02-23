@@ -1,8 +1,9 @@
 
 import { loadComponents, updateNavbarAuth, updateNavbarCartCount, createSkeletonCard } from './components.js';
-import { getUser, onAuthStateChange, fetchPurchasedProducts, downloadProductFile } from './api.js';
+import { getUser, onAuthStateChange, fetchPurchasedProducts, downloadProductFile, fetchProductById } from './api.js';
 import { loadCart, getCartCount } from './state.js';
 import { escapeHtml, sanitizeCssValue, showToast, InfiniteScrollManager } from './utils.js';
+import { generateProductBundle } from './pdf-export.js';
 import i18n from './i18n.js';
 
 async function init() {
@@ -161,14 +162,25 @@ function attachDownloadListeners() {
             if (window.lucide) window.lucide.createIcons();
 
             try {
-                const result = await downloadProductFile(productId);
-                if (result && result.url) {
-                    const link = document.createElement('a');
-                    link.href = result.url;
-                    link.download = result.filename || productTitle + '.zip';
-                    document.body.appendChild(link);
-                    link.click();
-                    document.body.removeChild(link);
+                // 1. Get Signed URLs for all files
+                const signedFiles = await downloadProductFile(productId);
+
+                if (signedFiles && signedFiles.length > 0) {
+                    // 2. Fetch full product data for PDF generation
+                    const productData = await fetchProductById(productId);
+
+                    if (!productData) {
+                        throw new Error('Could not fetch product details');
+                    }
+
+                    // 3. Generate and Download ZIP Bundle
+                    // Set default settings for user download
+                    const settings = {
+                        logo: 'MiniFrancine',
+                        footer: 'MiniFrancine - Embroidery Designs'
+                    };
+
+                    await generateProductBundle(productData, signedFiles, settings);
 
                     btn.innerHTML = `<i data-lucide="check"></i> ${i18n.t('btn.downloaded')}`;
                     if (window.lucide) window.lucide.createIcons();

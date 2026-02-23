@@ -10,7 +10,7 @@ import {
     deleteProductImage,
     uploadProductFile,
     saveProductFileRecord,
-    fetchProductFile,
+    fetchProductFiles,
     deleteProductFile,
     fetchCategories,
     fetchProductsListAdmin,
@@ -22,7 +22,8 @@ const urlParams = new URLSearchParams(window.location.search);
 const productId = urlParams.get('id');
 
 let currentProduct = null;
-let currentFileRec = null;
+let currentFilesRecs = [];
+let pendingFiles = [];
 
 let allAdminProducts = [];
 let selectedRelatedProducts = [];
@@ -149,7 +150,6 @@ async function loadProductData(id) {
     document.getElementById('prod-badge').value = standardizedBadge;
     document.getElementById('prod-badge-color').value = product.badgeColor || 'red';
     document.getElementById('prod-tags').value = (product.tags || []).join(', ');
-    document.getElementById('prod-image-color').value = product.imageColor || '';
     document.getElementById('prod-color-count').value = product.colorCount || '';
     document.getElementById('prod-color-change-count').value = product.colorChangeCount || '';
     document.getElementById('prod-size').value = product.size || '';
@@ -211,12 +211,10 @@ async function loadProductData(id) {
 
     if (window.lucide) window.lucide.createIcons();
 
-    // Load File Info
-    const fileRec = await fetchProductFile(id);
-    if (fileRec) {
-        currentFileRec = fileRec;
-        showFileStatus(fileRec.filename);
-    }
+    // Load Files
+    const files = await fetchProductFiles(id);
+    currentFilesRecs = files || [];
+    renderFilesList();
 }
 
 function createGalleryItemHTML(id, url, canDelete) {
@@ -269,8 +267,7 @@ function setupEventListeners() {
         handleFileSelect({ target: { files: e.dataTransfer.files } });
     };
 
-    // Delete File
-    document.getElementById('btn-delete-file').onclick = handleDeleteFile;
+    // Delete File button removed as we now have individual delete buttons in the list
 
     // Stitches: auto-format with commas as user types
     const stitchesInput = document.getElementById('prod-stitches');
@@ -383,45 +380,76 @@ function handleImageSelect(e) {
 }
 
 function handleFileSelect(e) {
-    const file = e.target.files[0];
-    if (!file) return;
+    const files = Array.from(e.target.files || []);
+    if (files.length === 0) return;
 
-    // Validate file type
-    if (!ALLOWED_FILE_TYPES.includes(file.type)) {
-        alert(`Tipo de archivo no permitido: ${file.name}. Solo se aceptan: ZIP, RAR, 7z.`);
-        e.target.value = '';
+    files.forEach(file => {
+        // Validate file size (MAX_FILE_SIZE is 50MB)
+        if (file.size > MAX_FILE_SIZE) {
+            alert(`Archivo demasiado grande: ${file.name} (${(file.size / 1024 / 1024).toFixed(1)}MB). Máximo: 50MB.`);
+            return;
+        }
+        pendingFiles.push(file);
+    });
+
+    renderFilesList();
+    e.target.value = ''; // Reset input
+}
+
+function renderFilesList() {
+    const container = document.getElementById('product-files-list');
+    if (!container) return;
+
+    if (currentFilesRecs.length === 0 && pendingFiles.length === 0) {
+        container.innerHTML = '<p class="text-gray text-sm">No hay archivos cargados.</p>';
         return;
     }
-    // Validate file size
-    if (file.size > MAX_FILE_SIZE) {
-        alert(`Archivo demasiado grande: ${file.name} (${(file.size / 1024 / 1024).toFixed(1)}MB). Máximo: 50MB.`);
-        e.target.value = '';
-        return;
+
+    let html = '';
+
+    // Render Existing Files
+    currentFilesRecs.forEach(file => {
+        html += `
+            <div class="file-status-box" style="margin-bottom: 0;">
+                <span title="${escapeHtml(file.storage_path)}">${escapeHtml(file.filename)}</span>
+                <button type="button" class="btn-icon text-red" onclick="removeExistingFile('${escapeHtml(file.id)}')">
+                    <i data-lucide="trash-2" style="width:16px; height:16px;"></i>
+                </button>
+            </div>
+        `;
+    });
+
+    // Render Pending Files (Blue highlight)
+    pendingFiles.forEach((file, index) => {
+        html += `
+            <div class="file-status-box" style="margin-bottom: 0; border-color: var(--admin-primary); background: #f0f7ff;">
+                <span>${escapeHtml(file.name)} <small>(Pendiente)</small></span>
+                <button type="button" class="btn-icon text-red" onclick="removePendingFile(${index})">
+                    <i data-lucide="x" style="width:16px; height:16px;"></i>
+                </button>
+            </div>
+        `;
+    });
+
+    container.innerHTML = html;
+    if (window.lucide) window.lucide.createIcons();
+}
+
+window.removeExistingFile = async (id) => {
+    if (!confirm('¿Eliminar este archivo permanente?')) return;
+    const { error } = await deleteProductFile(id);
+    if (error) {
+        alert('Error al eliminar archivo: ' + error.message);
+    } else {
+        currentFilesRecs = currentFilesRecs.filter(f => f.id !== id);
+        renderFilesList();
     }
+};
 
-    pendingFile = file;
-    showFileStatus(file.name + ' (Pendiente de guardar)');
-}
-
-function showFileStatus(name) {
-    document.getElementById('file-drop-zone').classList.add('hidden');
-    document.getElementById('current-file-display').classList.remove('hidden');
-    document.getElementById('current-filename').textContent = name;
-}
-
-async function handleDeleteFile() {
-    if (!confirm('¿Eliminar archivo? Se borrará al guardar los cambios (o inmediatamente si ya existe).')) return;
-
-    if (currentFileRec) {
-        await deleteProductFile(currentFileRec.id);
-        currentFileRec = null;
-    }
-    pendingFile = null;
-
-    document.getElementById('file-drop-zone').classList.remove('hidden');
-    document.getElementById('current-file-display').classList.add('hidden');
-    document.getElementById('prod-file-input').value = '';
-}
+window.removePendingFile = (index) => {
+    pendingFiles.splice(index, 1);
+    renderFilesList();
+};
 
 window.removeImage = async (id) => {
     if (id === 'legacy-main') return; // Can't delete the fallback easily from here without refreshing logic
@@ -508,7 +536,6 @@ async function handleSave(e) {
             badge: document.getElementById('prod-badge').value,
             badge_color: document.getElementById('prod-badge-color').value,
             tags: document.getElementById('prod-tags').value.split(',').map(t => t.trim()).filter(t => t),
-            image_color: document.getElementById('prod-image-color').value,
             color_count: parseInt(document.getElementById('prod-color-count').value) || 0,
             color_change_count: parseInt(document.getElementById('prod-color-change-count').value) || 0,
             size: document.getElementById('prod-size').value,
@@ -551,22 +578,20 @@ async function handleSave(e) {
 
         }
 
-        // 3. Upload Pending File
-        if (pendingFile) {
-            // Delete old if exists? logic handled in UI mostly, but to be safe:
-            if (currentFileRec) {
-                await deleteProductFile(currentFileRec.id);
-            }
-            const res = await uploadProductFile(pendingFile);
-            if (res) {
-                const { error: fileErr } = await saveProductFileRecord(savedProductId, res.storagePath, res.filename);
-                if (fileErr) throw fileErr;
+        // 3. Upload Pending Files
+        if (pendingFiles.length > 0) {
+            for (const file of pendingFiles) {
+                const res = await uploadProductFile(file);
+                if (res) {
+                    const { error: fileErr } = await saveProductFileRecord(savedProductId, res.storagePath, res.filename);
+                    if (fileErr) throw fileErr;
+                }
             }
         }
 
         // --- FIX: Clear pending buffers so subsequent saves don't re-upload/duplicate ---
         pendingImages = [];
-        pendingFile = null;
+        pendingFiles = [];
         // -------------------------------------------------------------------------------
 
         alert('Producto guardado correctamente');
@@ -679,6 +704,104 @@ document.addEventListener('DOMContentLoaded', () => {
             if (!dropdownBtn.contains(e.target) && !dropdownList.contains(e.target)) {
                 dropdownList.classList.add('hidden');
             }
+        });
+    }
+
+    // --- Tag Suggestions Logic ---
+    const tagsInput = document.getElementById('prod-tags');
+    const tagsSuggestions = document.getElementById('tags-suggestions');
+    let uniqueTags = [];
+
+    // Helper to extract unique tags from all products
+    const getUniqueTags = () => {
+        const tagSet = new Set();
+        allAdminProducts.forEach(p => {
+            if (p.tags && Array.isArray(p.tags)) {
+                p.tags.forEach(t => tagSet.add(t.trim()));
+            }
+        });
+        return Array.from(tagSet).sort();
+    };
+
+    if (tagsInput && tagsSuggestions) {
+        tagsInput.addEventListener('input', () => {
+            if (uniqueTags.length === 0) uniqueTags = getUniqueTags();
+
+            const value = tagsInput.value;
+            const cursorPos = tagsInput.selectionStart;
+
+            // Find the current tag being typed (text between commas or boundaries)
+            const beforeCursor = value.substring(0, cursorPos);
+            const afterCursor = value.substring(cursorPos);
+
+            const lastCommaBefore = beforeCursor.lastIndexOf(',');
+            const firstCommaAfter = afterCursor.indexOf(',');
+
+            const currentTag = beforeCursor.substring(lastCommaBefore + 1).trim();
+            const startOfTag = lastCommaBefore + 1;
+            const endOfTag = cursorPos + (firstCommaAfter !== -1 ? firstCommaAfter : afterCursor.length);
+
+            if (currentTag.length < 1) {
+                tagsSuggestions.classList.add('hidden');
+                return;
+            }
+
+            const matches = uniqueTags.filter(t =>
+                t.toLowerCase().includes(currentTag.toLowerCase()) &&
+                !value.toLowerCase().includes(t.toLowerCase()) // Don't suggest if already there
+            ).slice(0, 10);
+
+            if (matches.length > 0) {
+                tagsSuggestions.innerHTML = matches.map(m => `
+                    <div class="dropdown-item" style="padding: 8px 12px; cursor: pointer; font-size: 14px; border-bottom: 1px solid #f3f4f6;">
+                        ${escapeHtml(m)}
+                    </div>
+                `).join('');
+                tagsSuggestions.classList.remove('hidden');
+
+                // Handle click on suggestion
+                tagsSuggestions.querySelectorAll('.dropdown-item').forEach((item, index) => {
+                    item.onclick = () => {
+                        const tag = matches[index];
+                        const before = value.substring(0, startOfTag);
+                        const after = value.substring(endOfTag);
+
+                        let newValue = before.trim();
+                        if (newValue && !newValue.endsWith(',')) newValue += ', ';
+                        newValue += tag;
+
+                        if (after.trim()) {
+                            let cleanAfter = after.trim();
+                            if (!cleanAfter.startsWith(',')) newValue += ', ';
+                            newValue += cleanAfter;
+                        } else {
+                            newValue += ', ';
+                        }
+
+                        tagsInput.value = newValue;
+                        tagsSuggestions.classList.add('hidden');
+                        tagsInput.focus();
+                    };
+                });
+            } else {
+                tagsSuggestions.classList.add('hidden');
+            }
+        });
+
+        // Hide suggestions when clicking outside
+        document.addEventListener('click', (e) => {
+            if (!tagsInput.contains(e.target) && !tagsSuggestions.contains(e.target)) {
+                tagsSuggestions.classList.add('hidden');
+            }
+        });
+
+        // Handle Enter/Tab/Esc keys
+        tagsInput.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape') {
+                tagsSuggestions.classList.add('hidden');
+            }
+            // If suggestions are visible, maybe handle Enter to pick first?
+            // For now, let's keep it simple with clicks.
         });
     }
 });

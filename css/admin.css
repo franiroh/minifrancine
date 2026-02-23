@@ -581,10 +581,13 @@
     transition: border-color 0.2s;
 }
 
-.form-group input:focus {
+.form-group input:focus,
+.form-group select:focus {
     outline: none;
     border-color: var(--admin-primary);
 }
+
+
 
 .btn-icon:hover {
     background-color: var(--color-gray-100);
@@ -848,4 +851,79 @@
 
 .hidden {
     display: none !important;
+}
+
+/* --- Action Bar (Product Edit) --- */
+.action-bar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    background: var(--color-surface);
+    padding: 12px 24px;
+    border-radius: 16px;
+    border: 1px solid var(--admin-border);
+    margin-bottom: 32px;
+    box-shadow: var(--admin-shadow);
+    flex-wrap: wrap;
+}
+
+.action-bar__group {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.action-bar__status {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 6px 12px;
+    background: var(--color-gray-soft);
+    border-radius: 10px;
+    border: 1px solid var(--admin-border);
+}
+
+.action-bar__label {
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--admin-text);
+}
+
+@media (max-width: 768px) {
+    .action-bar {
+        flex-direction: column;
+        align-items: stretch;
+    }
+
+    .action-bar__group {
+        justify-content: center;
+    }
+}
+
+/* --- Select Wrapper & Icons --- */
+.select-wrapper {
+    position: relative;
+    width: 100%;
+}
+
+.select-wrapper select {
+    appearance: none !important;
+    -webkit-appearance: none !important;
+    -moz-appearance: none !important;
+    padding-right: 40px !important;
+}
+
+/* Target both the <i> and the generated <svg> */
+.select-wrapper .select-icon,
+.select-wrapper svg.select-icon {
+    position: absolute !important;
+    right: 14px !important;
+    top: 50% !important;
+    transform: translateY(-50%) !important;
+    pointer-events: none !important;
+    color: var(--color-gray-400) !important;
+    width: 16px !important;
+    height: 16px !important;
+    margin: 0 !important;
 }

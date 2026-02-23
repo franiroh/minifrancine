@@ -1,6 +1,6 @@
 
 import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js/+esm'
-import { getUser, signOut, fetchProducts, updateProduct, fetchProductById } from './api.js';
+import { getUser, signOut, fetchProducts, updateProduct, fetchProductById, downloadProductFile } from './api.js';
 import { fetchAllOrders, fetchAdminStats, deleteProduct, archiveProduct, unarchiveProduct, fetchCategories, createCategory, updateCategory, deleteCategory, upsertCategoryTranslations, fetchCategoryTranslations } from './api.js';
 import { loadAdminMessages } from './admin-messages.js';
 import { initContent } from './admin-content.js';
@@ -8,7 +8,7 @@ import { initI18nEditor } from './admin-i18n.js';
 import { initAdminCoupons } from './admin-coupons.js';
 import i18n from './i18n.js';
 import { escapeHtml, sanitizeCssValue, getBadgeKey } from './utils.js';
-import { generateProductPDF } from './pdf-export.js';
+import { generateProductPDF, generateProductBundle } from './pdf-export.js';
 import { fetchProductImages } from './api.js';
 
 let currentView = 'dashboard';
@@ -441,7 +441,7 @@ function renderProductsTable(allProducts, selectedCategoryId, archiveStatus = 'a
             <td class="actions-cell">
                 <div class="actions-wrapper">
                     <button class="btn-icon" onclick="window.location.href='admin-product.html?id=${parseInt(p.id)}'"><i data-lucide="edit-3"></i></button>
-                    <button class="btn-icon" onclick="downloadPDFHandler(${parseInt(p.id)}, this)" title="Descargar PDF"><i data-lucide="file-text"></i></button>
+                    <button class="btn-icon" onclick="downloadBundleHandler(${parseInt(p.id)}, this)" title="Descargar Bundle (ZIP)"><i data-lucide="archive"></i></button>
                     ${p.archived
             ? `<button class="btn-icon" onclick="unarchiveProductHandler(${parseInt(p.id)})" title="Desarchivar"><i data-lucide="archive-restore"></i></button>`
             : `<button class="btn-icon" onclick="archiveProductHandler(${parseInt(p.id)})" title="Archivar"><i data-lucide="archive"></i></button>`
@@ -616,9 +616,9 @@ window.toggleIndexHandler = async (id, indexed) => {
     }
 };
 
-window.downloadPDFHandler = async (productId, btn) => {
+window.downloadBundleHandler = async (productId, btn) => {
+    const originalHTML = btn.innerHTML;
     try {
-        const originalText = btn.innerHTML;
         btn.disabled = true;
         btn.innerHTML = '<i data-lucide="loader-2" class="animate-spin" style="width: 16px; height: 16px;"></i>';
         if (window.lucide) window.lucide.createIcons();
@@ -629,10 +629,12 @@ window.downloadPDFHandler = async (productId, btn) => {
 
         // 2. Fetch Full Product Data (to ensure we have all fields for PDF)
         const product = await fetchProductById(productId);
-
         if (!product) throw new Error('Producto no encontrado');
 
-        // 3. Fetch PDF Settings
+        // 3. Get Signed URLs for all files
+        const signedFiles = await downloadProductFile(productId);
+
+        // 4. Fetch PDF Settings
         const { data: settingsData } = await supabase.from('site_translations').select('key, es').ilike('key', 'pdf.%');
         const settings = {};
         if (settingsData) {
@@ -653,20 +655,22 @@ window.downloadPDFHandler = async (productId, btn) => {
             }
         };
 
-        if (window.generateProductPDF) {
-            await window.generateProductPDF(pdfProduct, settings);
-        } else if (generateProductPDF) {
-            await generateProductPDF(pdfProduct, settings);
+        if (window.generateProductBundle) {
+            const bundleSettings = {
+                logo: settings.logo || 'MiniFrancine',
+                footer: settings.footer || 'MiniFrancine - Embroidery Designs'
+            };
+            await window.generateProductBundle(pdfProduct, signedFiles || [], bundleSettings);
         } else {
-            throw new Error('Generador de PDF no disponible');
+            throw new Error('Generador de Bundle no disponible');
         }
 
     } catch (err) {
         console.error(err);
-        alert('Error al descargar PDF: ' + err.message);
+        alert('Error al descargar Bundle: ' + err.message);
     } finally {
         btn.disabled = false;
-        btn.innerHTML = '<i data-lucide="file-text"></i>';
+        btn.innerHTML = originalHTML;
         if (window.lucide) window.lucide.createIcons();
     }
 };

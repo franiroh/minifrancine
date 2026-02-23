@@ -190,7 +190,7 @@ export async function fetchProductsByIds(ids) {
 export async function fetchProductsListAdmin() {
     const { data, error } = await supabase
         .from('products')
-        .select('id, title, main_image, image_color')
+        .select('id, title, main_image, image_color, tags')
         .order('title', { ascending: true });
 
     if (error) {
@@ -775,31 +775,48 @@ export async function downloadProductFile(productId) {
     const { data: files, error } = await supabase
         .from('product_files')
         .select('storage_path, filename')
-        .eq('product_id', productId)
-        .single()
+        .eq('product_id', productId);
 
     if (error) {
-        console.error('Error fetching file info:', error)
-        return null
+        console.error('Error fetching file info:', error);
+        return [];
     }
 
-    if (!files) return null;
+    if (!files || files.length === 0) return [];
 
-    const { data: signedData, error: signError } = await supabase
-        .storage
-        .from('product-files')
-        .createSignedUrl(files.storage_path, 60)
+    // Sign all URLs
+    const signedFiles = [];
+    for (const f of files) {
+        const { data: signedData, error: signError } = await supabase
+            .storage
+            .from('product-files')
+            .createSignedUrl(f.storage_path, 3600); // 1 hour for bundling large sets
 
-    if (signError) {
-        console.error('Error signing URL:', signError)
-        return null
+        if (!signError) {
+            signedFiles.push({
+                url: signedData.signedUrl,
+                filename: f.filename
+            });
+        }
     }
-
-    return {
-        url: signedData.signedUrl,
-        filename: files.filename
-    }
+    return signedFiles;
 }
+
+export async function fetchProductFiles(productId) {
+    const { data, error } = await supabase
+        .from('product_files')
+        .select('*')
+        .eq('product_id', productId)
+        .order('created_at', { ascending: true });
+
+    if (error) {
+        console.error('Error fetching file records', error);
+        return [];
+    }
+    return data;
+}
+
+
 
 // --- Admin ---
 

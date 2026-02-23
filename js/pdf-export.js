@@ -360,11 +360,54 @@ export async function generateProductPDF(product, settings) {
         currentY += 10;
     }
 
-    // --- Add footer to the last page ---
     addPageFooter();
 
     const filename = `${product.title?.replace(/[^a-z0-9]/gi, '_').toLowerCase() || 'product'}.pdf`;
+
+    if (settings.output === 'blob') {
+        return doc.output('blob');
+    }
+
     doc.save(filename);
 }
 
+/**
+ * Generates a ZIP bundle containing the product PDF and all associated embroidery files.
+ * @param {Object} product Product data
+ * @param {Array} signedFiles Array of {url, filename} from Supabase
+ * @param {Object} settings PDF settings
+ */
+export async function generateProductBundle(product, signedFiles, settings) {
+    const zip = new JSZip();
+    const folderName = product.title?.replace(/[^a-z0-9]/gi, '_').toLowerCase() || 'bundle';
+    const folder = zip.folder(folderName);
+
+    // 1. Add PDF
+    const pdfBlob = await generateProductPDF(product, { ...settings, output: 'blob' });
+    folder.file(`${folderName}.pdf`, pdfBlob);
+
+    // 2. Add Embroidery Files
+    for (const file of signedFiles) {
+        try {
+            const resp = await fetch(file.url);
+            const blob = await resp.blob();
+            folder.file(file.filename, blob);
+        } catch (err) {
+            console.error(`Error adding file ${file.filename} to bundle:`, err);
+        }
+    }
+
+    // 3. Generate and Download ZIP
+    const content = await zip.generateAsync({ type: "blob" });
+    const zipFilename = `${folderName}_bundle.zip`;
+
+    const link = document.createElement('a');
+    link.href = URL.createObjectURL(content);
+    link.download = zipFilename;
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+}
+
 window.generateProductPDF = generateProductPDF;
+window.generateProductBundle = generateProductBundle;
