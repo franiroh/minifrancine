@@ -1,6 +1,6 @@
 
 import { loadComponents, updateNavbarAuth, updateNavbarCartCount, createSkeletonCard } from './components.js';
-import { getUser, onAuthStateChange, fetchPurchasedProducts, downloadProductFile, fetchProductById } from './api.js';
+import { getUser, onAuthStateChange, fetchPurchasedProducts, downloadProductFile, fetchProductById, fetchProductImages, fetchPDFSettings } from './api.js';
 import { loadCart, getCartCount } from './state.js';
 import { escapeHtml, sanitizeCssValue, showToast, InfiniteScrollManager } from './utils.js';
 import { generateProductBundle } from './pdf-export.js';
@@ -165,39 +165,50 @@ function attachDownloadListeners() {
                 // 1. Get Signed URLs for all files
                 const signedFiles = await downloadProductFile(productId);
 
-                if (signedFiles && signedFiles.length > 0) {
-                    // 2. Fetch full product data for PDF generation
-                    const productData = await fetchProductById(productId);
+                // 2. Fetch full product data and images for PDF generation
+                const product = await fetchProductById(productId);
+                if (!product) {
+                    throw new Error('No se pudo obtener la información del producto.');
+                }
 
-                    if (!productData) {
-                        throw new Error('Could not fetch product details');
+                const images = await fetchProductImages(productId);
+                const imageData = images ? images.map(img => img.public_url) : [];
+
+                // 3. Prepare structured product record for PDF generator
+                const productForPDF = {
+                    ...product,
+                    images: imageData,
+                    meta: {
+                        size: product.size || '-',
+                        stitches: String(product.stitches || 0),
+                        color_changes: String(product.colorChangeCount || 0),
+                        colors_used: String(product.colorCount || 0)
                     }
+                };
 
-                    // 3. Generate and Download ZIP Bundle
-                    // Set default settings for user download
-                    const settings = {
-                        logo: 'MiniFrancine',
-                        footer: 'MiniFrancine - Embroidery Designs'
-                    };
+                // 4. Fetch Global PDF Settings (Logo, Promo, Footer from Admin)
+                const pdfSettings = await fetchPDFSettings();
 
-                    await generateProductBundle(productData, signedFiles, settings);
+                // Fallback to defaults if settings are empty
+                const settings = {
+                    logo: pdfSettings.logo || 'MiniFrancine',
+                    promo: pdfSettings.promo || '',
+                    footer: pdfSettings.footer || 'MiniFrancine - Embroidery Designs'
+                };
 
-                    btn.innerHTML = `<i data-lucide="check"></i> ${i18n.t('btn.downloaded')}`;
-                    if (window.lucide) window.lucide.createIcons();
-                    setTimeout(() => {
-                        btn.innerHTML = originalHTML;
-                        btn.disabled = false;
-                        if (window.lucide) window.lucide.createIcons();
-                    }, 2000);
-                } else {
-                    showToast(i18n.t('error.file_unavailable'), 'error');
+                await generateProductBundle(productForPDF, signedFiles, settings);
+
+                btn.innerHTML = `<i data-lucide="check"></i> ${i18n.t('btn.downloaded')}`;
+                if (window.lucide) window.lucide.createIcons();
+                setTimeout(() => {
                     btn.innerHTML = originalHTML;
                     btn.disabled = false;
                     if (window.lucide) window.lucide.createIcons();
-                }
+                }, 2000);
             } catch (err) {
                 console.error('Download error:', err);
-                showToast(i18n.t('error.download_link'), 'error');
+                const errMsg = err.message || i18n.t('error.download_link');
+                showToast(errMsg, 'error');
                 btn.innerHTML = originalHTML;
                 btn.disabled = false;
                 if (window.lucide) window.lucide.createIcons();

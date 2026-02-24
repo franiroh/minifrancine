@@ -15,13 +15,13 @@ export async function generateProductPDF(product, settings) {
     // Helper: Add footer to current page
     const addPageFooter = () => {
         const footerY = pageHeight - margin;
-        doc.setDrawColor(230, 230, 230);
-        doc.setLineWidth(0.2);
+        doc.setDrawColor(180, 180, 180); // Darker line
+        doc.setLineWidth(0.3);
         doc.line(margin, footerY - 10, pageWidth - margin, footerY - 10);
 
         doc.setFontSize(9);
         doc.setFont('helvetica', 'normal');
-        doc.setTextColor(150, 150, 150);
+        doc.setTextColor(100, 100, 100); // Darker text
         const footerText = settings.footer || 'MiniFrancine - Embroidery Designs';
         const footerLines = doc.splitTextToSize(footerText, contentWidth);
         doc.text(footerLines, margin, footerY - 5);
@@ -221,8 +221,17 @@ export async function generateProductPDF(product, settings) {
     doc.setFont('helvetica', 'bold');
     doc.setTextColor(26, 26, 26);
 
-    // Split title to avoid overlap with logo
-    const titleWidth = logoProps ? (contentWidth - logoMaxW - 10) : contentWidth;
+    // Reserved space for logo (image or text)
+    let reservedLogoWidth = 0;
+    if (logoProps) {
+        reservedLogoWidth = logoMaxW + 10;
+    } else if (settings.logo) {
+        doc.setFontSize(24);
+        reservedLogoWidth = doc.getTextWidth(settings.logo) + 10;
+        doc.setFontSize(18); // Reset to title size
+    }
+
+    const titleWidth = contentWidth - reservedLogoWidth;
     const titleLines = doc.splitTextToSize(product.title || 'Product Documentation', titleWidth);
     doc.text(titleLines, margin, currentY + 7);
 
@@ -242,6 +251,8 @@ export async function generateProductPDF(product, settings) {
     } else if (settings.logo) {
         // Fallback text logo
         doc.setFontSize(24);
+        doc.setFont('helvetica', 'bold');
+        doc.setTextColor(150, 150, 150); // Muted logo color
         const logoText = settings.logo;
         const logoW = doc.getTextWidth(logoText);
         doc.text(logoText, pageWidth - margin - logoW, currentY + 10);

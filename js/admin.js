@@ -1,6 +1,6 @@
 
 import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js/+esm'
-import { getUser, signOut, fetchProducts, updateProduct, fetchProductById, downloadProductFile } from './api.js';
+import { getUser, signOut, fetchProducts, fetchProductById, fetchProductImages, fetchPDFSettings, downloadProductFile } from './api.js';
 import { fetchAllOrders, fetchAdminStats, deleteProduct, archiveProduct, unarchiveProduct, fetchCategories, createCategory, updateCategory, deleteCategory, upsertCategoryTranslations, fetchCategoryTranslations } from './api.js';
 import { loadAdminMessages } from './admin-messages.js';
 import { initContent } from './admin-content.js';
@@ -635,14 +635,7 @@ window.downloadBundleHandler = async (productId, btn) => {
         const signedFiles = await downloadProductFile(productId);
 
         // 4. Fetch PDF Settings
-        const { data: settingsData } = await supabase.from('site_translations').select('key, es').ilike('key', 'pdf.%');
-        const settings = {};
-        if (settingsData) {
-            settingsData.forEach(s => {
-                const k = s.key.split('.')[1];
-                settings[k] = s.es;
-            });
-        }
+        const settings = await fetchPDFSettings();
 
         const pdfProduct = {
             ...product,

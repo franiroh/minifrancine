@@ -779,10 +779,12 @@ export async function downloadProductFile(productId) {
 
     if (error) {
         console.error('Error fetching file info:', error);
-        return [];
+        throw new Error(`Error fetching file info: ${error.message}`);
     }
 
-    if (!files || files.length === 0) return [];
+    if (!files || files.length === 0) {
+        throw new Error('No se encontraron archivos digitales para este producto.');
+    }
 
     // Sign all URLs
     const signedFiles = [];
@@ -790,15 +792,25 @@ export async function downloadProductFile(productId) {
         const { data: signedData, error: signError } = await supabase
             .storage
             .from('product-files')
-            .createSignedUrl(f.storage_path, 3600); // 1 hour for bundling large sets
+            .createSignedUrl(f.storage_path, 3600);
 
-        if (!signError) {
+        if (signError) {
+            console.warn(`Error signing file ${f.filename}:`, signError);
+            continue; // Skip failed ones but try others
+        }
+
+        if (signedData && signedData.signedUrl) {
             signedFiles.push({
                 url: signedData.signedUrl,
                 filename: f.filename
             });
         }
     }
+
+    if (signedFiles.length === 0 && files.length > 0) {
+        throw new Error('Could not generate secure download links for any of the files.');
+    }
+
     return signedFiles;
 }
 
@@ -1405,6 +1417,27 @@ export async function fetchCategoryTranslations(id) {
         .maybeSingle();
 
     return { data, error };
+}
+
+export async function fetchPDFSettings() {
+    const { data, error } = await supabase
+        .from('site_translations')
+        .select('key, es')
+        .ilike('key', 'pdf.%');
+
+    if (error) {
+        console.error('Error fetching PDF settings:', error);
+        return {};
+    }
+
+    const settings = {};
+    if (data) {
+        data.forEach(s => {
+            const k = s.key.split('.')[1]; // get 'logo', 'promo', 'footer'
+            settings[k] = s.es;
+        });
+    }
+    return settings;
 }
 
 
