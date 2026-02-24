@@ -438,8 +438,9 @@ function renderProductsTable(allProducts, selectedCategoryId, archiveStatus = 'a
             </td>
             <td class="actions-cell">
                 <div class="actions-wrapper">
-                    <button class="btn-icon" onclick="window.location.href='admin-product.html?id=${parseInt(p.id)}'"><i data-lucide="edit-3"></i></button>
-                    <button class="btn-icon" onclick="downloadBundleHandler(${parseInt(p.id)}, this)" title="Descargar Bundle (ZIP)"><i data-lucide="archive"></i></button>
+                    <button class="btn-icon" onclick="window.location.href='admin-product.html?id=${parseInt(p.id)}'" title="Editar"><i data-lucide="edit-3"></i></button>
+                    <button class="btn-icon" onclick="downloadPDFHandler(${parseInt(p.id)}, this)" title="Exportar PDF"><i data-lucide="file-text"></i></button>
+                    <button class="btn-icon" onclick="downloadBundleHandler(${parseInt(p.id)}, this)" title="Descargar Bundle (ZIP)"><i data-lucide="package"></i></button>
                     ${p.archived
             ? `<button class="btn-icon" onclick="unarchiveProductHandler(${parseInt(p.id)})" title="Desarchivar"><i data-lucide="archive-restore"></i></button>`
             : `<button class="btn-icon" onclick="archiveProductHandler(${parseInt(p.id)})" title="Archivar"><i data-lucide="archive"></i></button>`
@@ -614,6 +615,57 @@ window.toggleIndexHandler = async (id, indexed) => {
     }
 };
 
+async function prepareProductForPDF(productId) {
+    // 1. Fetch Product Images
+    const images = await fetchProductImages(productId);
+    const imageData = images.map(img => img.public_url);
+
+    // 2. Fetch Full Product Data
+    const product = await fetchProductById(productId);
+    if (!product) throw new Error('Producto no encontrado');
+
+    return {
+        ...product,
+        images: imageData,
+        meta: {
+            size: product.size || '-',
+            stitches: String(product.stitches || 0),
+            color_changes: String(product.colorChangeCount || 0),
+            colors_used: String(product.colorCount || 0)
+        }
+    };
+}
+
+window.downloadPDFHandler = async (productId, btn) => {
+    const originalHTML = btn.innerHTML;
+    try {
+        btn.disabled = true;
+        btn.innerHTML = '<i data-lucide="loader-2" class="animate-spin" style="width: 16px; height: 16px;"></i>';
+        if (window.lucide) window.lucide.createIcons();
+
+        const pdfProduct = await prepareProductForPDF(productId);
+        const settings = await fetchPDFSettings();
+
+        if (window.generateProductPDF) {
+            const pdfSettings = {
+                logo: settings.logo || 'MiniFrancine',
+                promo: settings.promo || '',
+                footer: settings.footer || 'MiniFrancine - Embroidery Designs'
+            };
+            await window.generateProductPDF(pdfProduct, pdfSettings);
+        } else {
+            throw new Error('Generador de PDF no disponible');
+        }
+    } catch (err) {
+        console.error(err);
+        alert('Error al exportar PDF: ' + err.message);
+    } finally {
+        btn.disabled = false;
+        btn.innerHTML = originalHTML;
+        if (window.lucide) window.lucide.createIcons();
+    }
+};
+
 window.downloadBundleHandler = async (productId, btn) => {
     const originalHTML = btn.innerHTML;
     try {
@@ -621,30 +673,9 @@ window.downloadBundleHandler = async (productId, btn) => {
         btn.innerHTML = '<i data-lucide="loader-2" class="animate-spin" style="width: 16px; height: 16px;"></i>';
         if (window.lucide) window.lucide.createIcons();
 
-        // 1. Fetch Product Images
-        const images = await fetchProductImages(productId);
-        const imageData = images.map(img => img.public_url);
-
-        // 2. Fetch Full Product Data (to ensure we have all fields for PDF)
-        const product = await fetchProductById(productId);
-        if (!product) throw new Error('Producto no encontrado');
-
-        // 3. Get Signed URLs for all files
+        const pdfProduct = await prepareProductForPDF(productId);
         const signedFiles = await downloadProductFile(productId);
-
-        // 4. Fetch PDF Settings
         const settings = await fetchPDFSettings();
-
-        const pdfProduct = {
-            ...product,
-            images: imageData,
-            meta: {
-                size: product.size || '-',
-                stitches: String(product.stitches || 0),
-                color_changes: String(product.colorChangeCount || 0),
-                colors_used: String(product.colorCount || 0)
-            }
-        };
 
         if (window.generateProductBundle) {
             const bundleSettings = {

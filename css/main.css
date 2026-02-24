@@ -158,6 +158,10 @@ input {
     }
 }
 
+.animate-spin {
+    animation: spin 1s linear infinite;
+}
+
 /* --- Product Grid --- */
 .product-grid {
     display: grid;
