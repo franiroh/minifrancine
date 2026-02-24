@@ -1,7 +1,6 @@
 
 import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js/+esm'
-import { getUser, signOut, fetchProducts, fetchProductById, fetchProductImages, fetchPDFSettings, downloadProductFile } from './api.js';
-import { fetchAllOrders, fetchAdminStats, deleteProduct, archiveProduct, unarchiveProduct, fetchCategories, createCategory, updateCategory, deleteCategory, upsertCategoryTranslations, fetchCategoryTranslations } from './api.js';
+import { getUser, signOut, fetchProducts, fetchProductById, fetchProductImages, fetchPDFSettings, downloadProductFile, fetchAllOrders, fetchAdminStats, deleteProduct, archiveProduct, unarchiveProduct, fetchCategories, createCategory, updateCategory, deleteCategory, upsertCategoryTranslations, fetchCategoryTranslations, supabase } from './api.js';
 import { loadAdminMessages } from './admin-messages.js';
 import { initContent } from './admin-content.js';
 import { initI18nEditor } from './admin-i18n.js';
@@ -9,7 +8,6 @@ import { initAdminCoupons } from './admin-coupons.js';
 import i18n from './i18n.js';
 import { escapeHtml, sanitizeCssValue, getBadgeKey } from './utils.js';
 import { generateProductPDF, generateProductBundle } from './pdf-export.js';
-import { fetchProductImages } from './api.js';
 
 let currentView = 'dashboard';
 let currentProductPage = 1;
@@ -695,6 +693,5 @@ window.unarchiveProductHandler = async (id) => {
     }
 };
 
-import { supabase } from './api.js';
 
 document.addEventListener('DOMContentLoaded', init);

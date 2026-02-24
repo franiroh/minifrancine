@@ -2,7 +2,7 @@
 import { loadComponents, updateNavbarAuth, updateNavbarCartCount, createSkeletonCard } from './components.js';
 import { getUser, onAuthStateChange, fetchPurchasedProducts, downloadProductFile, fetchProductById, fetchProductImages, fetchPDFSettings } from './api.js';
 import { loadCart, getCartCount } from './state.js';
-import { escapeHtml, sanitizeCssValue, showToast, InfiniteScrollManager } from './utils.js';
+import { escapeHtml, sanitizeCssValue, showToast, InfiniteScrollManager, showLoadingOverlay, hideLoadingOverlay } from './utils.js';
 import { generateProductBundle } from './pdf-export.js';
 import i18n from './i18n.js';
 
@@ -161,6 +161,9 @@ function attachDownloadListeners() {
             btn.disabled = true;
             if (window.lucide) window.lucide.createIcons();
 
+            // Show persistent loading overlay
+            showLoadingOverlay(i18n.t('btn.downloading'), i18n.t('msg.download_preparing'));
+
             try {
                 // 1. Get Signed URLs for all files
                 const signedFiles = await downloadProductFile(productId);
@@ -198,6 +201,8 @@ function attachDownloadListeners() {
 
                 await generateProductBundle(productForPDF, signedFiles, settings);
 
+                // Success!
+                hideLoadingOverlay();
                 btn.innerHTML = `<i data-lucide="check"></i> ${i18n.t('btn.downloaded')}`;
                 if (window.lucide) window.lucide.createIcons();
                 setTimeout(() => {
@@ -207,6 +212,7 @@ function attachDownloadListeners() {
                 }, 2000);
             } catch (err) {
                 console.error('Download error:', err);
+                hideLoadingOverlay();
                 const errMsg = err.message || i18n.t('error.download_link');
                 showToast(errMsg, 'error');
                 btn.innerHTML = originalHTML;

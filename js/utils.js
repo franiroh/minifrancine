@@ -96,6 +96,32 @@ export const showToast = (message, type = 'info') => {
     }, 3000);
 };
 
+export const showLoadingOverlay = (message, subtext = '') => {
+    // Prevent duplicates
+    if (document.querySelector('.loading-overlay')) return;
+
+    const overlay = document.createElement('div');
+    overlay.className = 'loading-overlay';
+    overlay.innerHTML = `
+        <div class="loading-overlay__spinner"></div>
+        <div class="loading-overlay__content">
+            <h2 class="loading-overlay__text">${escapeHtml(message)}</h2>
+            ${subtext ? `<p class="loading-overlay__subtext">${escapeHtml(subtext)}</p>` : ''}
+        </div>
+    `;
+    document.body.appendChild(overlay);
+};
+
+export const hideLoadingOverlay = () => {
+    const overlay = document.querySelector('.loading-overlay');
+    if (overlay) {
+        overlay.style.animation = 'fade-out 0.3s forwards';
+        overlay.addEventListener('animationend', () => {
+            overlay.remove();
+        });
+    }
+};
+
 export const getBadgeKey = (badge) => {
     if (!badge) return null;
     const lower = badge.toLowerCase().trim();

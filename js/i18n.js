@@ -32,7 +32,7 @@ export const i18n = {
             'btn.save': { es: 'Guardar', en: 'Save', pt: 'Salvar' },
             'btn.delete': { es: 'Eliminar', en: 'Delete', pt: 'Excluir' },
             'btn.download': { es: 'Descargar', en: 'Download', pt: 'Baixar' },
-            'btn.downloading': { es: 'Descargando...', en: 'Downloading...', pt: 'Baixando...' },
+            'btn.downloading': { es: 'Procesando...', en: 'Processing...', pt: 'Processando...' },
             'btn.downloaded': { es: 'Listo', en: 'Done', pt: 'Concluído' },
             'btn.edit': { es: 'Editar', en: 'Edit', pt: 'Editar' },
             'btn.rate': { es: 'Calificar', en: 'Rate', pt: 'Avaliar' },
@@ -328,6 +328,11 @@ export const i18n = {
             'msg.delete_account_error': { es: 'Error al eliminar cuenta. Intenta nuevamente.', en: 'Error deleting account. Please try again.', pt: 'Erro ao excluir conta. Tente novamente.' },
             'msg.account_deleted': { es: 'Tu cuenta ha sido eliminada.', en: 'Your account has been deleted.', pt: 'Sua conta foi excluída.' },
             'msg.download_started': { es: 'Descarga iniciada correctamente.', en: 'Download started successfully.', pt: 'Download iniciado com sucesso.' },
+            'msg.download_preparing': {
+                es: 'Estamos preparando tus archivos, esto puede demorar un momento. Por favor no cierres la ventana.',
+                en: 'We are preparing your files, this may take a moment. Please do not close the window.',
+                pt: 'Estamos preparando seus arquivos, isso pode demorar um momento. Por favor, não feche a janela.'
+            },
             'error.download_link': { es: 'Error al generar el enlace de descarga.', en: 'Error generating download link.', pt: 'Erro ao gerar o link de download.' },
             'msg.invalid_score': { es: 'Por favor selecciona una puntuación válida (1-5).', en: 'Please select a valid score (1-5).', pt: 'Por favor, selecione uma pontuação válida (1-5).' },
             'msg.comment_limit': { es: 'El comentario no puede exceder los 1000 caracteres.', en: 'Comment cannot exceed 1000 characters.', pt: 'O comentário não pode exceder 1000 caracteres.' },
