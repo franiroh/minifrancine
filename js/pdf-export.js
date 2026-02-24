@@ -410,7 +410,7 @@ export async function generateProductBundle(product, signedFiles, settings) {
 
     // 3. Generate and Download ZIP
     const content = await zip.generateAsync({ type: "blob" });
-    const zipFilename = `${folderName}_bundle.zip`;
+    const zipFilename = `${folderName}.zip`;
 
     const link = document.createElement('a');
     link.href = URL.createObjectURL(content);
