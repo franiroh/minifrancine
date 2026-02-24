@@ -1,9 +1,10 @@
 
 import { loadComponents, updateNavbarAuth, updateNavbarCartCount } from './components.js';
-import { getUser, onAuthStateChange, fetchMyOrders, downloadProductFile, fetchAllUserReviews, fetchUserReview, addReview, updateReview, deleteReview } from './api.js';
+import { getUser, onAuthStateChange, fetchMyOrders, downloadProductFile, fetchAllUserReviews, fetchUserReview, addReview, updateReview, deleteReview, fetchProductById, fetchProductImages, fetchPDFSettings } from './api.js';
 import { state, loadCart, getCartCount } from './state.js';
-import { escapeHtml, sanitizeCssValue, showToast } from './utils.js';
+import { escapeHtml, sanitizeCssValue, showToast, showLoadingOverlay, hideLoadingOverlay } from './utils.js';
 import i18n from './i18n.js';
+import { generateProductBundle } from './pdf-export.js';
 
 // ... (rest of imports)
 
@@ -223,37 +224,63 @@ function attachDownloadListeners() {
             const productTitle = btn.dataset.title;
 
             const originalHTML = btn.innerHTML;
-            btn.innerHTML = '<i data-lucide="loader"></i> ...';
+            btn.innerHTML = `<i data-lucide="loader"></i> ${i18n.t('btn.downloading')}`;
             btn.disabled = true;
             if (window.lucide) window.lucide.createIcons();
 
-            try {
-                const result = await downloadProductFile(productId);
-                if (result && result.url) {
-                    const link = document.createElement('a');
-                    link.href = result.url;
-                    link.download = result.filename || productTitle + '.zip';
-                    document.body.appendChild(link);
-                    link.click();
-                    document.body.removeChild(link);
+            // Show persistent loading overlay
+            showLoadingOverlay(i18n.t('btn.downloading'), i18n.t('msg.download_preparing'));
 
-                    btn.innerHTML = `<i data-lucide="check"></i> ${i18n.t('btn.downloaded')}`;
-                    showToast(i18n.t('msg.download_started'), 'success');
-                    if (window.lucide) window.lucide.createIcons();
-                    setTimeout(() => {
-                        btn.innerHTML = originalHTML;
-                        btn.disabled = false;
-                        if (window.lucide) window.lucide.createIcons();
-                    }, 2000);
-                } else {
-                    showToast(i18n.t('error.file_unavailable'), 'error');
+            try {
+                // 1. Get Signed URLs for all files
+                const signedFiles = await downloadProductFile(productId);
+
+                // 2. Fetch full product data and images for PDF generation
+                const product = await fetchProductById(productId);
+                if (!product) {
+                    throw new Error(i18n.t('error.product_not_found') || 'Producto no encontrado');
+                }
+
+                const images = await fetchProductImages(productId);
+                const imageData = images ? images.map(img => img.public_url) : [];
+
+                // 3. Prepare structured product record for PDF generator
+                const productForPDF = {
+                    ...product,
+                    images: imageData,
+                    meta: {
+                        size: product.size || '-',
+                        stitches: String(product.stitches || 0),
+                        color_changes: String(product.colorChangeCount || 0),
+                        colors_used: String(product.colorCount || 0)
+                    }
+                };
+
+                // 4. Fetch Global PDF Settings
+                const pdfSettings = await fetchPDFSettings();
+                const settings = {
+                    logo: pdfSettings.logo || 'MiniFrancine',
+                    promo: pdfSettings.promo || '',
+                    footer: pdfSettings.footer || 'MiniFrancine - Embroidery Designs'
+                };
+
+                await generateProductBundle(productForPDF, signedFiles, settings);
+
+                // Success!
+                hideLoadingOverlay();
+                btn.innerHTML = `<i data-lucide="check"></i> ${i18n.t('btn.downloaded')}`;
+                if (window.lucide) window.lucide.createIcons();
+                setTimeout(() => {
                     btn.innerHTML = originalHTML;
                     btn.disabled = false;
                     if (window.lucide) window.lucide.createIcons();
-                }
+                }, 2000);
+
             } catch (err) {
                 console.error('Download error:', err);
-                showToast(i18n.t('error.download_link'), 'error');
+                hideLoadingOverlay();
+                const errMsg = err.message || i18n.t('error.download_link');
+                showToast(errMsg, 'error');
                 btn.innerHTML = originalHTML;
                 btn.disabled = false;
                 if (window.lucide) window.lucide.createIcons();
