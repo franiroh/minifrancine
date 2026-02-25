@@ -89,7 +89,8 @@ export async function fetchProducts({ publishedOnly = false, tag = null, search 
             published: p.published,
             archived: p.archived,
             indexed: p.indexed,
-            threadColors: p.thread_colors || []
+            threadColors: p.thread_colors || [],
+            bundledZipUrl: p.bundled_zip_url
         };
     });
 }
@@ -134,7 +135,8 @@ export async function fetchProductById(id) {
         published: data.published,
         indexed: data.indexed,
         relatedProductIds: data.related_product_ids || [],
-        threadColors: data.thread_colors || []
+        threadColors: data.thread_colors || [],
+        bundledZipUrl: data.bundled_zip_url
     };
 }
 
@@ -182,7 +184,8 @@ export async function fetchProductsByIds(ids) {
             published: p.published,
             archived: p.archived,
             indexed: p.indexed,
-            threadColors: p.thread_colors || []
+            threadColors: p.thread_colors || [],
+            bundledZipUrl: p.bundled_zip_url
         };
     });
 }
@@ -386,7 +389,8 @@ export async function fetchFavoriteProducts(userId, specificIds = null) {
             reviews: p.reviews,
             description: p.description,
             mainImage: p.main_image,
-            published: p.published
+            published: p.published,
+            bundledZipUrl: p.bundled_zip_url
         };
     })
 }
@@ -458,7 +462,8 @@ export async function fetchPurchasedProducts() {
             reviews: p.reviews,
             description: p.description,
             mainImage: p.main_image,
-            published: p.published
+            published: p.published,
+            bundledZipUrl: p.bundled_zip_url
         };
     })
 }
@@ -757,7 +762,8 @@ export async function fetchMyOrders(userId) {
                 products (
                     title,
                     main_image,
-                    image_color
+                    image_color,
+                    bundled_zip_url
                 )
             )
         `)
@@ -1227,6 +1233,45 @@ export async function uploadProductFile(file) {
     return { storagePath: fileName, filename: file.name };
 }
 
+export async function uploadProductBundle(productId, blob) {
+    const fileName = `bundles/bundle_${productId}.zip`;
+
+    // Upload/Overwrite the bundle for this product
+    const { data, error } = await supabase.storage
+        .from('product-files')
+        .upload(fileName, blob, {
+            contentType: 'application/zip',
+            upsert: true
+        });
+
+    if (error) {
+        console.error('Bundle Upload Error', error);
+        return { error };
+    }
+
+    // Update the product record with the storage path
+    const { error: updateError } = await updateProduct(productId, { bundled_zip_url: fileName });
+
+    return { data, error: updateError };
+}
+
+export async function getSignedBundleUrl(storagePath, downloadName = null) {
+    const options = {};
+    if (downloadName) options.download = downloadName;
+
+    const { data, error } = await supabase
+        .storage
+        .from('product-files')
+        .createSignedUrl(storagePath, 3600, options); // 1 hour
+
+
+    if (error) {
+        console.error('Error signing bundle URL:', error);
+        return null;
+    }
+    return data.signedUrl;
+}
+
 export async function saveProductFileRecord(productId, storagePath, filename) {
     // Upsert: One file per product for now? Or multiple? 
     // Schema allows multiple, but UI might treat as one. 
@@ -1296,7 +1341,8 @@ export async function fetchOrderItems(orderId) {
             products (
                 title,
                 main_image,
-                image_color
+                image_color,
+                bundled_zip_url
             )
         `)
         .eq('order_id', orderId)

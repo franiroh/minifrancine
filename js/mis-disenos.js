@@ -1,6 +1,6 @@
 
 import { loadComponents, updateNavbarAuth, updateNavbarCartCount, createSkeletonCard } from './components.js';
-import { getUser, onAuthStateChange, fetchPurchasedProducts, downloadProductFile, fetchProductById, fetchProductImages, fetchPDFSettings } from './api.js';
+import { getUser, onAuthStateChange, fetchPurchasedProducts, downloadProductFile, fetchProductById, fetchProductImages, fetchPDFSettings, getSignedBundleUrl } from './api.js';
 import { loadCart, getCartCount } from './state.js';
 import { escapeHtml, sanitizeCssValue, showToast, InfiniteScrollManager, showLoadingOverlay, hideLoadingOverlay } from './utils.js';
 import { generateProductBundle } from './pdf-export.js';
@@ -165,14 +165,39 @@ function attachDownloadListeners() {
             showLoadingOverlay(i18n.t('btn.downloading'), i18n.t('msg.download_preparing'));
 
             try {
-                // 1. Get Signed URLs for all files
-                const signedFiles = await downloadProductFile(productId);
-
-                // 2. Fetch full product data and images for PDF generation
+                // 1. Check if pre-generated ZIP exists
                 const product = await fetchProductById(productId);
                 if (!product) {
                     throw new Error('No se pudo obtener la información del producto.');
                 }
+
+                if (product.bundledZipUrl) {
+                    // FAST PATH: Download pre-generated ZIP
+                    const downloadName = `${product.title.replace(/[^a-z0-9]/gi, '_').toLowerCase()}.zip`;
+                    const signedUrl = await getSignedBundleUrl(product.bundledZipUrl, downloadName);
+                    if (signedUrl) {
+                        const link = document.createElement('a');
+                        link.href = signedUrl;
+                        link.download = `${product.title.replace(/[^a-z0-9]/gi, '_').toLowerCase()}.zip`;
+                        document.body.appendChild(link);
+                        link.click();
+                        document.body.removeChild(link);
+
+                        // Success!
+                        hideLoadingOverlay();
+                        btn.innerHTML = `<i data-lucide="check"></i> ${i18n.t('btn.downloaded')}`;
+                        if (window.lucide) window.lucide.createIcons();
+                        setTimeout(() => {
+                            btn.innerHTML = originalHTML;
+                            btn.disabled = false;
+                            if (window.lucide) window.lucide.createIcons();
+                        }, 2000);
+                        return; // Exit
+                    }
+                }
+
+                // SLOW PATH (Fallback): Generate on the fly
+                const signedFiles = await downloadProductFile(productId);
 
                 const images = await fetchProductImages(productId);
                 const imageData = images ? images.map(img => img.public_url) : [];

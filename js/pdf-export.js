@@ -408,8 +408,13 @@ export async function generateProductBundle(product, signedFiles, settings) {
         }
     }
 
-    // 3. Generate and Download ZIP
+    // 3. Generate ZIP
     const content = await zip.generateAsync({ type: "blob" });
+
+    if (settings.output === 'blob') {
+        return content;
+    }
+
     const zipFilename = `${folderName}.zip`;
 
     const link = document.createElement('a');

@@ -1,6 +1,6 @@
 
 import { loadComponents, updateNavbarAuth, updateNavbarCartCount } from './components.js';
-import { getUser, onAuthStateChange, fetchMyOrders, downloadProductFile, fetchAllUserReviews, fetchUserReview, addReview, updateReview, deleteReview, fetchProductById, fetchProductImages, fetchPDFSettings } from './api.js';
+import { getUser, onAuthStateChange, fetchMyOrders, downloadProductFile, fetchAllUserReviews, fetchUserReview, addReview, updateReview, deleteReview, fetchProductById, fetchProductImages, fetchPDFSettings, getSignedBundleUrl } from './api.js';
 import { state, loadCart, getCartCount } from './state.js';
 import { escapeHtml, sanitizeCssValue, showToast, showLoadingOverlay, hideLoadingOverlay } from './utils.js';
 import i18n from './i18n.js';
@@ -110,7 +110,7 @@ function renderOrderCard(order, reviewsMap = {}) {
                 : `<i data-lucide="image" style="width:24px; height:24px; color:#D1D5DB;"></i>`;
 
             const downloadBtn = isPaid
-                ? `<button class="order-item__download btn btn--sm btn--outline" data-id="${productId}" data-title="${escapeHtml(title)}" style="margin-right: 8px;">
+                ? `<button class="order-item__download btn btn--sm btn--outline" data-id="${productId}" data-title="${escapeHtml(title)}" data-bundle="${product.bundled_zip_url || ''}" style="margin-right: 8px;">
                      <i data-lucide="download"></i> ${i18n.t('btn.download')}
                    </button>`
                 : '';
@@ -230,8 +230,35 @@ function attachDownloadListeners() {
 
             // Show persistent loading overlay
             showLoadingOverlay(i18n.t('btn.downloading'), i18n.t('msg.download_preparing'));
+            const bundledPath = btn.dataset.bundle;
 
             try {
+                if (bundledPath) {
+                    // FAST PATH: Download pre-generated ZIP
+                    const downloadName = `${productTitle.replace(/[^a-z0-9]/gi, '_').toLowerCase()}.zip`;
+                    const signedUrl = await getSignedBundleUrl(bundledPath, downloadName);
+                    if (signedUrl) {
+                        const link = document.createElement('a');
+                        link.href = signedUrl;
+                        link.download = `${productTitle.replace(/[^a-z0-9]/gi, '_').toLowerCase()}.zip`;
+                        document.body.appendChild(link);
+                        link.click();
+                        document.body.removeChild(link);
+
+                        // Success!
+                        hideLoadingOverlay();
+                        btn.innerHTML = `<i data-lucide="check"></i> ${i18n.t('btn.downloaded')}`;
+                        if (window.lucide) window.lucide.createIcons();
+                        setTimeout(() => {
+                            btn.innerHTML = originalHTML;
+                            btn.disabled = false;
+                            if (window.lucide) window.lucide.createIcons();
+                        }, 2000);
+                        return; // Exit fast path
+                    }
+                }
+
+                // SLOW PATH: Generate on the fly
                 // 1. Get Signed URLs for all files
                 const signedFiles = await downloadProductFile(productId);
 

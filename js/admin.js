@@ -1,6 +1,6 @@
 
 import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js/+esm'
-import { getUser, signOut, fetchProducts, fetchProductById, fetchProductImages, fetchPDFSettings, downloadProductFile, fetchAllOrders, fetchAdminStats, deleteProduct, archiveProduct, unarchiveProduct, fetchCategories, createCategory, updateCategory, deleteCategory, upsertCategoryTranslations, fetchCategoryTranslations, supabase } from './api.js';
+import { getUser, signOut, fetchProducts, fetchProductById, fetchProductImages, fetchPDFSettings, downloadProductFile, fetchAllOrders, fetchAdminStats, deleteProduct, archiveProduct, unarchiveProduct, fetchCategories, createCategory, updateCategory, deleteCategory, upsertCategoryTranslations, fetchCategoryTranslations, uploadProductBundle, updateProduct, supabase } from './api.js';
 import { loadAdminMessages } from './admin-messages.js';
 import { initContent } from './admin-content.js';
 import { initI18nEditor } from './admin-i18n.js';
@@ -441,6 +441,7 @@ function renderProductsTable(allProducts, selectedCategoryId, archiveStatus = 'a
                     <button class="btn-icon" onclick="window.location.href='admin-product.html?id=${parseInt(p.id)}'" title="Editar"><i data-lucide="edit-3"></i></button>
                     <button class="btn-icon" onclick="downloadPDFHandler(${parseInt(p.id)}, this)" title="Exportar PDF"><i data-lucide="file-text"></i></button>
                     <button class="btn-icon" onclick="downloadBundleHandler(${parseInt(p.id)}, this)" title="Descargar Bundle (ZIP)"><i data-lucide="package"></i></button>
+                    <button class="btn-icon ${p.bundledZipUrl ? 'text-green' : 'text-gray'}" onclick="updateStoredBundleHandler(${parseInt(p.id)}, this)" title="${p.bundledZipUrl ? 'Actualizar ZIP Almacenado' : 'Generar ZIP Almacenado'}"><i data-lucide="refresh-cw"></i></button>
                     ${p.archived
             ? `<button class="btn-icon" onclick="unarchiveProductHandler(${parseInt(p.id)})" title="Desarchivar"><i data-lucide="archive-restore"></i></button>`
             : `<button class="btn-icon" onclick="archiveProductHandler(${parseInt(p.id)})" title="Archivar"><i data-lucide="archive"></i></button>`
@@ -680,6 +681,7 @@ window.downloadBundleHandler = async (productId, btn) => {
         if (window.generateProductBundle) {
             const bundleSettings = {
                 logo: settings.logo || 'MiniFrancine',
+                promo: settings.promo || '',
                 footer: settings.footer || 'MiniFrancine - Embroidery Designs'
             };
             await window.generateProductBundle(pdfProduct, signedFiles || [], bundleSettings);
@@ -687,11 +689,50 @@ window.downloadBundleHandler = async (productId, btn) => {
             throw new Error('Generador de Bundle no disponible');
         }
 
-    } catch (err) {
-        console.error(err);
-        alert('Error al descargar Bundle: ' + err.message);
     } finally {
         btn.disabled = false;
+        btn.innerHTML = originalHTML;
+        if (window.lucide) window.lucide.createIcons();
+    }
+};
+
+window.updateStoredBundleHandler = async (productId, btn) => {
+    const originalHTML = btn.innerHTML;
+    try {
+        btn.disabled = true;
+        btn.classList.add('animate-spin');
+        btn.innerHTML = '<i data-lucide="refresh-cw"></i>';
+        if (window.lucide) window.lucide.createIcons();
+
+        // 1. Prepare data (same as bundle download)
+        const pdfProduct = await prepareProductForPDF(productId);
+        const signedFiles = await downloadProductFile(productId);
+        const settings = await fetchPDFSettings();
+
+        const bundleSettings = {
+            logo: settings.logo || 'MiniFrancine',
+            promo: settings.promo || '',
+            footer: settings.footer || 'MiniFrancine - Embroidery Designs',
+            output: 'blob' // CRITICAL: Get Blob instead of download
+        };
+
+        // 2. Generate
+        if (!window.generateProductBundle) throw new Error('Generador de Bundle no disponible');
+        const zipBlob = await window.generateProductBundle(pdfProduct, signedFiles || [], bundleSettings);
+
+        // 3. Upload
+        const { error } = await uploadProductBundle(productId, zipBlob);
+        if (error) throw error;
+
+        alert('ZIP pre-generado y almacenado correctamente.');
+        loadProducts(); // Refresh table to show green icon
+
+    } catch (err) {
+        console.error(err);
+        alert('Error al actualizar ZIP almacenado: ' + err.message);
+    } finally {
+        btn.disabled = false;
+        btn.classList.remove('animate-spin');
         btn.innerHTML = originalHTML;
         if (window.lucide) window.lucide.createIcons();
     }

@@ -446,6 +446,14 @@
     border-radius: 999px;
 }
 
+.text-green {
+    color: #10B981 !important;
+}
+
+.text-gray {
+    color: #9CA3AF !important;
+}
+
 /* --- Data Table --- */
 .view-header {
     display: flex;
