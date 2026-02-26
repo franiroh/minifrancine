@@ -155,6 +155,7 @@ async function loadProductData(id) {
     document.getElementById('prod-size').value = product.size || '';
     document.getElementById('prod-stitches').value = product.stitches ? Number(product.stitches).toLocaleString('en-US') : '';
     document.getElementById('prod-formats').value = product.formats || '';
+    document.getElementById('prod-image-color').value = product.imageColor || '';
 
     // Load Colors
     if (quillColors) {
@@ -544,7 +545,8 @@ async function handleSave(e) {
             published: document.getElementById('prod-published').checked,
             indexed: document.getElementById('prod-indexed').checked,
             related_product_ids: selectedRelatedProducts,
-            thread_colors: quillColors ? quillColors.root.innerHTML : ''
+            thread_colors: quillColors ? quillColors.root.innerHTML : '',
+            image_color: document.getElementById('prod-image-color').value
         };
 
         let savedProductId = productId; // Existing or new
