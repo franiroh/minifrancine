@@ -139,9 +139,11 @@ function renderDesignCard(product) {
                 <h3 class="product-card__title">${escapeHtml(product.title)}</h3>
                 <div class="product-card__price-row">
                     <div class="product-card__btns">
+                        ${product.isBundle ? '' : `
                         <button class="btn btn--sm btn--purchased btn-download" data-id="${parseInt(product.id)}" data-title="${escapeHtml(product.title)}">
                             <i data-lucide="download"></i> ${i18n.t('btn.download')}
                         </button>
+                        `}
                     </div>
                 </div>
             </div>

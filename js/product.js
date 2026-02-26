@@ -284,7 +284,70 @@ async function renderProduct() {
     if (priceContainer) {
         priceContainer.innerHTML = priceHtml;
     }
-    // setText('detail-price', `USD ${p.price}`); // Removed as we handle HTML manually above
+
+    // Bundle Section
+    const bundleSection = document.getElementById('detail-bundle-section');
+    const bundleContainer = document.getElementById('detail-bundle-items');
+    const specsSection = document.getElementById('detail-specs-section');
+
+    if (bundleSection && bundleContainer) {
+        if (p.isBundle) {
+            bundleSection.style.display = 'block';
+            if (specsSection) {
+                specsSection.style.display = 'none';
+                // Also hide previous/next dividers if they are distinct elements
+                if (specsSection.previousElementSibling && specsSection.previousElementSibling.tagName === 'HR') {
+                    specsSection.previousElementSibling.style.display = 'none';
+                }
+            }
+            bundleContainer.innerHTML = `<div class="skeleton-text" style="width: 100%; height: 200px;"></div>`;
+
+            const { fetchBundleItems, fetchProductsByIds } = await import('./api.js');
+            const itemIds = await fetchBundleItems(p.id);
+            if (itemIds && itemIds.length > 0) {
+                // Fetch details for bundle items, including unpublished ones
+                const items = await fetchProductsByIds(itemIds, { includeUnpublished: true });
+                bundleContainer.innerHTML = items.map(item => {
+                    return `
+                        <div class="bundle-item-card">
+                            <a href="product.html?id=${item.id}" class="bundle-item-card__image-link">
+                                <div class="bundle-item-card__image-container" style="background: ${item.imageColor || '#f3f4f6'};">
+                                    <img src="${item.mainImage}" alt="${item.title}" class="bundle-item-card__img">
+                                </div>
+                            </a>
+                            <div class="bundle-item-card__info">
+                                <a href="product.html?id=${item.id}" class="bundle-item-card__title-link">
+                                    <h4 class="bundle-item-card__title">${item.title}</h4>
+                                </a>
+                                <div class="bundle-item-card__specs">
+                                    <div class="bundle-item-card__spec">
+                                        <span class="bundle-item-card__spec-label">${i18n.t('product.specs.size')}:</span>
+                                        <span class="bundle-item-card__spec-value">${item.size || '-'}</span>
+                                    </div>
+                                    <div class="bundle-item-card__spec">
+                                        <span class="bundle-item-card__spec-label">${i18n.t('product.specs.stitches')}:</span>
+                                        <span class="bundle-item-card__spec-value">${item.stitches ? Number(item.stitches).toLocaleString() : '-'}</span>
+                                    </div>
+                                    <div class="bundle-item-card__spec">
+                                        <span class="bundle-item-card__spec-label">${i18n.t('product.specs.colors')}:</span>
+                                        <span class="bundle-item-card__spec-value">${item.colorCount || '-'}</span>
+                                    </div>
+                                    <div class="bundle-item-card__spec">
+                                        <span class="bundle-item-card__spec-label">${i18n.t('product.specs.formats')}:</span>
+                                        <span class="bundle-item-card__spec-value">${item.formats || '-'}</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    `;
+                }).join('');
+            } else {
+                bundleContainer.innerHTML = '<p class="text-gray text-sm">Este pack no contiene productos aún.</p>';
+            }
+        } else {
+            bundleSection.style.display = 'none';
+        }
+    }
 
     // Specs
     setText('detail-size', p.size);

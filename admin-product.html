@@ -88,6 +88,14 @@
                             <span id="prod-indexed-label" class="action-bar__label"
                                 style="color:#22C55E;">Indexar</span>
                         </div>
+                        <div class="action-bar__status">
+                            <label class="toggle-switch toggle-switch--gray" title="Es un Pack de varios productos">
+                                <input type="checkbox" id="prod-is-bundle">
+                                <span class="slider"></span>
+                            </label>
+                            <span id="prod-is-bundle-label" class="action-bar__label" style="color:#9CA3AF;">Es un
+                                Pack</span>
+                        </div>
                     </div>
 
                     <div class="action-bar__group">
@@ -175,7 +183,7 @@
                     </div>
 
                     <!-- Technical Specifics -->
-                    <div class="card" style="margin-top: 2rem;">
+                    <div class="card" id="specs-card" style="margin-top: 2rem;">
                         <h3>Ficha Técnica</h3>
                         <div class="form-row">
                             <div class="form-group">
@@ -209,7 +217,7 @@
                     </div>
 
                     <!-- Secuencia de Colores Section -->
-                    <div class="card" style="margin-top: 2rem;">
+                    <div class="card" id="colors-card" style="margin-top: 2rem;">
                         <h3
                             style="margin-bottom: 16px; border-bottom: 1px solid var(--admin-border); padding-bottom: 8px;">
                             Secuencia de Colores (Color Sheet)</h3>
@@ -221,7 +229,7 @@
                     </div>
 
                     <!-- Digital File Section -->
-                    <div class="card" style="margin-top: 2rem;">
+                    <div class="card" id="files-card" style="margin-top: 2rem;">
                         <h3>Archivos Digitales (Privados)</h3>
                         <p class="text-sm text-gray">Sube todos los archivos (.PES, .DST, .SEW, etc). Se incluirán en un
                             ZIP junto al PDF.</p>
@@ -276,6 +284,29 @@
                                 style="position: absolute; top: 100%; left: 0; right: 0; background: #fff; border: 1px solid #e5e7eb; border-radius: 8px; margin-top: 4px; z-index: 60; max-height: 200px; overflow-y: auto; box-shadow: 0 10px 15px -3px rgba(0,0,0,0.1);">
                                 <!-- Suggestions will populate here -->
                             </div>
+                        </div>
+                    </div>
+
+                    <div id="bundle-items-card" class="card hidden" style="margin-top: 2rem;">
+                        <h3>Productos en este Pack</h3>
+                        <p class="text-sm text-gray">Elige los diseños que componen este pack. Se pueden incluir diseños
+                            no publicados.
+                        </p>
+
+                        <div class="form-group" style="margin-top: 1rem;">
+                            <label>Agregar Diseño al Pack</label>
+                            <div style="display: flex; gap: 8px;">
+                                <input type="text" id="prod-bundle-search" placeholder="Busca por ID o nombre..."
+                                    list="bundle-products-list" style="flex: 1;" autocomplete="off">
+                                <datalist id="bundle-products-list"></datalist>
+                                <button type="button" class="btn btn--secondary"
+                                    id="btn-add-bundle-item">Agregar</button>
+                            </div>
+                        </div>
+
+                        <div id="bundle-items-container"
+                            style="display: flex; flex-direction: column; gap: 8px; margin-top: 1rem;">
+                            <p class="text-gray text-sm">No hay productos en este pack.</p>
                         </div>
                     </div>
 

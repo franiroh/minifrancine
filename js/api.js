@@ -136,19 +136,25 @@ export async function fetchProductById(id) {
         indexed: data.indexed,
         relatedProductIds: data.related_product_ids || [],
         threadColors: data.thread_colors || [],
-        bundledZipUrl: data.bundled_zip_url
+        bundledZipUrl: data.bundled_zip_url,
+        isBundle: data.is_bundle || false
     };
 }
 
-export async function fetchProductsByIds(ids) {
+export async function fetchProductsByIds(ids, options = {}) {
     if (!ids || ids.length === 0) return [];
 
-    const { data, error } = await supabase
+    let query = supabase
         .from('products')
         .select('*, product_categories(category_id, categories(name))')
         .in('id', ids)
-        .eq('published', true)
         .eq('archived', false);
+
+    if (!options.includeUnpublished) {
+        query = query.eq('published', true);
+    }
+
+    const { data, error } = await query;
 
     if (error) {
         console.error('Error fetching products by ids:', error);
@@ -1630,3 +1636,37 @@ export async function deleteReview(reviewId) {
     return { error };
 }
 
+
+export async function fetchBundleItems(bundleId) {
+    const { data, error } = await supabase
+        .from('bundle_items')
+        .select('product_id')
+        .eq('bundle_id', bundleId);
+
+    if (error) {
+        console.error('Error fetching bundle items:', error);
+        return [];
+    }
+    return data.map(item => item.product_id);
+}
+
+export async function updateBundleItems(bundleId, productIds) {
+    // 1. Remove existing items
+    const { error: delError } = await supabase
+        .from('bundle_items')
+        .delete()
+        .eq('bundle_id', bundleId);
+
+    if (delError) return { error: delError };
+
+    // 2. Insert new items
+    if (productIds && productIds.length > 0) {
+        const records = productIds.map(pid => ({ bundle_id: bundleId, product_id: pid }));
+        const { error: insError } = await supabase
+            .from('bundle_items')
+            .insert(records);
+        return { error: insError };
+    }
+
+    return { error: null };
+}

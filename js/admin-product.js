@@ -27,6 +27,7 @@ let pendingFiles = [];
 
 let allAdminProducts = [];
 let selectedRelatedProducts = [];
+let selectedBundleItems = [];
 let allCategories = [];
 let selectedCategoryIds = [];
 let quillColors = null;
@@ -78,11 +79,13 @@ async function init() {
         allAdminProducts = allAdminProducts.filter(p => p.id !== parseInt(productId, 10));
     }
     const datalist = document.getElementById('related-products-list');
-    if (datalist) {
-        datalist.innerHTML = allAdminProducts.map(p =>
-            `<option value="${p.id} - ${escapeHtml(p.title)}">`
-        ).join('');
-    }
+    const bundleDatalist = document.getElementById('bundle-products-list');
+    const optionsHtml = allAdminProducts.map(p =>
+        `<option value="${p.id} - ${escapeHtml(p.title)}">`
+    ).join('');
+
+    if (datalist) datalist.innerHTML = optionsHtml;
+    if (bundleDatalist) bundleDatalist.innerHTML = optionsHtml;
 
     if (productId) {
         document.getElementById('page-title').textContent = 'Editar Producto';
@@ -115,6 +118,31 @@ async function init() {
         indexLabel.textContent = indexCheckbox.checked ? 'Indexar' : 'No indexar';
         indexLabel.style.color = indexCheckbox.checked ? '#22C55E' : '#9CA3AF';
     });
+
+    // Bundle toggle label sync
+    const bundleCheckbox = document.getElementById('prod-is-bundle');
+    const bundleLabel = document.getElementById('prod-is-bundle-label');
+    const bundleCard = document.getElementById('bundle-items-card');
+    const specsCard = document.getElementById('specs-card');
+    const colorsCard = document.getElementById('colors-card');
+    const filesCard = document.getElementById('files-card');
+    const btnPdf = document.getElementById('btn-export-pdf');
+
+    const updatePackVisibility = () => {
+        const isBundle = bundleCheckbox.checked;
+        bundleLabel.textContent = isBundle ? 'Es un Pack' : 'No es pack';
+        bundleLabel.style.color = isBundle ? '#22C55E' : '#9CA3AF';
+        bundleCard.classList.toggle('hidden', !isBundle);
+
+        if (specsCard) specsCard.classList.toggle('hidden', isBundle);
+        if (colorsCard) colorsCard.classList.toggle('hidden', isBundle);
+        if (filesCard) filesCard.classList.toggle('hidden', isBundle);
+        if (btnPdf) btnPdf.classList.toggle('hidden', isBundle);
+    };
+
+    bundleCheckbox.addEventListener('change', updatePackVisibility);
+    // Keep it as a window function so loadProductData can call it if needed, or just call it after load.
+    window.updatePackVisibility = updatePackVisibility;
 
     setupEventListeners();
     fadeOutPreloader();
@@ -183,6 +211,23 @@ async function loadProductData(id) {
     indexLabel.textContent = indexCheckbox.checked ? 'Indexar' : 'No indexar';
     indexLabel.style.color = indexCheckbox.checked ? '#22C55E' : '#9CA3AF';
 
+    // Bundle state
+    const bundleCheckbox = document.getElementById('prod-is-bundle');
+    const bundleLabel = document.getElementById('prod-is-bundle-label');
+    const bundleCard = document.getElementById('bundle-items-card');
+    bundleCheckbox.checked = product.isBundle === true;
+    if (window.updatePackVisibility) window.updatePackVisibility();
+
+    // Load Bundle Items
+    if (bundleCheckbox.checked) {
+        const { fetchBundleItems } = await import('./api.js');
+        selectedBundleItems = await fetchBundleItems(id);
+        renderBundleItems();
+    } else {
+        selectedBundleItems = [];
+        renderBundleItems();
+    }
+
     // Load Related Products
     selectedRelatedProducts = product.relatedProductIds || [];
     renderRelatedProducts();
@@ -237,6 +282,9 @@ function setupEventListeners() {
     // Related Products
     const btnAddRelated = document.getElementById('btn-add-related');
     if (btnAddRelated) btnAddRelated.onclick = handleAddRelated;
+
+    const btnAddBundleItem = document.getElementById('btn-add-bundle-item');
+    if (btnAddBundleItem) btnAddBundleItem.onclick = handleAddBundleItem;
 
     // Image Upload Drop/Click
     const dropZone = document.getElementById('images-drop-zone');
@@ -515,6 +563,51 @@ function renderRelatedProducts() {
     if (window.lucide) window.lucide.createIcons();
 }
 
+function handleAddBundleItem() {
+    const input = document.getElementById('prod-bundle-search');
+    const val = input.value;
+    if (!val) return;
+
+    const id = parseInt(val.split('-')[0].trim());
+    if (isNaN(id)) return;
+
+    if (!selectedBundleItems.includes(id)) {
+        selectedBundleItems.push(id);
+        renderBundleItems();
+    }
+    input.value = '';
+}
+
+window.removeBundleItem = (id) => {
+    selectedBundleItems = selectedBundleItems.filter(pid => pid !== id);
+    renderBundleItems();
+}
+
+function renderBundleItems() {
+    const container = document.getElementById('bundle-items-container');
+    if (!container) return;
+
+    if (selectedBundleItems.length === 0) {
+        container.innerHTML = '<p class="text-gray text-sm">No hay productos en este pack.</p>';
+        return;
+    }
+
+    container.innerHTML = selectedBundleItems.map(id => {
+        const prod = allAdminProducts.find(p => p.id === id);
+        const title = prod ? escapeHtml(prod.title) : `Diseño #${id}`;
+        return `
+            <div style="display: flex; justify-content: space-between; align-items: center; padding: 8px; border: 1px solid #e5e7eb; border-radius: 6px;">
+                <span class="text-sm"><strong>#${id}</strong> - ${title}</span>
+                <button type="button" class="btn-icon text-red" onclick="removeBundleItem(${id})">
+                    <i data-lucide="trash-2" style="width:16px; height:16px;"></i>
+                </button>
+            </div>
+        `;
+    }).join('');
+
+    if (window.lucide) window.lucide.createIcons();
+}
+
 // Deprecated color list functions removed
 
 async function handleSave(e) {
@@ -544,6 +637,7 @@ async function handleSave(e) {
             formats: document.getElementById('prod-formats').value,
             published: document.getElementById('prod-published').checked,
             indexed: document.getElementById('prod-indexed').checked,
+            is_bundle: document.getElementById('prod-is-bundle').checked,
             related_product_ids: selectedRelatedProducts,
             thread_colors: quillColors ? quillColors.root.innerHTML : '',
             image_color: document.getElementById('prod-image-color').value
@@ -591,6 +685,13 @@ async function handleSave(e) {
                     throw new Error(`Error al subir el archivo: ${file.name}. Asegúrese de que el formato sea válido.`);
                 }
             }
+        }
+
+        // 4. Update Bundle Items
+        if (data.is_bundle) {
+            const { updateBundleItems } = await import('./api.js');
+            const { error: bundleErr } = await updateBundleItems(savedProductId, selectedBundleItems);
+            if (bundleErr) throw bundleErr;
         }
 
         // --- FIX: Clear pending buffers so subsequent saves don't re-upload/duplicate ---

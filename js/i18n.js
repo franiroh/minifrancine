@@ -133,6 +133,7 @@ export const i18n = {
             'msg.profile_saved': { es: 'Perfil actualizado correctamente.', en: 'Profile updated successfully.', pt: 'Perfil atualizado com sucesso.' },
             'msg.no_products_category': { es: 'No se encontraron productos en esta categoría.', en: 'No products found in this category.', pt: 'Nenhum produto encontrado nesta categoria.' },
             'product.related.title': { es: 'Diseños Relacionados', en: 'Related Designs', pt: 'Designs Relacionados' },
+            'product.bundle.includes': { es: 'Este pack incluye:', en: 'This pack includes:', pt: 'Este pack inclui:' },
 
             'nav.my_orders': { es: 'Mis Pedidos', en: 'My Orders', pt: 'Meus Pedidos' },
             'error.designs_load': { es: 'Hubo un error al cargar tus diseños.', en: 'There was an error loading your designs.', pt: 'Houve um erro ao carregar seus designs.' },
