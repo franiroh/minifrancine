@@ -29,6 +29,7 @@ export const i18n = {
             'btn.my_designs': { es: 'Mis diseños', en: 'My designs', pt: 'Meus designs' },
             'btn.buy_now': { es: 'Comprar', en: 'Buy now', pt: 'Comprar' },
             'btn.cancel': { es: 'Cancelar', en: 'Cancel', pt: 'Cancelar' },
+            'btn.continue_shopping': { es: 'Seguir comprando', en: 'Continue shopping', pt: 'Continuar comprando' },
             'btn.save': { es: 'Guardar', en: 'Save', pt: 'Salvar' },
             'btn.delete': { es: 'Eliminar', en: 'Delete', pt: 'Excluir' },
             'btn.download': { es: 'Descargar', en: 'Download', pt: 'Baixar' },
@@ -104,6 +105,8 @@ export const i18n = {
             'checkout.coupon_applied': { es: 'Cupón aplicado: ', en: 'Coupon applied: ', pt: 'Cupom aplicado: ' },
             'checkout.coupon_welcome_title': { es: 'Descuento de Bienvenida (20%)', en: 'Welcome Discount (20%)', pt: 'Desconto de Boas-vindas (20%)' },
             'checkout.coupon_bulk_title': { es: 'Descuento por Volumen (50% en 10 items)', en: 'Bulk Discount (50% on 10 items)', pt: 'Desconto por Volume (50% em 10 itens)' },
+            'thank_you.title': { es: '¡Pedido Confirmado!', en: 'Order Confirmed!', pt: 'Pedido Confirmado!' },
+            'thank_you.message': { es: 'Muchas gracias por tu compra. Tus diseños ya están listos para descargar en tu cuenta. Hemos enviado un correo de confirmación con los detalles de tu pedido.', en: 'Thank you very much for your purchase. Your designs are now ready to download in your account. We have sent a confirmation email with your order details.', pt: 'Muito obrigado pela sua compra. Seus designs já estão prontos para download em sua conta. Enviamos um e-mail de confirmação com os detalhes do seu pedido.' },
 
             // Orders
             'orders.title': { es: 'Mis Pedidos', en: 'My Orders', pt: 'Meus Pedidos' },
