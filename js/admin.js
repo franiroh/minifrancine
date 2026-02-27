@@ -5,6 +5,7 @@ import { loadAdminMessages } from './admin-messages.js';
 import { initContent } from './admin-content.js';
 import { initI18nEditor } from './admin-i18n.js';
 import { initAdminCoupons } from './admin-coupons.js';
+import { initTagsManagement } from './admin-tags.js';
 import i18n from './i18n.js';
 import { escapeHtml, sanitizeCssValue, getBadgeKey } from './utils.js';
 import { generateProductPDF, generateProductBundle } from './pdf-export.js';
@@ -39,7 +40,7 @@ async function init() {
 
     // 3. Load Initial View (Hash Routing)
     const hash = window.location.hash.replace('#', '');
-    if (hash && ['dashboard', 'products', 'orders', 'categories', 'messages', 'translations', 'content', 'coupons'].includes(hash)) {
+    if (hash && ['dashboard', 'products', 'orders', 'categories', 'messages', 'translations', 'content', 'coupons', 'tags'].includes(hash)) {
         const navItem = document.querySelector(`.nav-item[data-tab="${hash}"]`);
         if (navItem) navItem.click();
     } else {
@@ -199,12 +200,13 @@ function setupNavigation() {
             if (viewId === 'content') initContent();
             if (viewId === 'translations') initI18nEditor();
             if (viewId === 'coupons') initAdminCoupons();
+            if (viewId === 'tags') initTagsManagement();
         };
     });
 
     // Handle Initial State (for hash loading)
     const hash = window.location.hash.replace('#', '');
-    if (hash && ['dashboard', 'products', 'orders', 'categories', 'messages', 'translations', 'content', 'coupons'].includes(hash)) {
+    if (hash && ['dashboard', 'products', 'orders', 'categories', 'messages', 'translations', 'content', 'coupons', 'tags'].includes(hash)) {
         const navItem = document.querySelector(`.nav-item[data-tab="${hash}"]`);
         if (navItem) navItem.click(); // This triggers onclick logic
     } else {

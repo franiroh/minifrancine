@@ -58,6 +58,9 @@
                 <button class="nav-item" data-tab="translations">
                     <i data-lucide="languages"></i> Traducciones
                 </button>
+                <button class="nav-item" data-tab="tags">
+                    <i data-lucide="code"></i> Marketing Tags
+                </button>
             </nav>
         </aside>
 
@@ -543,6 +546,43 @@
                                 </tr>
                             </tbody>
                         </table>
+                    </div>
+                </div>
+                <!-- Marketing Tags View -->
+                <div id="view-tags" class="view">
+                    <div class="view-header">
+                        <h2>Configuración de Marketing Tags</h2>
+                        <button class="btn btn--primary" id="btn-save-tags">
+                            <i data-lucide="save"></i> Guardar Etiquetas
+                        </button>
+                    </div>
+
+                    <div class="card" style="max-width: 800px; margin: 0 auto;">
+                        <p class="text-gray" style="margin-bottom: 24px;">
+                            Configura aquí los IDs de seguimiento para Google Tag Manager y Google Ads. Estos cambios se
+                            aplicarán dinámicamente en todo el sitio.
+                        </p>
+                        <form id="marketing-tags-form">
+                            <div class="form-group">
+                                <label for="tag-gtm-id">Google Tag Manager ID</label>
+                                <input type="text" id="tag-gtm-id" placeholder="Ej: GTM-XXXXXXX">
+                                <small class="text-gray">El ID principal de tu contenedor de GTM.</small>
+                            </div>
+
+                            <div class="form-row-group" style="margin-top: 24px;">
+                                <div class="form-group">
+                                    <label for="tag-google-ads-id">Google Ads ID</label>
+                                    <input type="text" id="tag-google-ads-id" placeholder="Ej: AW-XXXXXXXXXXX">
+                                    <small class="text-gray">ID global para rastreo de conversiones.</small>
+                                </div>
+                                <div class="form-group">
+                                    <label for="tag-google-ads-conv-id">Conversion Label (Thank You Page)</label>
+                                    <input type="text" id="tag-google-ads-conv-id"
+                                        placeholder="Ej: fd6dCPmyjYAcEPLWnv5C">
+                                    <small class="text-gray">Etiqueta específica para el evento de compra.</small>
+                                </div>
+                            </div>
+                        </form>
                     </div>
                 </div>
             </div>
