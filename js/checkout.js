@@ -233,7 +233,7 @@ function renderCheckout() {
                             }
 
                             state.cart = [];
-                            window.location.href = 'orders.html';
+                            window.location.href = 'thank-you.html';
                         } else if (result && result.error) {
                             throw new Error(result.error);
                         } else {
@@ -259,7 +259,7 @@ function renderCheckout() {
                             }
 
                             state.cart = [];
-                            window.location.href = 'orders.html';
+                            window.location.href = 'thank-you.html';
                         }
 
                     } catch (err) {

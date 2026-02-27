@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <!-- Google tag (gtag.js) -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=AW-17981483890"></script>
+    <script>
+        window.dataLayer = window.dataLayer || [];
+        function gtag() { dataLayer.push(arguments); }
+        gtag('js', new Date());
+
+        gtag('config', 'AW-17981483890');
+    </script>
+
+    <!-- CONVERSION TAG PLACEHOLDER -->
+    <!-- 
+    El usuario debe colocar aquí el snippet de evento de conversión. 
+    Ejemplo:
+    <script>
+      gtag('event', 'conversion', {
+          'send_to': 'AW-17981483890/XXXXX-XXXXX',
+          'value': 1.0,
+          'currency': 'USD',
+          'transaction_id': ''
+      });
+    </script>
+  -->
+
+    <!-- Google Tag Manager -->
+    <script>(function (w, d, s, l, i) {
+            w[l] = w[l] || []; w[l].push({
+                'gtm.start':
+                    new Date().getTime(), event: 'gtm.js'
+            }); var f = d.getElementsByTagName(s)[0],
+                j = d.createElement(s), dl = l != 'dataLayer' ? '&l=' + l : ''; j.async = true; j.src =
+                    'https://www.googletagmanager.com/gtm.js?id=' + i + dl; f.parentNode.insertBefore(j, f);
+        })(window, document, 'script', 'dataLayer', 'GTM-5LQVQNPH');</script>
+    <!-- End Google Tag Manager -->
+
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>¡Gracias por tu compra! — MiniFrancine</title>
+    <link rel="icon" type="image/svg+xml" href="favicon.svg">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:wght@700;800&family=DM+Sans:wght@400;500;600;700&display=swap"
+        rel="stylesheet">
+    <script src="https://unpkg.com/lucide@latest"></script>
+
+    <link rel="stylesheet" href="css/main.css">
+    <link rel="stylesheet" href="css/components.css">
+    <style>
+        .thank-you {
+            padding: 80px 20px;
+            text-align: center;
+            max-width: 600px;
+            margin: 0 auto;
+            min-height: 60vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .thank-you__icon-wrap {
+            width: 80px;
+            height: 80px;
+            background: #ECFDF5;
+            color: #10B981;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 32px;
+            animation: scaleIn 0.5s ease-out;
+        }
+
+        .thank-you__title {
+            font-family: 'Bricolage Grotesque', serif;
+            font-size: 40px;
+            font-weight: 800;
+            margin-bottom: 16px;
+            color: #1A1A1A;
+        }
+
+        .thank-you__text {
+            font-size: 18px;
+            color: #4B5563;
+            margin-bottom: 40px;
+            line-height: 1.6;
+        }
+
+        .thank-you__actions {
+            display: flex;
+            gap: 16px;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+
+        @keyframes scaleIn {
+            from {
+                transform: scale(0);
+                opacity: 0;
+            }
+
+            to {
+                transform: scale(1);
+                opacity: 1;
+            }
+        }
+
+        @media (max-width: 640px) {
+            .thank-you__title {
+                font-size: 32px;
+            }
+
+            .thank-you {
+                padding: 60px 20px;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <!-- Google Tag Manager (noscript) -->
+    <noscript><iframe src="https://www.googletagmanager.com/ns.html?id=GTM-5LQVQNPH" height="0" width="0"
+            style="display:none;visibility:hidden"></iframe></noscript>
+    <!-- End Google Tag Manager (noscript) -->
+
+    <div class="page">
+        <div id="navbar-placeholder"></div>
+
+        <main class="thank-you">
+            <div class="thank-you__icon-wrap">
+                <i data-lucide="check-circle-2" style="width: 48px; height: 48px;"></i>
+            </div>
+            <h1 class="thank-you__title" data-i18n="thank_you.title">¡Pedido Confirmado!</h1>
+            <p class="thank-you__text" data-i18n="thank_you.message">
+                Muchas gracias por tu compra. Tus diseños ya están listos para descargar en tu cuenta. Hemos enviado un
+                correo de confirmación con los detalles de tu pedido.
+            </p>
+            <div class="thank-you__actions">
+                <a href="mis-disenos.html" class="btn btn--primary btn--lg">
+                    <i data-lucide="download"></i> <span data-i18n="btn.my_designs">Ver mis diseños</span>
+                </a>
+                <a href="index.html" class="btn btn--outline btn--lg">
+                    <span data-i18n="btn.continue_shopping">Seguir comprando</span>
+                </a>
+            </div>
+        </main>
+
+        <div id="footer-placeholder"></div>
+    </div>
+
+    <script type="module">
+        import { loadComponents, updateNavbarAuth } from './js/components.js';
+        import { getUser, onAuthStateChange } from './js/api.js';
+
+        async function init() {
+            const user = await getUser();
+            await loadComponents(user);
+            onAuthStateChange((event, session) => {
+                updateNavbarAuth(session ? session.user : null);
+            });
+            if (window.lucide) window.lucide.createIcons();
+        }
+        document.addEventListener('DOMContentLoaded', init);
+    </script>
+</body>
+
+</html>
