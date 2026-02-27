@@ -126,10 +126,17 @@ function renderDesigns(products) {
 }
 
 function renderDesignCard(product) {
+    const noIndex = product.indexed === false;
+    const imageHtml = (product.mainImage)
+        ? (noIndex
+            ? `<div class="product-card__img product-card__img--noindex" style="background-image: url('${escapeHtml(product.mainImage)}'); background-size: cover; background-position: center; width: 100%; height: 100%;" aria-label="${escapeHtml(product.title)}"></div>`
+            : `<img src="${escapeHtml(product.mainImage)}" alt="${escapeHtml(product.title)}" class="product-card__img" loading="lazy">`)
+        : '';
+
     return `
-        <div class="product-card product-card--purchased" id="product-${parseInt(product.id)}" data-id="${parseInt(product.id)}">
-            <a href="product.html?id=${product.id}" class="product-card__image" style="background: ${sanitizeCssValue(product.imageColor)}; display: block;">
-                ${product.mainImage ? `<img src="${escapeHtml(product.mainImage)}" alt="${escapeHtml(product.title)}" class="product-card__img" loading="lazy">` : ''}
+        <div class="product-card product-card--purchased ${noIndex ? 'product-card--noindex' : ''}" id="product-${parseInt(product.id)}" data-id="${parseInt(product.id)}" ${noIndex ? 'data-nosnippet' : ''}>
+            <a href="product.html?id=${product.id}" class="product-card__image" style="background: ${sanitizeCssValue(product.imageColor)}; display: block;" ${noIndex ? 'rel="nofollow"' : ''}>
+                ${imageHtml}
                 <span class="product-card__badge product-card__badge--purchased">
                     ${i18n.t('designs.purchased')}
                 </span>

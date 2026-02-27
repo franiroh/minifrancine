@@ -110,9 +110,14 @@ async function renderProduct() {
     if (img) {
         img.style.background = p.imageColor;
         if (images.length > 0) {
-            img.innerHTML = images.map((url, i) =>
-                `<img src="${url}" alt="${p.title}" class="detail__main-img-el ${i === 0 ? 'detail__main-img-el--active' : ''}" data-index="${i}">`
-            ).join('');
+            const noIndex = p.indexed === false;
+            img.innerHTML = images.map((url, i) => {
+                const activeClass = i === 0 ? 'detail__main-img-el--active' : '';
+                if (noIndex) {
+                    return `<div class="detail__main-img-el ${activeClass}" data-index="${i}" style="background-image: url('${url}'); background-size: contain; background-repeat: no-repeat; background-position: center; width: 100%; height: 100%;" aria-label="${p.title}"></div>`;
+                }
+                return `<img src="${url}" alt="${p.title}" class="detail__main-img-el ${activeClass}" data-index="${i}">`;
+            }).join('');
         }
 
         // Setup dots for mobile/tablet slider
@@ -149,11 +154,17 @@ async function renderProduct() {
     }
 
     if (thumbsContainer && images.length > 1) {
-        thumbsContainer.innerHTML = images.map((url, i) =>
-            `<div class="detail__thumb ${i === 0 ? 'detail__thumb--active' : ''}" data-index="${i}">
-                <img src="${url}" alt="${p.title}" class="detail__thumb-img-el">
-            </div>`
-        ).join('');
+        const noIndex = p.indexed === false;
+        thumbsContainer.innerHTML = images.map((url, i) => {
+            const activeClass = i === 0 ? 'detail__thumb--active' : '';
+            const imgHtml = noIndex
+                ? `<div class="detail__thumb-img-el" style="background-image: url('${url}'); background-size: cover; background-position: center; width: 100%; height: 100%;"></div>`
+                : `<img src="${url}" alt="${p.title}" class="detail__thumb-img-el">`;
+            return `
+                <div class="detail__thumb ${activeClass}" data-index="${i}">
+                    ${imgHtml}
+                </div>`;
+        }).join('');
 
         thumbsContainer.addEventListener('click', (e) => {
             const thumb = e.target.closest('.detail__thumb');
@@ -182,7 +193,7 @@ async function renderProduct() {
             metaRobots.name = 'robots';
             document.head.appendChild(metaRobots);
         }
-        metaRobots.content = 'noindex';
+        metaRobots.content = 'noindex, noimageindex';
     } else if (metaRobots) {
         // If it was added but then we navigated to an indexed product (if SPA-like, but let's be safe)
         metaRobots.content = 'index, follow'; // or remove it

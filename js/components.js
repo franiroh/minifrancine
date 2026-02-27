@@ -399,6 +399,7 @@ export const updateNavbarCartCount = (count) => {
 export const createProductCard = (product) => {
   const purchased = isPurchased(product.id);
   const favorite = isFavorite(product.id);
+  const noIndex = product.indexed === false;
 
   // Discount Calculation
   const isProdPurchased = purchased;
@@ -406,10 +407,21 @@ export const createProductCard = (product) => {
   const oldPrice = parseFloat(product.oldPrice || product.old_price);
   const hasDiscount = !isProdPurchased && oldPrice > price;
 
+  // Image Logic
+  let imageHtml = '';
+  if (product.mainImage) {
+    if (noIndex) {
+      // Use div with background-image to discourage bot indexing
+      imageHtml = `<div class="product-card__img product-card__img--noindex" style="background-image: url('${escapeHtml(product.mainImage)}'); background-size: cover; background-position: center; width: 100%; height: 100%;" aria-label="${escapeHtml(product.title)}"></div>`;
+    } else {
+      imageHtml = `<img src="${escapeHtml(product.mainImage)}" alt="${escapeHtml(product.title)}" class="product-card__img" loading="lazy">`;
+    }
+  }
+
   return `
-    <div class="product-card ${purchased ? 'product-card--purchased' : ''}" data-id="${parseInt(product.id)}">
+    <div class="product-card ${purchased ? 'product-card--purchased' : ''} ${noIndex ? 'product-card--noindex' : ''}" data-id="${parseInt(product.id)}" ${noIndex ? 'data-nosnippet' : ''}>
       <div class="product-card__image" style="background: ${sanitizeCssValue(product.imageColor)};">
-        ${product.mainImage ? `<img src="${escapeHtml(product.mainImage)}" alt="${escapeHtml(product.title)}" class="product-card__img" loading="lazy">` : ''}
+        ${imageHtml}
         ${purchased
       ? `<span class="product-card__badge product-card__badge--purchased">${i18n.t('btn.purchased')}</span>`
       : (product.badge ? (() => {
@@ -440,7 +452,7 @@ export const createProductCard = (product) => {
 
         <div class="product-card__btns">
           ${purchased
-      ? `<a href="mis-disenos.html#product-${parseInt(product.id)}" class="btn btn--sm btn--purchased" style="width: 100%;">
+      ? `<a href="mis-disenos.html#product-${parseInt(product.id)}" class="btn btn--sm btn--purchased" style="width: 100%;" ${noIndex ? 'rel="nofollow"' : ''}>
                  <i data-lucide="download"></i> ${i18n.t('btn.my_designs')}
                </a>`
       : `<button class="btn btn--sm btn--outline btn-add-cart" data-id="${parseInt(product.id)}" style="flex:1;">

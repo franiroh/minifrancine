@@ -396,6 +396,7 @@ export async function fetchFavoriteProducts(userId, specificIds = null) {
             description: p.description,
             mainImage: p.main_image,
             published: p.published,
+            indexed: p.indexed,
             bundledZipUrl: p.bundled_zip_url
         };
     })
@@ -469,6 +470,7 @@ export async function fetchPurchasedProducts() {
             description: p.description,
             mainImage: p.main_image,
             published: p.published,
+            indexed: p.indexed,
             bundledZipUrl: p.bundled_zip_url
         };
     })
