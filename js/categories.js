@@ -55,19 +55,23 @@ function renderCategories(products, categoriesData) {
 
     // Group products count by category
     products.forEach(p => {
-        // If product has a category that exists in our map
-        if (p.category && categoriesMap[p.category]) {
-            categoriesMap[p.category].count++;
+        // Handle multiple categories
+        const pCategories = p.categories || (p.category ? [p.category] : []);
 
-            // If category doesn't have an image from DB, use the first product's image as fallback
-            if (!categoriesMap[p.category].image && p.mainImage) {
-                categoriesMap[p.category].image = p.mainImage;
+        pCategories.forEach(catName => {
+            if (categoriesMap[catName]) {
+                categoriesMap[catName].count++;
+
+                // If category doesn't have an image from DB, use the first product's image as fallback
+                if (!categoriesMap[catName].image && p.mainImage) {
+                    categoriesMap[catName].image = p.mainImage;
+                }
+                // Same for background color
+                if (!categoriesMap[catName].bg && p.imageColor) {
+                    categoriesMap[catName].bg = p.imageColor;
+                }
             }
-            // Same for background color
-            if (!categoriesMap[p.category].bg && p.imageColor) {
-                categoriesMap[p.category].bg = p.imageColor;
-            }
-        }
+        });
     });
 
     const sortedCategories = Object.values(categoriesMap).sort((a, b) => b.count - a.count);

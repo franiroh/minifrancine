@@ -208,7 +208,7 @@ function filterProducts(category) {
     // showCategoryView(currentCategory); <--- REMOVED
     showHomeView();
 
-    const filtered = products.filter(p => p.category === currentCategory);
+    const filtered = products.filter(p => (p.categories && p.categories.includes(currentCategory)) || p.category === currentCategory);
     renderCatalog(filtered);
 }
 
