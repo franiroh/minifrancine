@@ -7,15 +7,65 @@ export const i18n = {
 
     async init() {
         console.log('Initializing i18n...', this.lang);
-        await this.loadTranslations();
+
+        // 1. Initial load from static + cache
+        this.loadInitialTranslations();
         document.documentElement.lang = this.lang;
-        await this.updatePage();
+        this.updatePage();
+
+        // 2. Remove loading class immediately after initial translation
         document.body.classList.remove('i18n-loading');
+
+        // 3. Background refresh (non-blocking)
+        this.refreshTranslations();
     },
 
-    async loadTranslations() {
-        // Define static translations (badges, statuses, etc.)
-        const staticTranslations = {
+    loadInitialTranslations() {
+        const staticTranslations = this.getStaticTranslations();
+        const cachedFn = localStorage.getItem('site_translations_cache');
+        if (cachedFn) {
+            try {
+                this.translations = { ...staticTranslations, ...JSON.parse(cachedFn) };
+            } catch (e) {
+                console.error('Error parsing cached translations', e);
+                this.translations = { ...staticTranslations };
+            }
+        } else {
+            this.translations = { ...staticTranslations };
+        }
+    },
+
+    async refreshTranslations() {
+        const staticTranslations = this.getStaticTranslations();
+        try {
+            const { data, error } = await supabase
+                .from('site_translations')
+                .select('*');
+
+            if (error) {
+                console.error('Error loading translations:', error);
+                return;
+            }
+
+            if (data) {
+                const newTranslations = data.reduce((acc, row) => {
+                    acc[row.key] = row;
+                    return acc;
+                }, {});
+
+                const mergedTranslations = { ...staticTranslations, ...newTranslations };
+                localStorage.setItem('site_translations_cache', JSON.stringify(mergedTranslations));
+
+                this.translations = mergedTranslations;
+                this.updatePage();
+            }
+        } catch (err) {
+            console.error('Fetch error', err);
+        }
+    },
+
+    getStaticTranslations() {
+        return {
             'badge.new': { es: 'Nuevo', en: 'New', pt: 'Novo' },
             'badge.hot': { es: 'Hot', en: 'Hot', pt: 'Quente' },
             'badge.sale': { es: 'Oferta', en: 'Sale', pt: 'Oferta' },
@@ -350,50 +400,7 @@ export const i18n = {
             'msg.payment_processed': { es: 'Pago procesado. Verificá en "Mis Compras".', en: 'Payment processed. Check in "My Orders".', pt: 'Pagamento processado. Verifique em "Meus Pedidos".' },
             'error.payment_process': { es: 'Hubo un error al procesar el pago: ', en: 'There was an error processing the payment: ', pt: 'Houve um erro ao processar o pagamento: ' },
             'error.paypal_error': { es: 'Hubo un error con el pago de PayPal.', en: 'There was an error with the PayPal payment.', pt: 'Houve um erro com o pagamento do PayPal.' },
-            'error.unexpected': { es: 'Error inesperado: ', en: 'Unexpected error: ', pt: 'Erro inesperado: ' }
         };
-
-        // 1. Try to load from local storage first (Cache)
-        const cachedFn = localStorage.getItem('site_translations_cache');
-        if (cachedFn) {
-            try {
-                this.translations = { ...staticTranslations, ...JSON.parse(cachedFn) };
-            } catch (e) {
-                console.error('Error parsing cached translations', e);
-                this.translations = { ...staticTranslations };
-            }
-        } else {
-            // Init with static if no cache
-            this.translations = { ...staticTranslations };
-        }
-
-        // 2. Fetch fresh data from Supabase (Background / Async)
-        try {
-            const { data, error } = await supabase
-                .from('site_translations')
-                .select('*');
-
-            if (error) console.error('Error loading translations:', error);
-
-            if (data) {
-                const newTranslations = data.reduce((acc, row) => {
-                    acc[row.key] = row;
-                    return acc;
-                }, {});
-
-                // Merge: Dynamic > Static
-                const mergedTranslations = { ...staticTranslations, ...newTranslations };
-
-                // Update cache
-                localStorage.setItem('site_translations_cache', JSON.stringify(mergedTranslations));
-
-                // Update memory and page
-                this.translations = mergedTranslations;
-                this.updatePage();
-            }
-        } catch (err) {
-            console.error('Fetch error', err);
-        }
     },
 
 
