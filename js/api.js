@@ -90,7 +90,8 @@ export async function fetchProducts({ publishedOnly = false, tag = null, search 
             archived: p.archived,
             indexed: p.indexed,
             threadColors: p.thread_colors || [],
-            bundledZipUrl: p.bundled_zip_url
+            bundledZipUrl: p.bundled_zip_url,
+            isBundle: p.is_bundle || false
         };
     });
 }
@@ -191,7 +192,8 @@ export async function fetchProductsByIds(ids, options = {}) {
             archived: p.archived,
             indexed: p.indexed,
             threadColors: p.thread_colors || [],
-            bundledZipUrl: p.bundled_zip_url
+            bundledZipUrl: p.bundled_zip_url,
+            isBundle: p.is_bundle || false
         };
     });
 }
@@ -199,14 +201,17 @@ export async function fetchProductsByIds(ids, options = {}) {
 export async function fetchProductsListAdmin() {
     const { data, error } = await supabase
         .from('products')
-        .select('id, title, main_image, image_color, tags')
+        .select('id, title, main_image, image_color, tags, is_bundle')
         .order('title', { ascending: true });
 
     if (error) {
         console.error('Error fetching admin product list:', error);
         return [];
     }
-    return data;
+    return data.map(p => ({
+        ...p,
+        isBundle: p.is_bundle || false
+    }));
 }
 
 // --- Auth ---

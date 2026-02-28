@@ -173,7 +173,6 @@
                 <!-- Products View -->
                 <div id="view-products" class="view">
                     <div class="view-header">
-                        <h2>Catálogo de Productos</h2>
                         <div style="display: flex; gap: 12px; align-items: center; flex-wrap: wrap;">
                             <div class="search-box">
                                 <div style="position: relative; display: flex; align-items: center;">
@@ -183,11 +182,16 @@
                                         class="form-input" style="width: 240px; padding-left: 38px;">
                                 </div>
                             </div>
-                            <select id="category-filter" class="form-input" style="width: 220px;">
+                            <select id="category-filter" class="form-input" style="width: 200px;">
                                 <option value="">Todas las categorías</option>
                                 <!-- Dynamic categories -->
                             </select>
-                            <select id="archive-filter" class="form-input" style="width: 180px;">
+                            <select id="type-filter" class="form-input" style="width: 160px;">
+                                <option value="all">Todos los tipos</option>
+                                <option value="single">Diseños individuales</option>
+                                <option value="pack">Packs / Combos</option>
+                            </select>
+                            <select id="archive-filter" class="form-input" style="width: 150px;">
                                 <option value="active">Activos</option>
                                 <option value="archived">Archivados</option>
                                 <option value="all">Todos</option>

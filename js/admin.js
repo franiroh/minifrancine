@@ -243,11 +243,13 @@ async function loadProducts() {
     const categories = await fetchCategories();
     const tbody = document.querySelector('#products-table tbody');
     const categoryFilter = document.getElementById('category-filter');
+    const typeFilter = document.getElementById('type-filter');
     const archiveFilter = document.getElementById('archive-filter');
     const searchInput = document.getElementById('product-search');
 
     const getFilters = () => ({
         categoryId: categoryFilter?.value || '',
+        typeStatus: typeFilter?.value || 'all',
         archiveStatus: archiveFilter?.value || 'active',
         searchTerm: searchInput?.value.trim().toLowerCase() || ''
     });
@@ -267,8 +269,17 @@ async function loadProducts() {
         // Add filter event listener
         categoryFilter.onchange = () => {
             currentProductPage = 1;
-            const { categoryId, archiveStatus, searchTerm } = getFilters();
-            renderProductsTable(products, categoryId, archiveStatus, searchTerm);
+            const { categoryId, typeStatus, archiveStatus, searchTerm } = getFilters();
+            renderProductsTable(products, categoryId, typeStatus, archiveStatus, searchTerm);
+        };
+    }
+
+    // Add type filter event listener
+    if (typeFilter) {
+        typeFilter.onchange = () => {
+            currentProductPage = 1;
+            const { categoryId, typeStatus, archiveStatus, searchTerm } = getFilters();
+            renderProductsTable(products, categoryId, typeStatus, archiveStatus, searchTerm);
         };
     }
 
@@ -285,25 +296,25 @@ async function loadProducts() {
         // Add filter event listener
         archiveFilter.onchange = () => {
             currentProductPage = 1;
-            const { categoryId, archiveStatus, searchTerm } = getFilters();
-            renderProductsTable(products, categoryId, archiveStatus, searchTerm);
+            const { categoryId, typeStatus, archiveStatus, searchTerm } = getFilters();
+            renderProductsTable(products, categoryId, typeStatus, archiveStatus, searchTerm);
         };
     }
 
     if (searchInput) {
         searchInput.oninput = () => {
             currentProductPage = 1;
-            const { categoryId, archiveStatus, searchTerm } = getFilters();
-            renderProductsTable(products, categoryId, archiveStatus, searchTerm);
+            const { categoryId, typeStatus, archiveStatus, searchTerm } = getFilters();
+            renderProductsTable(products, categoryId, typeStatus, archiveStatus, searchTerm);
         };
     }
 
     // Initial render
-    const { categoryId, archiveStatus, searchTerm } = getFilters();
-    renderProductsTable(products, categoryId, archiveStatus, searchTerm);
+    const { categoryId, typeStatus, archiveStatus, searchTerm } = getFilters();
+    renderProductsTable(products, categoryId, typeStatus, archiveStatus, searchTerm);
 }
 
-function renderProductsTable(allProducts, selectedCategoryId, archiveStatus = 'active', searchTerm = '') {
+function renderProductsTable(allProducts, selectedCategoryId, typeStatus = 'all', archiveStatus = 'active', searchTerm = '') {
     const tbody = document.querySelector('#products-table tbody');
     const pageInfo = document.getElementById('products-page-info');
     const btnPrev = document.getElementById('btn-prev-page');
@@ -327,6 +338,13 @@ function renderProductsTable(allProducts, selectedCategoryId, archiveStatus = 'a
         filteredProducts = filteredProducts.filter(p =>
             p.title.toLowerCase().includes(searchTerm)
         );
+    }
+
+    // Filter by type status (Pack vs Single)
+    if (typeStatus === 'pack') {
+        filteredProducts = filteredProducts.filter(p => p.isBundle === true);
+    } else if (typeStatus === 'single') {
+        filteredProducts = filteredProducts.filter(p => p.isBundle !== true);
     }
 
     // Pagination Calculation
@@ -382,7 +400,7 @@ function renderProductsTable(allProducts, selectedCategoryId, archiveStatus = 'a
         btnPrev.onclick = () => {
             if (currentProductPage > 1) {
                 currentProductPage--;
-                renderProductsTable(allProducts, selectedCategoryId, archiveStatus, searchTerm);
+                renderProductsTable(allProducts, selectedCategoryId, typeStatus, archiveStatus, searchTerm);
             }
         };
     }
@@ -390,7 +408,7 @@ function renderProductsTable(allProducts, selectedCategoryId, archiveStatus = 'a
         btnNext.onclick = () => {
             if (currentProductPage < totalPages) {
                 currentProductPage++;
-                renderProductsTable(allProducts, selectedCategoryId, archiveStatus, searchTerm);
+                renderProductsTable(allProducts, selectedCategoryId, typeStatus, archiveStatus, searchTerm);
             }
         };
     }
@@ -398,7 +416,7 @@ function renderProductsTable(allProducts, selectedCategoryId, archiveStatus = 'a
     // Expose jump function to window for onclick handlers
     window.changeProductPage = (page) => {
         currentProductPage = page;
-        renderProductsTable(allProducts, selectedCategoryId, archiveStatus, searchTerm);
+        renderProductsTable(allProducts, selectedCategoryId, typeStatus, archiveStatus, searchTerm);
     };
 
     if (paginatedProducts.length === 0) {
@@ -419,6 +437,7 @@ function renderProductsTable(allProducts, selectedCategoryId, archiveStatus = 'a
             </td>
             <td>
                 <strong>${escapeHtml(p.title)}</strong>
+                ${p.isBundle ? '<br><span style="font-size: 11px; color: var(--primary-color);">📦 Pack</span>' : ''}
                 ${p.archived ? '<br><span style="font-size: 11px; color: #9CA3AF;">📦 Archivado</span>' : ''}
             </td>
             <td>${p.categories && p.categories.length > 0 ? escapeHtml(p.categories.join(', ')) : 'Sin categoría'}</td>
@@ -441,9 +460,9 @@ function renderProductsTable(allProducts, selectedCategoryId, archiveStatus = 'a
             <td class="actions-cell">
                 <div class="actions-wrapper">
                     <button class="btn-icon" onclick="window.location.href='admin-product.html?id=${parseInt(p.id)}'" title="Editar"><i data-lucide="edit-3"></i></button>
-                    <button class="btn-icon" onclick="downloadPDFHandler(${parseInt(p.id)}, this)" title="Exportar PDF"><i data-lucide="file-text"></i></button>
-                    <button class="btn-icon" onclick="downloadBundleHandler(${parseInt(p.id)}, this)" title="Descargar Bundle (ZIP)"><i data-lucide="package"></i></button>
-                    <button class="btn-icon ${p.bundledZipUrl ? 'text-green' : 'text-gray'}" onclick="updateStoredBundleHandler(${parseInt(p.id)}, this)" title="${p.bundledZipUrl ? 'Actualizar ZIP Almacenado' : 'Generar ZIP Almacenado'}"><i data-lucide="refresh-cw"></i></button>
+                    <button class="btn-icon ${p.isBundle ? 'hidden' : ''}" onclick="downloadPDFHandler(${parseInt(p.id)}, this)" title="Exportar PDF"><i data-lucide="file-text"></i></button>
+                    <button class="btn-icon ${p.isBundle ? 'hidden' : ''}" onclick="downloadBundleHandler(${parseInt(p.id)}, this)" title="Descargar Bundle (ZIP)"><i data-lucide="package"></i></button>
+                    <button class="btn-icon ${p.isBundle ? 'hidden' : p.bundledZipUrl ? 'text-green' : 'text-gray'}" onclick="updateStoredBundleHandler(${parseInt(p.id)}, this)" title="${p.bundledZipUrl ? 'Actualizar ZIP Almacenado' : 'Generar ZIP Almacenado'}"><i data-lucide="refresh-cw"></i></button>
                     ${p.archived
             ? `<button class="btn-icon" onclick="unarchiveProductHandler(${parseInt(p.id)})" title="Desarchivar"><i data-lucide="archive-restore"></i></button>`
             : `<button class="btn-icon" onclick="archiveProductHandler(${parseInt(p.id)})" title="Archivar"><i data-lucide="archive"></i></button>`

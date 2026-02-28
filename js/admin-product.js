@@ -87,6 +87,36 @@ async function init() {
     if (datalist) datalist.innerHTML = optionsHtml;
     if (bundleDatalist) bundleDatalist.innerHTML = optionsHtml;
 
+    // Bundle toggle label sync
+    const bundleCheckbox = document.getElementById('prod-is-bundle');
+    const bundleLabel = document.getElementById('prod-is-bundle-label');
+    const bundleCard = document.getElementById('bundle-items-card');
+    const specsCard = document.getElementById('specs-card');
+    const colorsCard = document.getElementById('colors-card');
+    const filesCard = document.getElementById('files-card');
+    const btnPdf = document.getElementById('btn-export-pdf');
+
+    const updatePackVisibility = () => {
+        if (!bundleCheckbox) return;
+        const isBundle = bundleCheckbox.checked;
+        if (bundleLabel) {
+            bundleLabel.textContent = isBundle ? 'Es un Pack' : 'No es pack';
+            bundleLabel.style.color = isBundle ? '#22C55E' : '#9CA3AF';
+        }
+        if (bundleCard) bundleCard.classList.toggle('hidden', !isBundle);
+
+        if (specsCard) specsCard.classList.toggle('hidden', isBundle);
+        if (colorsCard) colorsCard.classList.toggle('hidden', isBundle);
+        if (filesCard) filesCard.classList.toggle('hidden', isBundle);
+        if (btnPdf) btnPdf.classList.toggle('hidden', isBundle);
+    };
+
+    if (bundleCheckbox) {
+        bundleCheckbox.addEventListener('change', updatePackVisibility);
+    }
+    // Keep it as a window function so loadProductData can call it
+    window.updatePackVisibility = updatePackVisibility;
+
     if (productId) {
         document.getElementById('page-title').textContent = 'Editar Producto';
         document.getElementById('prod-id').value = productId;
@@ -106,43 +136,22 @@ async function init() {
     // Published toggle label sync
     const pubCheckbox = document.getElementById('prod-published');
     const pubLabel = document.getElementById('prod-published-label');
-    pubCheckbox.addEventListener('change', () => {
-        pubLabel.textContent = pubCheckbox.checked ? 'Publicado' : 'No publicado';
-        pubLabel.style.color = pubCheckbox.checked ? '#22C55E' : '#9CA3AF';
-    });
+    if (pubCheckbox && pubLabel) {
+        pubCheckbox.addEventListener('change', () => {
+            pubLabel.textContent = pubCheckbox.checked ? 'Publicado' : 'No publicado';
+            pubLabel.style.color = pubCheckbox.checked ? '#22C55E' : '#9CA3AF';
+        });
+    }
 
     // Indexed toggle label sync
     const indexCheckbox = document.getElementById('prod-indexed');
     const indexLabel = document.getElementById('prod-indexed-label');
-    indexCheckbox.addEventListener('change', () => {
-        indexLabel.textContent = indexCheckbox.checked ? 'Indexar' : 'No indexar';
-        indexLabel.style.color = indexCheckbox.checked ? '#22C55E' : '#9CA3AF';
-    });
-
-    // Bundle toggle label sync
-    const bundleCheckbox = document.getElementById('prod-is-bundle');
-    const bundleLabel = document.getElementById('prod-is-bundle-label');
-    const bundleCard = document.getElementById('bundle-items-card');
-    const specsCard = document.getElementById('specs-card');
-    const colorsCard = document.getElementById('colors-card');
-    const filesCard = document.getElementById('files-card');
-    const btnPdf = document.getElementById('btn-export-pdf');
-
-    const updatePackVisibility = () => {
-        const isBundle = bundleCheckbox.checked;
-        bundleLabel.textContent = isBundle ? 'Es un Pack' : 'No es pack';
-        bundleLabel.style.color = isBundle ? '#22C55E' : '#9CA3AF';
-        bundleCard.classList.toggle('hidden', !isBundle);
-
-        if (specsCard) specsCard.classList.toggle('hidden', isBundle);
-        if (colorsCard) colorsCard.classList.toggle('hidden', isBundle);
-        if (filesCard) filesCard.classList.toggle('hidden', isBundle);
-        if (btnPdf) btnPdf.classList.toggle('hidden', isBundle);
-    };
-
-    bundleCheckbox.addEventListener('change', updatePackVisibility);
-    // Keep it as a window function so loadProductData can call it if needed, or just call it after load.
-    window.updatePackVisibility = updatePackVisibility;
+    if (indexCheckbox && indexLabel) {
+        indexCheckbox.addEventListener('change', () => {
+            indexLabel.textContent = indexCheckbox.checked ? 'Indexar' : 'No indexar';
+            indexLabel.style.color = indexCheckbox.checked ? '#22C55E' : '#9CA3AF';
+        });
+    }
 
     setupEventListeners();
     fadeOutPreloader();
