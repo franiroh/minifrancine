@@ -9,7 +9,8 @@ export const i18n = {
         console.log('Initializing i18n...', this.lang);
         await this.loadTranslations();
         document.documentElement.lang = this.lang;
-        this.updatePage();
+        await this.updatePage();
+        document.body.classList.remove('i18n-loading');
     },
 
     async loadTranslations() {
