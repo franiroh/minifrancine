@@ -1174,14 +1174,16 @@ export async function uploadProductImage(file) {
 }
 
 export async function saveProductImageRecord(productId, storagePath, publicUrl) {
-    const { error } = await supabase
+    const { data, error } = await supabase
         .from('product_images')
         .insert({
             product_id: productId,
             storage_path: storagePath,
             public_url: publicUrl
         })
-    return { error }
+        .select()
+        .single()
+    return { data, error }
 }
 
 export async function fetchProductImages(productId) {
@@ -1189,6 +1191,7 @@ export async function fetchProductImages(productId) {
         .from('product_images')
         .select('*')
         .eq('product_id', productId)
+        .order('display_order', { ascending: true, nullsFirst: false })
         .order('created_at', { ascending: true })
 
     if (error) {
@@ -1196,6 +1199,14 @@ export async function fetchProductImages(productId) {
         return []
     }
     return data
+}
+
+export async function updateProductImageOrder(imageId, order) {
+    const { error } = await supabase
+        .from('product_images')
+        .update({ display_order: order })
+        .eq('id', imageId)
+    return { error }
 }
 
 export async function deleteProductImage(imageId) {

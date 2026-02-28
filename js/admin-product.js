@@ -14,6 +14,7 @@ import {
     deleteProductFile,
     fetchCategories,
     fetchProductsListAdmin,
+    updateProductImageOrder,
     supabase
 } from './api.js';
 import { escapeHtml } from './utils.js';
@@ -22,6 +23,7 @@ const urlParams = new URLSearchParams(window.location.search);
 const productId = urlParams.get('id');
 
 let currentProduct = null;
+let currentImages = [];
 let currentFilesRecs = [];
 let pendingFiles = [];
 
@@ -242,27 +244,8 @@ async function loadProductData(id) {
     renderRelatedProducts();
 
     // Load Images
-    const images = await fetchProductImages(id);
-    const gallery = document.getElementById('image-gallery');
-    gallery.innerHTML = '';
-
-    // Check if we have main_image but no gallery images (legacy migration visual aid)
-    if (images.length === 0 && product.mainImage) {
-        // Show at least the main image if exists
-        gallery.innerHTML += createGalleryItemHTML('legacy-main', product.mainImage, false);
-    }
-
-    images.forEach(img => {
-        const item = document.createElement('div');
-        item.className = 'gallery-item';
-        item.innerHTML = `
-            <img src="${escapeHtml(img.public_url)}" loading="lazy">
-            <div class="remove-btn" onclick="removeImage('${escapeHtml(img.id)}')">
-                <i data-lucide="x" style="width: 16px; height: 16px;"></i>
-            </div>
-        `;
-        gallery.appendChild(item);
-    });
+    currentImages = await fetchProductImages(id);
+    renderGallery();
 
     if (window.lucide) window.lucide.createIcons();
 
@@ -272,17 +255,60 @@ async function loadProductData(id) {
     renderFilesList();
 }
 
-function createGalleryItemHTML(id, url, canDelete) {
+function renderGallery() {
+    const gallery = document.getElementById('image-gallery');
+    if (!gallery) return;
+    gallery.innerHTML = '';
+
+    // Legacy fallback
+    if (currentImages.length === 0 && currentProduct && currentProduct.mainImage) {
+        gallery.innerHTML = createGalleryItemHTML('legacy-main', currentProduct.mainImage, -1);
+    }
+
+    currentImages.forEach((img, index) => {
+        gallery.innerHTML += createGalleryItemHTML(img.id, img.public_url, index);
+    });
+
+    if (window.lucide) window.lucide.createIcons();
+}
+
+function createGalleryItemHTML(id, url, index) {
+    const isFirst = index === 0;
+    const isLast = index === currentImages.length - 1;
+    const isLegacy = id === 'legacy-main';
+
     return `
         <div class="gallery-item">
             <img src="${escapeHtml(url)}" loading="lazy">
-            ${canDelete ? `
+            <div class="gallery-item__controls">
+                ${!isLegacy && !isFirst ? `
+                <button type="button" class="reorder-btn" onclick="moveImage(${index}, -1)" title="Mover izquierda">
+                    <i data-lucide="chevron-left" style="width:14px;"></i>
+                </button>` : '<span></span>'}
+                
+                ${!isLegacy && !isLast ? `
+                <button type="button" class="reorder-btn" onclick="moveImage(${index}, 1)" title="Mover derecha">
+                    <i data-lucide="chevron-right" style="width:14px;"></i>
+                </button>` : '<span></span>'}
+            </div>
+            ${!isLegacy ? `
             <div class="remove-btn" onclick="removeImage('${escapeHtml(id)}')">
                 <i data-lucide="x" style="width: 16px; height: 16px;"></i>
             </div>` : ''}
         </div>
     `;
 }
+
+window.moveImage = (index, direction) => {
+    const newIndex = index + direction;
+    if (newIndex < 0 || newIndex >= currentImages.length) return;
+
+    const temp = currentImages[index];
+    currentImages[index] = currentImages[newIndex];
+    currentImages[newIndex] = temp;
+
+    renderGallery();
+};
 
 function setupEventListeners() {
     // Save Button
@@ -391,7 +417,6 @@ function setupEventListeners() {
     }
 }
 
-let pendingImages = [];
 let pendingFile = null;
 
 // Allowed types and limits for security
@@ -415,26 +440,21 @@ function handleImageSelect(e) {
             alert(`Archivo demasiado grande: ${file.name} (${(file.size / 1024 / 1024).toFixed(1)}MB). Máximo: 5MB.`);
             return;
         }
-        pendingImages.push(file);
 
-        // Preview
+        // Preview and add to currentImages
         const reader = new FileReader();
         reader.onload = (loadEvent) => {
-            const gallery = document.getElementById('image-gallery');
-            const item = document.createElement('div');
-            item.className = 'gallery-item';
-            item.style.opacity = '0.7'; // Indicate pending
-            item.innerHTML = `
-                <img src="${loadEvent.target.result}">
-                <div class="remove-btn" title="Pending Save">
-                    <i data-lucide="clock" style="width: 16px; height: 16px;"></i>
-                </div>
-            `;
-            gallery.appendChild(item);
-            if (window.lucide) window.lucide.createIcons();
+            currentImages.push({
+                file: file,
+                public_url: loadEvent.target.result,
+                isPending: true,
+                id: 'pending-' + Date.now() + '-' + Math.random()
+            });
+            renderGallery();
         };
         reader.readAsDataURL(file);
     });
+    e.target.value = ''; // Reset
 }
 
 function handleFileSelect(e) {
@@ -510,11 +530,21 @@ window.removePendingFile = (index) => {
 };
 
 window.removeImage = async (id) => {
-    if (id === 'legacy-main') return; // Can't delete the fallback easily from here without refreshing logic
+    if (id === 'legacy-main') return;
+
+    const imgObj = currentImages.find(img => img.id === id);
+    if (!imgObj) return;
+
+    if (imgObj.isPending) {
+        currentImages = currentImages.filter(img => img.id !== id);
+        renderGallery();
+        return;
+    }
+
     if (confirm('¿Eliminar imagen?')) {
         await deleteProductImage(id);
-        // Refresh
-        await loadProductData(productId);
+        currentImages = currentImages.filter(img => img.id !== id);
+        renderGallery();
     }
 };
 
@@ -663,24 +693,32 @@ async function handleSave(e) {
             savedProductId = newProd.id;
         }
 
-        // 2. Upload Pending Images
-        if (pendingImages.length > 0) {
-            let firstImageUrl = null;
-            for (const file of pendingImages) {
-                const res = await uploadProductImage(file);
-                if (res) {
-                    const { error: imgErr } = await saveProductImageRecord(savedProductId, res.storagePath, res.publicUrl);
-                    if (imgErr) throw imgErr;
-                    if (!firstImageUrl) firstImageUrl = res.publicUrl;
+        // 2. Handle Images (New Uploads + Ordering)
+        if (currentImages.length > 0) {
+            for (let i = 0; i < currentImages.length; i++) {
+                const img = currentImages[i];
+                if (img.isPending) {
+                    const res = await uploadProductImage(img.file);
+                    if (res) {
+                        const { data: newImg, error: imgErr } = await saveProductImageRecord(savedProductId, res.storagePath, res.publicUrl);
+                        if (imgErr) throw imgErr;
+                        img.id = newImg?.id || img.id; // Update with real ID if available
+                        img.public_url = res.publicUrl;
+                        img.isPending = false;
+                    }
+                }
+                // Update order in DB
+                if (!img.isPending && img.id !== 'legacy-main') {
+                    await updateProductImageOrder(img.id, i);
                 }
             }
 
-            // Always update main_image to the first uploaded image
-            if (firstImageUrl) {
-                const { error: mainImgErr } = await updateProduct(savedProductId, { main_image: firstImageUrl });
+            // Update main_image to the first one in the list
+            const firstImg = currentImages.find(img => img.id !== 'legacy-main');
+            if (firstImg) {
+                const { error: mainImgErr } = await updateProduct(savedProductId, { main_image: firstImg.public_url });
                 if (mainImgErr) throw mainImgErr;
             }
-
         }
 
         // 3. Upload Pending Files
@@ -704,7 +742,6 @@ async function handleSave(e) {
         }
 
         // --- FIX: Clear pending buffers so subsequent saves don't re-upload/duplicate ---
-        pendingImages = [];
         pendingFiles = [];
         // -------------------------------------------------------------------------------
 

@@ -1,5 +1,5 @@
 import { loadComponents, updateNavbarAuth, updateNavbarCartCount } from './components.js';
-import { fetchProducts, getUser, onAuthStateChange } from './api.js';
+import { fetchProducts, fetchCategories, getUser, onAuthStateChange } from './api.js';
 import { getCartCount, loadCart } from './state.js';
 import { escapeHtml, sanitizeCssValue, renderBreadcrumbs } from './utils.js';
 import i18n from './i18n.js';
@@ -20,7 +20,10 @@ async function init() {
     });
 
     // Load Data
-    const products = await fetchProducts({ publishedOnly: true });
+    const [products, categoriesData] = await Promise.all([
+        fetchProducts({ publishedOnly: true }),
+        fetchCategories()
+    ]);
 
     // Render Breadcrumbs
     const breadcrumbs = document.getElementById('breadcrumbs-placeholder');
@@ -31,34 +34,43 @@ async function init() {
         ]);
     }
 
-    renderCategories(products);
+    renderCategories(products, categoriesData);
 }
 
-function renderCategories(products) {
+function renderCategories(products, categoriesData) {
     const grid = document.getElementById('categories-grid');
     if (!grid) return;
 
-    // Group products by category
-    const categories = {};
+    // Map categories from DB as primary source
+    const categoriesMap = {};
+    categoriesData.forEach(cat => {
+        categoriesMap[cat.name] = {
+            name: cat.name,
+            id: cat.id,
+            count: 0,
+            image: cat.image_url || null,
+            bg: cat.image_color || null
+        };
+    });
 
+    // Group products count by category
     products.forEach(p => {
-        if (!categories[p.category]) {
-            categories[p.category] = {
-                name: p.category,
-                id: p.categoryId, // Capture ID for translation
-                count: 0,
-                image: null,
-                bg: p.imageColor
-            };
-        }
-        categories[p.category].count++;
-        // Try to find a real image if available
-        if (!categories[p.category].image && p.mainImage) {
-            categories[p.category].image = p.mainImage;
+        // If product has a category that exists in our map
+        if (p.category && categoriesMap[p.category]) {
+            categoriesMap[p.category].count++;
+
+            // If category doesn't have an image from DB, use the first product's image as fallback
+            if (!categoriesMap[p.category].image && p.mainImage) {
+                categoriesMap[p.category].image = p.mainImage;
+            }
+            // Same for background color
+            if (!categoriesMap[p.category].bg && p.imageColor) {
+                categoriesMap[p.category].bg = p.imageColor;
+            }
         }
     });
 
-    const sortedCategories = Object.values(categories).sort((a, b) => b.count - a.count);
+    const sortedCategories = Object.values(categoriesMap).sort((a, b) => b.count - a.count);
 
     if (sortedCategories.length === 0) {
         grid.innerHTML = `<p>${i18n.t('common.no_categories') || 'No hay categorías disponibles.'}</p>`;
