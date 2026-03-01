@@ -94,7 +94,10 @@
 
 .detail__thumbs {
     display: flex;
+    flex-wrap: wrap;
     gap: 12px;
+    max-width: 356px;
+    /* (80px * 4) + (12px * 3) = 356px */
 }
 
 .detail__thumb {
