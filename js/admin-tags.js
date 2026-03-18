@@ -14,7 +14,7 @@ async function loadTagsConfig() {
     try {
         const { data: config, error } = await supabase
             .from('site_config')
-            .select('gtm_id, google_ads_id, google_ads_conversion_id')
+            .select('gtm_id, google_ads_id, google_ads_conversion_id, google_analytics_id')
             .limit(1)
             .single();
 
@@ -25,6 +25,7 @@ async function loadTagsConfig() {
 
         if (config) {
             if (document.getElementById('tag-gtm-id')) document.getElementById('tag-gtm-id').value = config.gtm_id || '';
+            if (document.getElementById('tag-google-analytics-id')) document.getElementById('tag-google-analytics-id').value = config.google_analytics_id || '';
             if (document.getElementById('tag-google-ads-id')) document.getElementById('tag-google-ads-id').value = config.google_ads_id || '';
             if (document.getElementById('tag-google-ads-conv-id')) document.getElementById('tag-google-ads-conv-id').value = config.google_ads_conversion_id || '';
         }
@@ -41,6 +42,7 @@ async function saveTagsConfig() {
 
     try {
         const gtmId = document.getElementById('tag-gtm-id').value.trim();
+        const analyticsId = document.getElementById('tag-google-analytics-id')?.value.trim() || '';
         const adsId = document.getElementById('tag-google-ads-id').value.trim();
         const convId = document.getElementById('tag-google-ads-conv-id').value.trim();
 
@@ -48,6 +50,7 @@ async function saveTagsConfig() {
 
         const payload = {
             gtm_id: gtmId,
+            google_analytics_id: analyticsId,
             google_ads_id: adsId,
             google_ads_conversion_id: convId,
             updated_at: new Date()

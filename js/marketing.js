@@ -4,7 +4,7 @@ async function initMarketingTags() {
     try {
         const { data: config, error } = await supabase
             .from('site_config')
-            .select('gtm_id, google_ads_id, google_ads_conversion_id')
+            .select('gtm_id, google_ads_id, google_ads_conversion_id, google_analytics_id')
             .limit(1)
             .single();
 
@@ -13,7 +13,7 @@ async function initMarketingTags() {
             return;
         }
 
-        const { gtm_id, google_ads_id, google_ads_conversion_id } = config;
+        const { gtm_id, google_ads_id, google_ads_conversion_id, google_analytics_id } = config;
 
         // 1. Google Tag Manager (Script)
         if (gtm_id) {
@@ -27,26 +27,35 @@ async function initMarketingTags() {
             })(window, document, 'script', 'dataLayer', gtm_id);
         }
 
-        // 2. Google Ads (gtag.js)
-        if (google_ads_id) {
+        const gtagIdToLoad = google_analytics_id || google_ads_id;
+
+        // 2 & 3. Google Analytics and Google Ads (gtag.js)
+        if (gtagIdToLoad) {
             const script = document.createElement('script');
             script.async = true;
-            script.src = `https://www.googletagmanager.com/gtag/js?id=${google_ads_id}`;
+            script.src = `https://www.googletagmanager.com/gtag/js?id=${gtagIdToLoad}`;
             document.head.appendChild(script);
 
             window.dataLayer = window.dataLayer || [];
             function gtag() { window.dataLayer.push(arguments); }
             gtag('js', new Date());
-            gtag('config', google_ads_id);
 
-            // 3. Conversion Event (only on thank-you page)
-            if (window.location.pathname.includes('thank-you.html') && google_ads_conversion_id) {
-                gtag('event', 'conversion', {
-                    'send_to': `${google_ads_id}/${google_ads_conversion_id}`,
-                    'value': 1.0,
-                    'currency': 'ARS',
-                    'transaction_id': ''
-                });
+            if (google_analytics_id) {
+                gtag('config', google_analytics_id);
+            }
+
+            if (google_ads_id) {
+                gtag('config', google_ads_id);
+
+                // 4. Conversion Event (only on thank-you page)
+                if (window.location.pathname.includes('thank-you.html') && google_ads_conversion_id) {
+                    gtag('event', 'conversion', {
+                        'send_to': `${google_ads_id}/${google_ads_conversion_id}`,
+                        'value': 1.0,
+                        'currency': 'ARS',
+                        'transaction_id': ''
+                    });
+                }
             }
         }
     } catch (err) {
